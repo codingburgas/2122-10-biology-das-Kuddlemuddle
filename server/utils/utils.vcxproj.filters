@@ -18,9 +18,21 @@
     <ClCompile Include="src\env.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\validations.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\response.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\env.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\validations.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\response.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

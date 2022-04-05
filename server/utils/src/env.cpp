@@ -15,7 +15,7 @@ std::string EnvManager::getEnv(const char* var)
 
 	if (val == "")
 	{
-		//Should log
+		//TODO: Should log
 		//throw ErrorHandler("env.cpp", "getEnv()", "Environment variable not found!");
 	}
 	else

@@ -123,13 +123,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>D:\lib\boost_1_77_0;$(ProjectDir)include;$(SolutionDir)logs\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\lib\boost_1_77_0;$(ProjectDir)include;$(SolutionDir)logs\include;$(SolutionDir)routes\include;$(SolutionDir)utils\include;$(SolutionDir)DB\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(ProjectDir)lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>logs.lib;fmt.lib;graylog_logger_static.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>logs.lib;fmt.lib;graylog_logger_static.lib;routes.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -140,7 +140,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>D:\lib\boost_1_77_0;$(ProjectDir)include;$(SolutionDir)logs\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\lib\boost_1_77_0;$(ProjectDir)include;$(SolutionDir)logs\include;$(SolutionDir)routes\include;$(SolutionDir)utils\include;$(SolutionDir)DB\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -148,7 +148,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(ProjectDir)lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>logs.lib;fmt.lib;graylog_logger_static.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>logs.lib;fmt.lib;graylog_logger_static.lib;routes.lib;DB.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

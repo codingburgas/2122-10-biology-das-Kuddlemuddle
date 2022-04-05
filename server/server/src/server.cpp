@@ -1,21 +1,25 @@
+#include <api.h>
 #include <crow.h>
 #include <loggerHandler.h>
+#include <crow/middlewares/cors.h>
+
 /**
  * @brief The entry point for our http server.
 */
 int main()
 {
-    crow::SimpleApp app;
+    // Initialise crow app
+    // and apply the default CORS handler
+    crow::App<crow::CORSHandler> app;
 
     // Change the default handler to a new one
     // with output to a file and a SEQ
     LoggerHandler loggerHandler;
-
     loggerHandler.initLogs();
 
-    CROW_ROUTE(app, "/")([]() {
-        return "Hello world";
-        });
+    // Use blueprints for modularity
+    crow::Blueprint api = initApi();
+    app.register_blueprint(api);
 
     // We should run app in singlethreaded mode
     // so that the request are handled in FIFO order
