@@ -2,11 +2,14 @@
 #include <crow.h>
 #include <nlohmann/json.hpp>
 #include <time.h>
+#include <jwt-cpp/jwt.h>
+#include <env.h>
 
 class DBManager
 {
 public:
 	std::vector<std::string> registerUser(crow::query_string data);
+	std::vector<std::string> loginUser(crow::query_string data);
 private:
 	nlohmann::json getJSONFromFile(std::string filename);
 	bool setJSONFile(nlohmann::json json, std::string filename);

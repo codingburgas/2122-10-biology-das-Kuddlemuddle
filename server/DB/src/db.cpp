@@ -13,7 +13,6 @@ std::vector<std::string> DBManager::registerUser(crow::query_string data)
 	}
 	catch (std::string ex)
 	{
-		//CROW_LOG_CRITICAL << "Could'n open user.json file";
 		recordSet.push_back("Could'n open user.json file");
 		return recordSet;
 	}
@@ -21,14 +20,14 @@ std::vector<std::string> DBManager::registerUser(crow::query_string data)
 	// Check for duplicate email
 	if (getUserByField(userJSON, "Email", data.get("email")))
 	{
-		recordSet.push_back("There is already a user with this email");
+		recordSet.push_back("There is already a user with this email: " + std::string(data.get("email")));
 		return recordSet;
 	}
 
 	// Check for duplicate username
 	if (getUserByField(userJSON, "Username", data.get("username")))
 	{
-		recordSet.push_back("There is already a user with this username");
+		recordSet.push_back("There is already a user with this username: " + std::string(data.get("username")));
 		return recordSet;
 	}
 
@@ -53,6 +52,76 @@ std::vector<std::string> DBManager::registerUser(crow::query_string data)
 	if (!setJSONFile(userJSON, "users.json"))
 	{
 		recordSet.push_back("Could'n open user.json file");
+		return recordSet;
+	}
+
+	return recordSet;
+}
+
+std::vector<std::string> DBManager::loginUser(crow::query_string data)
+{
+	EnvManager envManager;
+	std::vector<std::string> recordSet;
+	nlohmann::json userJSON;
+
+	// Get the JSON from the file
+	try
+	{
+		userJSON = getJSONFromFile("users.json");
+	}
+	catch (std::string ex)
+	{
+		recordSet.push_back("Could'n open user.json file");
+		return recordSet;
+	}
+
+	// Check if user is trying to log in with email or username
+	if (std::string(data.get("loginCredential")).find("@") != std::string::npos)
+	{
+		for (auto it = userJSON.begin(); it != userJSON.end(); ++it)
+		{
+			// Authtenticate user
+			if (it.value()["Email"] == data.get("loginCredential") && it.value()["Password"] == data.get("password"))
+			{
+				// Authorise user
+				auto token = jwt::create()
+					.set_type("JWS")
+					.set_subject(std::to_string(int(it.value()["ID"])))
+					.set_issued_at(std::chrono::system_clock::now())
+					.set_expires_at(std::chrono::system_clock::now() + std::chrono::hours(24))
+					.sign(jwt::algorithm::hs256(envManager.getEnv("JWT_SECRET")));
+
+				recordSet.push_back("Bearer " + token);
+				return recordSet;
+			}
+		}
+
+		// Login failure
+		recordSet.push_back("There is not a user with this email: " + std::string(data.get("loginCredential")));
+		return recordSet;
+	}
+	else
+	{
+		for (auto it = userJSON.begin(); it != userJSON.end(); ++it)
+		{
+			// Authtenticate user
+			if (it.value()["Username"] == data.get("loginCredential") && it.value()["Password"] == data.get("password"))
+			{
+				// Authorise user
+				auto token = jwt::create()
+					.set_type("JWS")
+					.set_subject(std::to_string(int(it.value()["ID"])))
+					.set_issued_at(std::chrono::system_clock::now())
+					.set_expires_at(std::chrono::system_clock::now() + std::chrono::hours(24))
+					.sign(jwt::algorithm::hs256(envManager.getEnv("JWT_SECRET")));
+
+				recordSet.push_back("Bearer " + token);
+				return recordSet;
+			}
+		}
+
+		// Login failure
+		recordSet.push_back("There is not a user with this username: " + std::string(data.get("loginCredential")));
 		return recordSet;
 	}
 
