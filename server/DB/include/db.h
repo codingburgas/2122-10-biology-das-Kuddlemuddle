@@ -1,15 +1,17 @@
 #pragma once
+#include <env.h>
 #include <crow.h>
-#include <nlohmann/json.hpp>
+#include <misc.h>
 #include <time.h>
 #include <jwt-cpp/jwt.h>
-#include <env.h>
+#include <nlohmann/json.hpp>
 
 class DBManager
 {
 public:
 	std::vector<std::string> registerUser(crow::query_string data);
 	std::vector<std::string> loginUser(crow::query_string data);
+	std::vector<std::string> getUserInfo(std::string username, int userId = NULL);
 private:
 	nlohmann::json getJSONFromFile(std::string filename);
 	bool setJSONFile(nlohmann::json json, std::string filename);

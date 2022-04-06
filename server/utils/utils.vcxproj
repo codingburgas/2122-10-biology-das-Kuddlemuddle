@@ -164,11 +164,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\env.cpp" />
+    <ClCompile Include="src\misc.cpp" />
     <ClCompile Include="src\response.cpp" />
     <ClCompile Include="src\validations.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\env.h" />
+    <ClInclude Include="include\misc.h" />
     <ClInclude Include="include\response.h" />
     <ClInclude Include="include\validations.h" />
   </ItemGroup>

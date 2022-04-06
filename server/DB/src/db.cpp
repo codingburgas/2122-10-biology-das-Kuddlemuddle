@@ -39,11 +39,9 @@ std::vector<std::string> DBManager::registerUser(crow::query_string data)
 		{ "LastName", data.get("lastName") },
 		{ "Username", data.get("username") },
 		{ "Email", data.get("email") },
-		{ "Token", NULL },
-		{ "TokenExpireData", NULL},
 		{ "Password", data.get("password") },
-		{ "RoleID", 0 },
 		// TODO: Add salt
+		{ "RoleID", 0 },
 		{ "AvatarURL", std::string("https://avatars.dicebear.com/api/identicon/" + std::to_string(time(0)) + ".svg") }
 		}
 	);
@@ -105,7 +103,7 @@ std::vector<std::string> DBManager::loginUser(crow::query_string data)
 		for (auto it = userJSON.begin(); it != userJSON.end(); ++it)
 		{
 			// Authtenticate user
-			if (it.value()["Username"] == data.get("loginCredential") && it.value()["Password"] == data.get("password"))
+			if (toLowerCase(it.value()["Username"]) == toLowerCase(data.get("loginCredential")) && it.value()["Password"] == data.get("password"))
 			{
 				// Authorise user
 				auto token = jwt::create()
@@ -125,6 +123,65 @@ std::vector<std::string> DBManager::loginUser(crow::query_string data)
 		return recordSet;
 	}
 
+	return recordSet;
+}
+
+std::vector<std::string> DBManager::getUserInfo(std::string username, int userId)
+{
+	std::vector<std::string> recordSet;
+	nlohmann::json userJSON;
+
+	// Get the JSON from the file
+	try
+	{
+		userJSON = getJSONFromFile("users.json");
+	}
+	catch (std::string ex)
+	{
+		recordSet.push_back("Could'n open user.json file");
+		return recordSet;
+	}
+
+	// Check if user is trying to access his account
+	if (username == "@me")
+	{
+		for (auto it = userJSON.begin(); it != userJSON.end(); ++it)
+		{
+			if (it.value()["ID"] == userId)
+			{
+				return {
+					it.value()["FirstName"],
+					it.value()["LastName"],
+					it.value()["Username"],
+					it.value()["Email"],
+					std::to_string(int(it.value()["RoleID"])),
+					it.value()["AvatarURL"]
+				};
+			}
+		}
+
+		// If the execution goes here, there should be smt very wrong
+		recordSet.push_back("Could not find user with id: " + std::to_string(userId));
+		return recordSet;
+	}
+
+	for (auto it = userJSON.begin(); it != userJSON.end(); ++it)
+	{
+		// Authtenticate user
+		if (toLowerCase(it.value()["Username"]) == toLowerCase(username))
+		{
+			return {
+				it.value()["FirstName"],
+				it.value()["LastName"],
+				it.value()["Username"],
+				it.value()["Email"],
+				it.value()["RoleID"],
+				it.value()["AvatarURL"]
+			};
+		}
+	}
+
+	recordSet.push_back("Could not find user with username: " + username);
 	return recordSet;
 }
 
@@ -175,7 +232,7 @@ int DBManager::getLastId(nlohmann::json json)
 	}
 	catch (nlohmann::json::invalid_iterator& ex)
 	{
-		return 0;
+		return 1;
 	}
 }
 
@@ -183,9 +240,19 @@ bool DBManager::getUserByField(nlohmann::json json, std::string field, std::stri
 {
 	for (auto it = json.begin(); it != json.end(); ++it)
 	{
-		if (it.value()[field] == fieldData)
+		if (field == "Username")
 		{
-			return true;
+			if (toLowerCase(it.value()[field]) == toLowerCase(fieldData))
+			{
+				return true;
+			}
+		}
+		else
+		{
+			if (it.value()[field] == fieldData)
+			{
+				return true;
+			}
 		}
 	}
 

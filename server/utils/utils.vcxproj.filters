@@ -24,6 +24,9 @@
     <ClCompile Include="src\response.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\misc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\env.h">
@@ -33,6 +36,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\response.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\misc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

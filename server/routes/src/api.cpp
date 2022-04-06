@@ -121,5 +121,77 @@ crow::Blueprint initApi()
 				return;
 			});
 
+	CROW_BP_ROUTE(api, "/users/<string>")
+		.methods(crow::HTTPMethod::Get)
+		([&](const crow::request& req, crow::response& res, std::string username)
+			{
+				EnvManager envManager;
+				std::cout << username;
+				int id;
+
+				if (username == "@me")
+				{
+					auto verifier = jwt::verify()
+						.allow_algorithm(jwt::algorithm::hs256(envManager.getEnv("JWT_SECRET")));
+
+					std::string myauth = req.get_header_value("Authorization");
+					
+					// If values is missing
+					if (myauth == "")
+					{
+						res = crow::response(401);
+						res.end();
+						return;
+					}
+
+					// Decode the token
+					std::string mycreds = myauth.substr(7);
+					auto decoded = jwt::decode(mycreds);
+
+					// Verify token
+					try
+					{
+						verifier.verify(decoded);
+					}
+					catch (...)
+					{
+						res = crow::response(403);
+						res.end();
+						return;
+					}
+
+					// Get id from JWT
+					for (auto& e : decoded.get_payload_claims())
+					{
+						if (e.first == "sub")
+						{
+							id = std::stoi(e.second.as_string());
+						}
+					}
+
+					std::vector<std::string> recordSet = dbManager.getUserInfo(username, id);
+
+					// Error happend
+					if (recordSet.size() == 1)
+					{
+						std::string log = "Failed to get user info with id: " + std::to_string(id) + ". Reason: ";
+
+						for (auto el : recordSet)
+						{
+							log += el + " ";
+						}
+
+						CROW_LOG_WARNING << log;
+					}
+
+					res = responseJSONManager.createProfileJSONResponse(recordSet);
+					res.end();
+					return;
+				}
+
+				res.end();
+				return;
+			});
+
 	return api;
 }
