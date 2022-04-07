@@ -1,7 +1,9 @@
 #pragma once
+#include <db.h>
 #include <crow.h>
-#include "../../utils/include/validations.h"
-#include "../../DB/include/db.h"
 #include <response.h>
+#include <validations.h>
+#include <crow/middlewares/cors.h>
+#include <authorisationMiddleware.h>
 
-crow::Blueprint initApi();
+crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware> &app);

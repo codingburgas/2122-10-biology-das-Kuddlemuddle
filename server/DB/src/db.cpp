@@ -82,11 +82,12 @@ std::vector<std::string> DBManager::loginUser(crow::query_string data)
 			if (it.value()["Email"] == data.get("loginCredential") && it.value()["Password"] == data.get("password"))
 			{
 				// Authorise user
-				auto token = jwt::create()
+				auto token = jwt::create<jwt::traits::nlohmann_json>()
 					.set_type("JWS")
 					.set_subject(std::to_string(int(it.value()["ID"])))
 					.set_issued_at(std::chrono::system_clock::now())
 					.set_expires_at(std::chrono::system_clock::now() + std::chrono::hours(24))
+					.set_payload_claim("isAdmin", int(it.value()["RoleID"]))
 					.sign(jwt::algorithm::hs256(envManager.getEnv("JWT_SECRET")));
 
 				recordSet.push_back("Bearer " + token);
@@ -106,11 +107,12 @@ std::vector<std::string> DBManager::loginUser(crow::query_string data)
 			if (toLowerCase(it.value()["Username"]) == toLowerCase(data.get("loginCredential")) && it.value()["Password"] == data.get("password"))
 			{
 				// Authorise user
-				auto token = jwt::create()
+				auto token = jwt::create<jwt::traits::nlohmann_json>()
 					.set_type("JWS")
 					.set_subject(std::to_string(int(it.value()["ID"])))
 					.set_issued_at(std::chrono::system_clock::now())
 					.set_expires_at(std::chrono::system_clock::now() + std::chrono::hours(24))
+					.set_payload_claim("isAdmin", int(it.value()["RoleID"]))
 					.sign(jwt::algorithm::hs256(envManager.getEnv("JWT_SECRET")));
 
 				recordSet.push_back("Bearer " + token);
@@ -161,7 +163,7 @@ std::vector<std::string> DBManager::getUserInfo(std::string username, int userId
 		}
 
 		// If the execution goes here, there should be smt very wrong
-		recordSet.push_back("Could not find user with id: " + std::to_string(userId));
+		recordSet.push_back("Could not find user with id: " + std::to_string(userId) + " or password is invalid.");
 		return recordSet;
 	}
 
@@ -171,17 +173,17 @@ std::vector<std::string> DBManager::getUserInfo(std::string username, int userId
 		if (toLowerCase(it.value()["Username"]) == toLowerCase(username))
 		{
 			return {
-				it.value()["FirstName"],
-				it.value()["LastName"],
-				it.value()["Username"],
-				it.value()["Email"],
-				it.value()["RoleID"],
-				it.value()["AvatarURL"]
+					it.value()["FirstName"],
+					it.value()["LastName"],
+					it.value()["Username"],
+					it.value()["Email"],
+					std::to_string(int(it.value()["RoleID"])),
+					it.value()["AvatarURL"]
 			};
 		}
 	}
 
-	recordSet.push_back("Could not find user with username: " + username);
+	recordSet.push_back("Could not find user with username: " + username + " or password is invalid.");
 	return recordSet;
 }
 
@@ -232,7 +234,7 @@ int DBManager::getLastId(nlohmann::json json)
 	}
 	catch (nlohmann::json::invalid_iterator& ex)
 	{
-		return 1;
+		return 0;
 	}
 }
 

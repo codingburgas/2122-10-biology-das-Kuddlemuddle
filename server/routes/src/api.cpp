@@ -1,6 +1,6 @@
 #include <api.h>
 
-crow::Blueprint initApi()
+crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware> &app)
 {
 	crow::Blueprint api("api");
 	ValidationManager validationManager;
@@ -126,12 +126,14 @@ crow::Blueprint initApi()
 		([&](const crow::request& req, crow::response& res, std::string username)
 			{
 				EnvManager envManager;
-				std::cout << username;
-				int id;
+				int id = 0;
+				
+				CROW_LOG_INFO << "Trying to get information for user: " << username;
 
 				if (username == "@me")
 				{
-					auto verifier = jwt::verify()
+
+					auto verifier = jwt::verify<jwt::traits::nlohmann_json>()
 						.allow_algorithm(jwt::algorithm::hs256(envManager.getEnv("JWT_SECRET")));
 
 					std::string myauth = req.get_header_value("Authorization");
@@ -146,12 +148,13 @@ crow::Blueprint initApi()
 
 					// Decode the token
 					std::string mycreds = myauth.substr(7);
-					auto decoded = jwt::decode(mycreds);
 
 					// Verify token
 					try
 					{
+						auto decoded = jwt::decode<jwt::traits::nlohmann_json>(mycreds);
 						verifier.verify(decoded);
+						id = std::stoi(decoded.get_payload_claim("sub").as_string());
 					}
 					catch (...)
 					{
@@ -159,32 +162,42 @@ crow::Blueprint initApi()
 						res.end();
 						return;
 					}
+				}
 
-					// Get id from JWT
-					for (auto& e : decoded.get_payload_claims())
+				std::vector<std::string> recordSet = dbManager.getUserInfo(username, id);
+				
+				// Error happend
+				if (recordSet.size() == 1)
+				{
+					std::string log = "Failed to get user info with username: " + username + ". Reason: ";
+				
+					for (auto el : recordSet)
 					{
-						if (e.first == "sub")
-						{
-							id = std::stoi(e.second.as_string());
-						}
+						log += el + " ";
 					}
+				
+					CROW_LOG_WARNING << log;
+				}
+				
+				res = responseJSONManager.createProfileJSONResponse(recordSet);
+				res.end();
+				return;
+			});
 
-					std::vector<std::string> recordSet = dbManager.getUserInfo(username, id);
+	CROW_BP_ROUTE(api, "/users/<string>")
+		.methods(crow::HTTPMethod::Delete)
+		.middlewares<crow::App<AuthorisationMiddleware>, AuthorisationMiddleware>()
+		//CROW_MIDDLEWARES(app, AuthorisationMiddleware)
+		([&](const crow::request& req, crow::response& res, std::string username)
+			{
+				auto& ctx = app.get_context<AuthorisationMiddleware>(req);
 
-					// Error happend
-					if (recordSet.size() == 1)
-					{
-						std::string log = "Failed to get user info with id: " + std::to_string(id) + ". Reason: ";
+				CROW_LOG_INFO << "Trying to delete user with username: " << username;
 
-						for (auto el : recordSet)
-						{
-							log += el + " ";
-						}
-
-						CROW_LOG_WARNING << log;
-					}
-
-					res = responseJSONManager.createProfileJSONResponse(recordSet);
+				if (username == "@me")
+				{
+					
+					//res = responseJSONManager.createProfileJSONResponse(recordSet);
 					res.end();
 					return;
 				}

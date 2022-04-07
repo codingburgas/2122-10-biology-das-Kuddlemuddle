@@ -5,6 +5,7 @@
 #include <time.h>
 #include <jwt-cpp/jwt.h>
 #include <nlohmann/json.hpp>
+#include <jwt-cpp/traits/nlohmann-json/traits.h>
 
 class DBManager
 {
