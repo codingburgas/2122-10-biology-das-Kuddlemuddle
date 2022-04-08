@@ -132,7 +132,6 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware> &a
 
 				if (username == "@me")
 				{
-
 					auto verifier = jwt::verify<jwt::traits::nlohmann_json>()
 						.allow_algorithm(jwt::algorithm::hs256(envManager.getEnv("JWT_SECRET")));
 
@@ -190,17 +189,38 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware> &a
 		//CROW_MIDDLEWARES(app, AuthorisationMiddleware)
 		([&](const crow::request& req, crow::response& res, std::string username)
 			{
-				auto& ctx = app.get_context<AuthorisationMiddleware>(req);
+				auto ctx = app.get_context<AuthorisationMiddleware>(req);
 
+				std::cout << ctx.userId;
 				CROW_LOG_INFO << "Trying to delete user with username: " << username;
+
+				std::vector<std::string> recordSet;
 
 				if (username == "@me")
 				{
+					recordSet = dbManager.deleteUser(username, ctx.userId);
 					
-					//res = responseJSONManager.createProfileJSONResponse(recordSet);
+					if (recordSet.size() != 0)
+					{
+						
+
+						res = responseJSONManager.createJSONResponse(false , recordSet, "used-deletion");
+						res.end();
+					}
+
+					res = responseJSONManager.createJSONResponse(true, recordSet, "used-deletion");
 					res.end();
 					return;
 				}
+
+				if (!ctx.isAdmin)
+				{
+					CROW_LOG_WARNING << "Failed to delete user. Reason: Requesting user isn't admin!";
+					res = crow::response(403);
+					res.end();
+				}
+
+
 
 				res.end();
 				return;

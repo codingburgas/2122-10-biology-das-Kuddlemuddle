@@ -187,6 +187,52 @@ std::vector<std::string> DBManager::getUserInfo(std::string username, int userId
 	return recordSet;
 }
 
+std::vector<std::string> DBManager::deleteUser(std::string username, int userId)
+{
+	std::vector<std::string> recordSet;
+	nlohmann::json userJSON;
+
+	// Get the JSON from the file
+	try
+	{
+		userJSON = getJSONFromFile("users.json");
+	}
+	catch (std::string ex)
+	{
+		recordSet.push_back("Could'n open user.json file");
+		return recordSet;
+	}
+
+	// Check if user is trying to access his account
+	if (username == "@me")
+	{
+		for (auto it = userJSON.begin(); it != userJSON.end(); ++it)
+		{
+			if (it.value()["ID"] == userId)
+			{
+				userJSON.erase(it);
+				return recordSet;
+			}
+		}
+
+		// If the execution goes here, there should be smt very wrong
+		recordSet.push_back("Could not find user with id: " + std::to_string(userId) + " or password is invalid.");
+		return recordSet;
+	}
+
+	for (auto it = userJSON.begin(); it != userJSON.end(); ++it)
+	{
+		// Authtenticate user
+		if (toLowerCase(it.value()["Username"]) == toLowerCase(username))
+		{
+			// Delet user
+		}
+	}
+
+	recordSet.push_back("Could not find user with username: " + username + " or password is invalid.");
+	return recordSet;
+}
+
 nlohmann::json DBManager::getJSONFromFile(std::string filename)
 {
 	std::ifstream JSONFile("users.json", std::fstream::app);
