@@ -96,7 +96,7 @@ std::vector<std::string> DBManager::loginUser(crow::query_string data)
 		}
 
 		// Login failure
-		recordSet.push_back("There is not a user with this email: " + std::string(data.get("loginCredential")));
+		recordSet.push_back("There is not a user with this email: " + std::string(data.get("loginCredential")) + " or password is invalid.");
 		return recordSet;
 	}
 	else
@@ -121,7 +121,7 @@ std::vector<std::string> DBManager::loginUser(crow::query_string data)
 		}
 
 		// Login failure
-		recordSet.push_back("There is not a user with this username: " + std::string(data.get("loginCredential")));
+		recordSet.push_back("There is not a user with this username: " + std::string(data.get("loginCredential")) + " or password is invalid.");
 		return recordSet;
 	}
 
@@ -163,7 +163,7 @@ std::vector<std::string> DBManager::getUserInfo(std::string username, int userId
 		}
 
 		// If the execution goes here, there should be smt very wrong
-		recordSet.push_back("Could not find user with id: " + std::to_string(userId) + " or password is invalid.");
+		recordSet.push_back("Could not find user with id: " + std::to_string(userId));
 		return recordSet;
 	}
 
@@ -183,7 +183,7 @@ std::vector<std::string> DBManager::getUserInfo(std::string username, int userId
 		}
 	}
 
-	recordSet.push_back("Could not find user with username: " + username + " or password is invalid.");
+	recordSet.push_back("Could not find user with username: " + username);
 	return recordSet;
 }
 
@@ -211,12 +211,16 @@ std::vector<std::string> DBManager::deleteUser(std::string username, int userId)
 			if (it.value()["ID"] == userId)
 			{
 				userJSON.erase(it);
+				if (!setJSONFile(userJSON, "users.json"))
+				{
+					recordSet.push_back("Could'n open user.json file");
+				}
 				return recordSet;
 			}
 		}
 
 		// If the execution goes here, there should be smt very wrong
-		recordSet.push_back("Could not find user with id: " + std::to_string(userId) + " or password is invalid.");
+		recordSet.push_back("Could not find user with id: " + std::to_string(userId));
 		return recordSet;
 	}
 

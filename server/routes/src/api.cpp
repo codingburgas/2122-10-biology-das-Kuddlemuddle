@@ -185,13 +185,12 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware> &a
 
 	CROW_BP_ROUTE(api, "/users/<string>")
 		.methods(crow::HTTPMethod::Delete)
-		.middlewares<crow::App<AuthorisationMiddleware>, AuthorisationMiddleware>()
+		.middlewares<crow::App<crow::CORSHandler, AuthorisationMiddleware>, AuthorisationMiddleware>()
 		//CROW_MIDDLEWARES(app, AuthorisationMiddleware)
 		([&](const crow::request& req, crow::response& res, std::string username)
 			{
-				auto ctx = app.get_context<AuthorisationMiddleware>(req);
+				auto& ctx = app.get_context<AuthorisationMiddleware>(req);
 
-				std::cout << ctx.userId;
 				CROW_LOG_INFO << "Trying to delete user with username: " << username;
 
 				std::vector<std::string> recordSet;
@@ -202,8 +201,6 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware> &a
 					
 					if (recordSet.size() != 0)
 					{
-						
-
 						res = responseJSONManager.createJSONResponse(false , recordSet, "used-deletion");
 						res.end();
 					}
