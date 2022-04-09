@@ -195,7 +195,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware> &a
 
 				std::vector<std::string> recordSet;
 
-				if (username == "@me")
+				if (username == "@me" || ctx.isAdmin)
 				{
 					recordSet = dbManager.deleteUser(username, ctx.userId);
 					
@@ -210,15 +210,8 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware> &a
 					return;
 				}
 
-				if (!ctx.isAdmin)
-				{
-					CROW_LOG_WARNING << "Failed to delete user. Reason: Requesting user isn't admin!";
-					res = crow::response(403);
-					res.end();
-				}
-
-
-
+				CROW_LOG_WARNING << "Failed to delete user. Reason: Requesting user isn't authorised!";
+				res = crow::response(403);
 				res.end();
 				return;
 			});

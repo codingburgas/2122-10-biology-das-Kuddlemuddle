@@ -229,11 +229,16 @@ std::vector<std::string> DBManager::deleteUser(std::string username, int userId)
 		// Authtenticate user
 		if (toLowerCase(it.value()["Username"]) == toLowerCase(username))
 		{
-			// Delet user
+			userJSON.erase(it);
+			if (!setJSONFile(userJSON, "users.json"))
+			{
+				recordSet.push_back("Could'n open user.json file");
+			}
+			return recordSet;
 		}
 	}
 
-	recordSet.push_back("Could not find user with username: " + username + " or password is invalid.");
+	recordSet.push_back("Could not find user with username: " + username);
 	return recordSet;
 }
 
