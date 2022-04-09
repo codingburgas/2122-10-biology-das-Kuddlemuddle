@@ -141,6 +141,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>C:\StoyanJR\boost_1_78_0\boost_1_78_0;D:\lib\boost_1_77_0;$(ProjectDir)include;$(SolutionDir)logs\include;$(SolutionDir)routes\include;$(SolutionDir)utils\include;$(SolutionDir)DB\include;$(SolutionDir)middlewares\include</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

@@ -158,6 +158,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>C:\StoyanJR\boost_1_78_0\boost_1_78_0;$(SolutionDir)server/include;$(ProjectDir)include;D:\lib\boost_1_77_0;$(SolutionDir)utils/include</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>

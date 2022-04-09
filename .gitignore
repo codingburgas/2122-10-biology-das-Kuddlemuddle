@@ -352,3 +352,6 @@ MigrationBackup/
 
 # data files
 users.json
+
+# Static folder
+static

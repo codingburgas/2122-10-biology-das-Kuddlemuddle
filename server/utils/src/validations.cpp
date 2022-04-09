@@ -1,6 +1,6 @@
 #include <validations.h>
 
-std::vector<std::string> ValidationManager::isRegisterDataValid(crow::query_string data)
+std::vector<std::string> ValidationManager::isRegisterDataValid(crow::query_string data, bool allowNulls)
 {
 	std::vector<std::string> incorrectValidation;
 
@@ -15,6 +15,14 @@ std::vector<std::string> ValidationManager::isRegisterDataValid(crow::query_stri
 
 	for (auto field : fields)
 	{
+		if (allowNulls)
+		{
+			if (std::string(data.get(field)) == "")
+			{
+				continue;
+			}
+		}
+
 		if (!(getValidationHandler(field)(data.get(field))))
 		{
 			incorrectValidation.push_back(field);

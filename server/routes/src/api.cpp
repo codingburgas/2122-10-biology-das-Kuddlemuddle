@@ -1,4 +1,5 @@
 #include <api.h>
+#include <filesystem>
 
 crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware> &app)
 {
@@ -201,17 +202,141 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware> &a
 					
 					if (recordSet.size() != 0)
 					{
-						res = responseJSONManager.createJSONResponse(false , recordSet, "used-deletion");
+						std::string log = "Failed to delete user. Reason: ";
+
+						for (auto el : recordSet)
+						{
+							log += el + " ";
+						}
+
+						CROW_LOG_WARNING << log;
+
+						res = responseJSONManager.createJSONResponse(false , recordSet, "user-deletion");
 						res.end();
+						return;
 					}
 
-					res = responseJSONManager.createJSONResponse(true, recordSet, "used-deletion");
+					res = responseJSONManager.createJSONResponse(true, recordSet, "user-deletion");
 					res.end();
 					return;
 				}
 
 				CROW_LOG_WARNING << "Failed to delete user. Reason: Requesting user isn't authorised!";
 				res = crow::response(403);
+				res.end();
+				return;
+			});
+
+	CROW_BP_ROUTE(api, "/users/@me")
+		.methods(crow::HTTPMethod::Patch)
+		.middlewares<crow::App<crow::CORSHandler, AuthorisationMiddleware>, AuthorisationMiddleware>()
+		//CROW_MIDDLEWARES(app, AuthorisationMiddleware)
+		([&](const crow::request& req, crow::response& res)
+			{
+				auto updateData = crow::query_string("?" + req.body);
+				auto& ctx = app.get_context<AuthorisationMiddleware>(req);
+
+				CROW_LOG_INFO << "Trying to update user info with id: " << ctx.userId;
+
+				std::vector<std::string> recordSet = validationManager.isRegisterDataValid(updateData, true);
+				
+				// If validation falls
+				if (recordSet.size() != 0)
+				{
+					std::string log = "Failed validation/s at user with id: " + std::to_string(ctx.userId) + " at: ";
+
+					for (auto el : recordSet)
+					{
+						log += el + " ";
+					}
+
+					CROW_LOG_WARNING << log;
+
+					res = responseJSONManager.createJSONResponse(false, recordSet, "user-update");
+					res.end();
+					return;
+				}
+
+				recordSet = dbManager.updateUser(ctx.userId, updateData);
+
+				if (recordSet.size() != 0)
+				{
+					std::string log = "Failed to update user. Reason: ";
+
+					for (auto el : recordSet)
+					{
+						log += el + " ";
+					}
+
+					CROW_LOG_WARNING << log;
+
+					res = responseJSONManager.createJSONResponse(false, recordSet, "user-update");
+					res.end();
+					return;
+				}
+
+				res = responseJSONManager.createJSONResponse(true, recordSet, "user-update");
+				res.end();
+				return;
+			});
+
+	CROW_BP_ROUTE(api, "/users/@me/updateAvatarURL")
+		.methods(crow::HTTPMethod::Patch)
+		.middlewares<crow::App<crow::CORSHandler, AuthorisationMiddleware>, AuthorisationMiddleware>()
+		//CROW_MIDDLEWARES(app, AuthorisationMiddleware)
+		([&](const crow::request& req, crow::response& res)
+			{
+				auto& ctx = app.get_context<AuthorisationMiddleware>(req);
+
+				CROW_LOG_INFO << "Trying to update user avatar with id: " << ctx.userId;
+
+				crow::multipart::message msg(req);
+
+				std::filesystem::path dir("static/avatars");
+				if (!(std::filesystem::exists(dir)))
+				{
+					if (std::filesystem::create_directories(dir))
+					{
+						CROW_LOG_WARNING << "Avatars folder not found! New folder created successfully!";
+					}
+				}
+
+				auto file = msg.parts[0].body;
+				auto fileExtension = msg.parts[1].body;
+
+				auto file_handler = std::ofstream("static/avatars/" + std::to_string(ctx.userId) + fileExtension, std::ofstream::binary);
+
+				if (!file_handler.is_open())
+				{
+					CROW_LOG_ERROR << "Cannot open file for avatar";
+					res = crow::response(500);
+					res.end();
+					return;
+				}
+
+				file_handler << file;
+				file_handler.close();
+
+				std::vector<std::string> recordSet;
+				recordSet = dbManager.updateUserAvatar(ctx.userId, std::to_string(ctx.userId) + fileExtension);
+
+				if (recordSet.size() != 0)
+				{
+					std::string log = "Failed to update user avatar. Reason: ";
+
+					for (auto el : recordSet)
+					{
+						log += el + " ";
+					}
+
+					CROW_LOG_WARNING << log;
+
+					res = responseJSONManager.createJSONResponse(false, recordSet, "user-avatar-update");
+					res.end();
+					return;
+				}
+
+				res = responseJSONManager.createJSONResponse(true, recordSet, "user-avatar-update");
 				res.end();
 				return;
 			});

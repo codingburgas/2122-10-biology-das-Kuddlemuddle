@@ -31,6 +31,15 @@ std::vector<std::string> DBManager::registerUser(crow::query_string data)
 		return recordSet;
 	}
 
+	// Check if json is []
+	if (userJSON.is_array())
+	{
+		if (userJSON.empty())
+		{
+			userJSON = nullptr;
+		}
+	}
+
 	// Add the user to the JSON
 	userJSON.push_back(
 		{
@@ -239,6 +248,81 @@ std::vector<std::string> DBManager::deleteUser(std::string username, int userId)
 	}
 
 	recordSet.push_back("Could not find user with username: " + username);
+	return recordSet;
+}
+
+std::vector<std::string> DBManager::updateUser(int userId, crow::query_string data)
+{
+	std::vector<std::string> recordSet;
+	nlohmann::json userJSON;
+
+	// Get the JSON from the file
+	try
+	{
+		userJSON = getJSONFromFile("users.json");
+	}
+	catch (std::string ex)
+	{
+		recordSet.push_back("Could'n open user.json file");
+		return recordSet;
+	}
+
+	for (auto it = userJSON.begin(); it != userJSON.end(); ++it)
+	{
+		if (it.value()["ID"] == userId)
+		{
+			it.value()["FirstName"] = std::string(data.get("firstName")).empty() ? it.value()["FirstName"] : data.get("firstName");
+			it.value()["LastName"] = std::string(data.get("lastName")).empty() ? it.value()["LastName"] : data.get("lastName");
+			it.value()["Username"] = std::string(data.get("username")).empty() ? it.value()["Username"] : data.get("username");
+			it.value()["Email"] = std::string(data.get("email")).empty() ? it.value()["Email"] : data.get("email");
+			it.value()["Password"] = std::string(data.get("password")).empty() ? it.value()["Password"] : data.get("password");
+
+			if (!setJSONFile(userJSON, "users.json"))
+			{
+				recordSet.push_back("Could'n open user.json file");
+			}
+
+			return recordSet;
+		}
+	}
+
+	// If the execution goes here, there should be smt very wrong
+	recordSet.push_back("Could not find user with id: " + std::to_string(userId));
+	return recordSet;
+}
+
+std::vector<std::string> DBManager::updateUserAvatar(int userId, std::string imageName)
+{
+	std::vector<std::string> recordSet;
+	nlohmann::json userJSON;
+	EnvManager envManager;
+
+	// Get the JSON from the file
+	try
+	{
+		userJSON = getJSONFromFile("users.json");
+	}
+	catch (std::string ex)
+	{
+		recordSet.push_back("Could'n open user.json file");
+		return recordSet;
+	}
+
+	for (auto it = userJSON.begin(); it != userJSON.end(); ++it)
+	{
+		if (it.value()["ID"] == userId)
+		{
+			it.value()["AvatarURL"] = envManager.getEnv("SERVER_URL") + "static/avatars/" + imageName;
+			if (!setJSONFile(userJSON, "users.json"))
+			{
+				recordSet.push_back("Could'n open user.json file");
+			}
+			return recordSet;
+		}
+	}
+
+	// If the execution goes here, there should be smt very wrong
+	recordSet.push_back("Could not find user with id: " + std::to_string(userId));
 	return recordSet;
 }
 
