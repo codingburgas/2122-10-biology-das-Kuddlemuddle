@@ -341,5 +341,61 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware> &a
 				return;
 			});
 
+	CROW_BP_ROUTE(api, "/createNewOrg")
+		.methods(crow::HTTPMethod::Post)
+		.middlewares<crow::App<crow::CORSHandler, AuthorisationMiddleware>, AuthorisationMiddleware>()
+		//CROW_MIDDLEWARES(app, AuthorisationMiddleware)
+		([&](const crow::request& req, crow::response& res)
+		{
+				auto registerData = crow::query_string("?" + req.body);
+				auto& ctx = app.get_context<AuthorisationMiddleware>(req);
+
+				CROW_LOG_INFO << "User with id: " << ctx.userId << " is trying to create new organisation with name: " << registerData.get("orgName");
+
+				std::vector<std::string> recordSet = validationManager.isOrgDataValid(registerData);
+
+				// If validation falls
+				if (recordSet.size() != 0)
+				{
+					std::string log = "Failed validation/s at creating organisation with name: " + std::string(registerData.get("orgName")) + " at: ";
+
+					for (auto el : recordSet)
+					{
+						log += el + " ";
+					}
+
+					CROW_LOG_WARNING << log;
+
+					res = responseJSONManager.createJSONResponse(false, recordSet, "organisation-register");
+					res.end();
+					return;
+				}
+
+				recordSet = dbManager.createOrg(ctx.userId, registerData);
+
+				// If saving to database fails
+				if (recordSet.size() != 0)
+				{
+					std::string log = "Failed to save organisation with name: " + std::string(registerData.get("orgName")) + " to the database. Reason/s: ";
+
+					for (auto el : recordSet)
+					{
+						log += el + " ";
+					}
+
+					CROW_LOG_WARNING << log;
+
+					res = responseJSONManager.createJSONResponse(false, recordSet, "organisation-register");
+					res.end();
+					return;
+				}
+
+				CROW_LOG_INFO << "Organisation with name: " + std::string(registerData.get("orgName")) + " is successfully saved into the database.";
+
+				// Create and send request
+				res = responseJSONManager.createJSONResponse(true, recordSet, "organisation-register");
+				res.end();
+				return;
+		});
 	return api;
 }

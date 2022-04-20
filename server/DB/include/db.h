@@ -16,6 +16,7 @@ public:
 	std::vector<std::string> deleteUser(std::string username, int userId = NULL);
 	std::vector<std::string> updateUser(int userId, crow::query_string data);
 	std::vector<std::string> updateUserAvatar(int userId, std::string imageName);
+	std::vector<std::string> createOrg(int userId, crow::query_string data);
 private:
 	nlohmann::json getJSONFromFile(std::string filename);
 	bool setJSONFile(nlohmann::json json, std::string filename);

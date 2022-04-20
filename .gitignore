@@ -352,6 +352,7 @@ MigrationBackup/
 
 # data files
 users.json
+orgs.json
 
 # Static folder
 static

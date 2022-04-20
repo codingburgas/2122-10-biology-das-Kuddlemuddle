@@ -326,13 +326,64 @@ std::vector<std::string> DBManager::updateUserAvatar(int userId, std::string ima
 	return recordSet;
 }
 
+std::vector<std::string> DBManager::createOrg(int userId, crow::query_string data)
+{
+	std::vector<std::string> recordSet;
+
+	nlohmann::json orgsJSON;
+
+	// Get the JSON from the file
+	try
+	{
+		orgsJSON = getJSONFromFile("orgs.json");
+	}
+	catch (std::string ex)
+	{
+		recordSet.push_back("Could'n open orgs.json file");
+		return recordSet;
+	}
+
+	// Check for duplicate name
+	if (getUserByField(orgsJSON, "Name", data.get("orgName")))
+	{
+		recordSet.push_back("There is already a organisation with this name: " + std::string(data.get("orgName")));
+		return recordSet;
+	}
+
+	// Check if json is []
+	if (orgsJSON.is_array())
+	{
+		if (orgsJSON.empty())
+		{
+			orgsJSON = nullptr;
+		}
+	}
+
+	// Add the user to the JSON
+	orgsJSON.push_back(
+		{
+		{ "ID", getLastId(orgsJSON) + 1},
+		{ "Name", data.get("orgName") }
+		}
+	);
+
+	// Save the json to the file
+	if (!setJSONFile(orgsJSON, "orgs.json"))
+	{
+		recordSet.push_back("Could'n open orgs.json file");
+		return recordSet;
+	}
+
+	return recordSet;
+}
+
 nlohmann::json DBManager::getJSONFromFile(std::string filename)
 {
-	std::ifstream JSONFile("users.json", std::fstream::app);
+	std::ifstream JSONFile(filename, std::fstream::app);
 
 	if (!JSONFile.is_open())
 	{
-		throw std::string("Can not open file");
+		throw std::string("Can not open file" + filename);
 	}
 
 	nlohmann::json userJSON;
@@ -343,7 +394,7 @@ nlohmann::json DBManager::getJSONFromFile(std::string filename)
 	}
 	catch (nlohmann::json::parse_error& ex)
 	{
-		CROW_LOG_WARNING << "users.json file is empty.";
+		CROW_LOG_WARNING << filename << " file is empty.";
 	}
 
 	JSONFile.close();
