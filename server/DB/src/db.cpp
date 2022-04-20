@@ -313,6 +313,7 @@ std::vector<std::string> DBManager::updateUserAvatar(int userId, std::string ima
 		if (it.value()["ID"] == userId)
 		{
 			it.value()["AvatarURL"] = envManager.getEnv("SERVER_URL") + "static/avatars/" + imageName;
+
 			if (!setJSONFile(userJSON, "users.json"))
 			{
 				recordSet.push_back("Could'n open user.json file");
@@ -363,7 +364,9 @@ std::vector<std::string> DBManager::createOrg(int userId, crow::query_string dat
 	orgsJSON.push_back(
 		{
 		{ "ID", getLastId(orgsJSON) + 1},
-		{ "Name", data.get("orgName") }
+		{ "Name", data.get("orgName") },
+		{ "Password", data.get("password") }
+		// TODO: Add Salt
 		}
 	);
 
@@ -374,6 +377,163 @@ std::vector<std::string> DBManager::createOrg(int userId, crow::query_string dat
 		return recordSet;
 	}
 
+	return recordSet;
+}
+
+std::vector<std::string> DBManager::addUserToOrganisation(int userId, int orgId, UserRolesInOrgs userRolesInOrgs, bool createNewEntry)
+{
+	std::vector<std::string> recordSet;
+
+	nlohmann::json userOrgRoleJSON;
+
+	// Get the JSON from the file
+	try
+	{
+		userOrgRoleJSON = getJSONFromFile("userOrgRole.json");
+	}
+	catch (std::string ex)
+	{
+		recordSet.push_back("Could'n open userOrgRole.json file");
+		return recordSet;
+	}
+
+	// Check if user is already in organisation
+	for (auto it = userOrgRoleJSON.begin(); it != userOrgRoleJSON.end(); ++it)
+	{
+		if (it.value()["UserID"] == userId && it.value()["OrganisationID"] == orgId)
+		{
+			it.value()["Role"] = userRolesInOrgs;
+
+			if (!setJSONFile(userOrgRoleJSON, "userOrgRole.json"))
+			{
+				recordSet.push_back("Could'n open userOrgRole.json file");
+			}
+
+			return recordSet;
+		}
+	}
+
+	if (!createNewEntry)
+	{
+		recordSet.push_back("Couldn't find user with id: " + std::to_string(userId) + " or organisation with id: " + std::to_string(orgId));
+		return recordSet;
+	}
+
+	// Check if json is []
+	if (userOrgRoleJSON.is_array())
+	{
+		if (userOrgRoleJSON.empty())
+		{
+			userOrgRoleJSON = nullptr;
+		}
+	}
+
+	// Add the user to the JSON
+	userOrgRoleJSON.push_back(
+		{
+		{ "UserID", userId },
+		{ "OrganisationID", orgId},
+		{ "Role", userRolesInOrgs}
+		}
+	);
+
+	// Save the json to the file
+	if (!setJSONFile(userOrgRoleJSON, "userOrgRole.json"))
+	{
+		recordSet.push_back("Could'n open userOrgRole.json file");
+		return recordSet;
+	}
+
+	return recordSet;
+}
+
+std::vector<std::string> DBManager::getOrgIdByName(std::string orgName)
+{
+	std::vector<std::string> recordSet;
+
+	nlohmann::json orgsJSON;
+
+	// Get the JSON from the file
+	try
+	{
+		orgsJSON = getJSONFromFile("orgs.json");
+	}
+	catch (std::string ex)
+	{
+		recordSet.push_back("Could'n open orgs.json file");
+		return recordSet;
+	}
+
+	for (auto it = orgsJSON.begin(); it != orgsJSON.end(); ++it)
+	{
+		if (it.value()["Name"] == orgName)
+		{
+			recordSet.push_back(it.value()["ID"].dump());
+			return recordSet;
+		}
+	}
+
+	recordSet.push_back("Could not find organisation with name: " + orgName);
+	return recordSet;
+}
+
+std::vector<std::string> DBManager::doesPasswordMatchOrg(std::string password, int orgId)
+{
+	std::vector<std::string> recordSet;
+
+	nlohmann::json orgsJSON;
+
+	// Get the JSON from the file
+	try
+	{
+		orgsJSON = getJSONFromFile("orgs.json");
+	}
+	catch (std::string ex)
+	{
+		recordSet.push_back("Could'n open orgs.json file");
+		return recordSet;
+	}
+
+	for (auto it = orgsJSON.begin(); it != orgsJSON.end(); ++it)
+	{
+		if (it.value()["ID"] == orgId)
+		{
+			recordSet.push_back(std::to_string(it.value()["Password"] == password));
+			return recordSet;
+		}
+	}
+
+	recordSet.push_back("Could not find organisation with id: " + orgId);
+	return recordSet;
+}
+
+std::vector<std::string> DBManager::isUserAdminInOrg(int userId, int orgId)
+{
+	std::vector<std::string> recordSet;
+
+	nlohmann::json userOrgRoleJSON;
+
+	// Get the JSON from the file
+	try
+	{
+		userOrgRoleJSON = getJSONFromFile("userOrgRole.json");
+	}
+	catch (std::string ex)
+	{
+		recordSet.push_back("Could'n open userOrgRole.json file");
+		return recordSet;
+	}
+
+	for (auto it = userOrgRoleJSON.begin(); it != userOrgRoleJSON.end(); ++it)
+	{
+		if (it.value()["UserID"] == userId && it.value()["OrganisationID"] == orgId)
+		{
+			recordSet.push_back(std::to_string(it.value()["Role"] == 2));
+			return recordSet;
+		}
+	}
+
+	recordSet.push_back("Could not find organisation with id: " + std::to_string(orgId));
 	return recordSet;
 }
 

@@ -353,6 +353,7 @@ MigrationBackup/
 # data files
 users.json
 orgs.json
+userOrgRole.json
 
 # Static folder
 static

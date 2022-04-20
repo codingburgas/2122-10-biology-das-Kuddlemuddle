@@ -59,7 +59,28 @@ std::vector<std::string> ValidationManager::isOrgDataValid(crow::query_string da
 
 	std::vector<std::string> fields =
 	{
-		"orgName"
+		"orgName",
+		"password"
+	};
+
+	for (auto field : fields)
+	{
+		if (!(getValidationHandler(field)(data.get(field))))
+		{
+			incorrectValidation.push_back(field);
+		}
+	}
+
+	return incorrectValidation;
+}
+
+std::vector<std::string> ValidationManager::isJoinOrgDataValid(crow::query_string data)
+{
+	std::vector<std::string> incorrectValidation;
+
+	std::vector<std::string> fields =
+	{
+		"password"
 	};
 
 	for (auto field : fields)

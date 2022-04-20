@@ -347,17 +347,17 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware> &a
 		//CROW_MIDDLEWARES(app, AuthorisationMiddleware)
 		([&](const crow::request& req, crow::response& res)
 		{
-				auto registerData = crow::query_string("?" + req.body);
+				auto reqData = crow::query_string("?" + req.body);
 				auto& ctx = app.get_context<AuthorisationMiddleware>(req);
 
-				CROW_LOG_INFO << "User with id: " << ctx.userId << " is trying to create new organisation with name: " << registerData.get("orgName");
+				CROW_LOG_INFO << "User with id: " << ctx.userId << " is trying to create new organisation with name: " << reqData.get("orgName");
 
-				std::vector<std::string> recordSet = validationManager.isOrgDataValid(registerData);
+				std::vector<std::string> recordSet = validationManager.isOrgDataValid(reqData);
 
 				// If validation falls
 				if (recordSet.size() != 0)
 				{
-					std::string log = "Failed validation/s at creating organisation with name: " + std::string(registerData.get("orgName")) + " at: ";
+					std::string log = "Failed validation/s at creating organisation with name: " + std::string(reqData.get("orgName")) + " at: ";
 
 					for (auto el : recordSet)
 					{
@@ -371,12 +371,34 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware> &a
 					return;
 				}
 
-				recordSet = dbManager.createOrg(ctx.userId, registerData);
+				// TODO: Hash password
+
+				recordSet = dbManager.createOrg(ctx.userId, reqData);
 
 				// If saving to database fails
 				if (recordSet.size() != 0)
 				{
-					std::string log = "Failed to save organisation with name: " + std::string(registerData.get("orgName")) + " to the database. Reason/s: ";
+					std::string log = "Failed to save organisation with name: " + std::string(reqData.get("orgName")) + " to the database. Reason/s: ";
+
+					for (auto el : recordSet)
+					{
+						log += el + " ";
+					}
+
+					CROW_LOG_WARNING << log;
+
+					res = responseJSONManager.createJSONResponse(false, recordSet, "organisation-register");
+					res.end();
+					return;
+				}
+				
+				recordSet = dbManager.getOrgIdByName(reqData.get("orgName"));
+
+				// If return value is bigger that 10
+				// then it is not a number
+				if (recordSet[0].size() > 10)
+				{
+					std::string log = "Failed to get organisation with name: " + std::string(reqData.get("orgName")) + " from the database. Reason/s: ";
 
 					for (auto el : recordSet)
 					{
@@ -390,12 +412,187 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware> &a
 					return;
 				}
 
-				CROW_LOG_INFO << "Organisation with name: " + std::string(registerData.get("orgName")) + " is successfully saved into the database.";
+				recordSet = dbManager.addUserToOrganisation(ctx.userId, std::stoi(recordSet[0]), UserRolesInOrgs::ADMIN);
+
+				if (recordSet.size() != 0)
+				{
+					std::string log = "Failed to add user with id: " + std::to_string(ctx.userId) + " to organisation with name : " + std::string(reqData.get("orgName"));
+
+					for (auto el : recordSet)
+					{
+						log += el + " ";
+					}
+
+					CROW_LOG_WARNING << log;
+
+					res = responseJSONManager.createJSONResponse(false, recordSet, "organisation-register");
+					res.end();
+					return;
+				}
+
+				CROW_LOG_INFO << "Organisation with name: " + std::string(reqData.get("orgName")) + " is successfully saved into the database.";
 
 				// Create and send request
 				res = responseJSONManager.createJSONResponse(true, recordSet, "organisation-register");
 				res.end();
 				return;
 		});
+
+		CROW_BP_ROUTE(api, "/joinOrg")
+			.methods(crow::HTTPMethod::Post)
+			.middlewares<crow::App<crow::CORSHandler, AuthorisationMiddleware>, AuthorisationMiddleware>()
+			//CROW_MIDDLEWARES(app, AuthorisationMiddleware)
+			([&](const crow::request& req, crow::response& res)
+				{
+					auto reqData = crow::query_string("?" + req.body);
+					auto& ctx = app.get_context<AuthorisationMiddleware>(req);
+
+					CROW_LOG_INFO << "User with id: " << ctx.userId << " is trying to join organisation with id:" << reqData.get("orgId");
+
+					std::vector<std::string> recordSet = validationManager.isJoinOrgDataValid(reqData);
+
+					// If validation falls
+					if (recordSet.size() != 0)
+					{
+						std::string log = "Failed validation/s at joining in organisation with id: " + std::string(reqData.get("orgId")) + " at: ";
+
+						for (auto el : recordSet)
+						{
+							log += el + " ";
+						}
+
+						CROW_LOG_WARNING << log;
+
+						res = responseJSONManager.createJSONResponse(false, recordSet, "login");
+						res.end();
+						return;
+					}
+
+					// TODO: Hash password
+
+					recordSet = dbManager.doesPasswordMatchOrg(reqData.get("password"), std::stoi(reqData.get("orgId")));
+
+					// If password is incorrect
+					if (recordSet[0] == "0")
+					{
+						recordSet[0] = "Password is incorrect";
+					}
+
+					if (recordSet[0] != "1")
+					{
+						std::string log = "Failed to join user with id: " + std::to_string(ctx.userId) + " to organisation with id: " + std::string(reqData.get("orgId")) + ". Reason: ";
+
+						for (auto el : recordSet)
+						{
+							log += el + " ";
+						}
+
+						CROW_LOG_WARNING << log;
+
+						res = responseJSONManager.createJSONResponse(false, recordSet, "join-org");
+						res.end();
+						return;
+					}
+
+					recordSet = dbManager.addUserToOrganisation(ctx.userId, std::stoi(reqData.get("orgId")), UserRolesInOrgs::USER);
+
+					if (recordSet.size() != 0)
+					{
+						std::string log = "Failed to add user with id: " + std::to_string(ctx.userId) + " to organisation with id: " + std::string(reqData.get("orgId")) + ". Reason: ";
+
+						for (auto el : recordSet)
+						{
+							log += el + " ";
+						}
+
+						CROW_LOG_WARNING << log;
+
+						res = responseJSONManager.createJSONResponse(false, recordSet, "join-org");
+						res.end();
+						return;
+					}
+
+					CROW_LOG_INFO << "User with id: " << ctx.userId << " is successfully added to organisation with id: " << reqData.get("orgId");
+
+					res = responseJSONManager.createJSONResponse(true, recordSet, "join-org");
+					res.end();
+					return;
+				});
+
+		CROW_BP_ROUTE(api, "/updateRolesInOrg")
+			.methods(crow::HTTPMethod::Post)
+			.middlewares<crow::App<crow::CORSHandler, AuthorisationMiddleware>, AuthorisationMiddleware>()
+			//CROW_MIDDLEWARES(app, AuthorisationMiddleware)
+			([&](const crow::request& req, crow::response& res)
+				{
+					auto reqData = crow::query_string("?" + req.body);
+					auto& ctx = app.get_context<AuthorisationMiddleware>(req);
+
+					CROW_LOG_INFO << "User with id: " << ctx.userId << " is trying to update role on user with id: " << reqData.get("userId") << " on organisation with id: " << reqData.get("orgId");
+
+					// Is user authorised
+					std::vector<std::string> recordSet = dbManager.isUserAdminInOrg(ctx.userId, std::stoi(reqData.get("orgId")));
+
+					// If password is incorrect
+					if (recordSet[0] == "0")
+					{
+						recordSet[0] = "User is unauthorised";
+					}
+
+					if (recordSet[0] != "1")
+					{
+						std::string log = "Failed to update role on user with id: " + std::string(reqData.get("userId")) + " on organisation with id: " + std::string(reqData.get("orgId")) + ". Reason: ";
+
+						for (auto el : recordSet)
+						{
+							log += el + " ";
+						}
+
+						CROW_LOG_WARNING << log;
+
+						res = responseJSONManager.createJSONResponse(false, recordSet, "update-user-role-org");
+						res.end();
+						return;
+					}
+
+					int roleId = std::stoi(reqData.get("roleId"));
+
+					switch (roleId)
+					{
+					case 1:
+						recordSet = dbManager.addUserToOrganisation(std::stoi(reqData.get("userId")), std::stoi(reqData.get("orgId")), UserRolesInOrgs::TEACHER, false);
+						break;
+					case 2:
+						recordSet = dbManager.addUserToOrganisation(std::stoi(reqData.get("userId")), std::stoi(reqData.get("orgId")), UserRolesInOrgs::ADMIN, false);
+						break;
+					case 0:
+					default:
+						recordSet = dbManager.addUserToOrganisation(std::stoi(reqData.get("userId")), std::stoi(reqData.get("orgId")), UserRolesInOrgs::USER, false);
+						break;
+					}
+
+					if (recordSet.size() != 0)
+					{
+						std::string log = "Failed to update role on user with id: " + std::string(reqData.get("userId")) + " on organisation with id: " + std::string(reqData.get("orgId")) + ". Reason: ";
+
+						for (auto el : recordSet)
+						{
+							log += el + " ";
+						}
+
+						CROW_LOG_WARNING << log;
+
+						res = responseJSONManager.createJSONResponse(false, recordSet, "update-user-role-org");
+						res.end();
+						return;
+					}
+
+					CROW_LOG_INFO << "The role on user with id: " << reqData.get("userId") << " is successfully updated on organisation with id: " << reqData.get("orgId");
+
+					res = responseJSONManager.createJSONResponse(true, recordSet, "update-user-role-org");
+					res.end();
+					return;
+				});
+
 	return api;
 }
