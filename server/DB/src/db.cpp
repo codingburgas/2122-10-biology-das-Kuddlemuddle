@@ -18,14 +18,14 @@ std::vector<std::string> DBManager::registerUser(crow::query_string data)
 	}
 
 	// Check for duplicate email
-	if (getUserByField(userJSON, "Email", data.get("email")))
+	if (checkIfValueExistsInField(userJSON, "Email", data.get("email")))
 	{
 		recordSet.push_back("There is already a user with this email: " + std::string(data.get("email")));
 		return recordSet;
 	}
 
 	// Check for duplicate username
-	if (getUserByField(userJSON, "Username", data.get("username")))
+	if (checkIfValueExistsInField(userJSON, "Username", data.get("username")))
 	{
 		recordSet.push_back("There is already a user with this username: " + std::string(data.get("username")));
 		return recordSet;
@@ -345,7 +345,7 @@ std::vector<std::string> DBManager::createOrg(int userId, crow::query_string dat
 	}
 
 	// Check for duplicate name
-	if (getUserByField(orgsJSON, "Name", data.get("orgName")))
+	if (checkIfValueExistsInField(orgsJSON, "Name", data.get("orgName")))
 	{
 		recordSet.push_back("There is already a organisation with this name: " + std::string(data.get("orgName")));
 		return recordSet;
@@ -507,6 +507,168 @@ std::vector<std::string> DBManager::doesPasswordMatchOrg(std::string password, i
 	return recordSet;
 }
 
+std::vector<std::string> DBManager::isUserInOrgAndGetRole(int userId, int orgId)
+{
+	std::vector<std::string> recordSet;
+
+	nlohmann::json userOrgRoleJSON;
+
+	// Get the JSON from the file
+	try
+	{
+		userOrgRoleJSON = getJSONFromFile("userOrgRole.json");
+	}
+	catch (std::string ex)
+	{
+		recordSet.push_back("Could'n open userOrgRole.json file");
+		return recordSet;
+	}
+
+	for (auto it = userOrgRoleJSON.begin(); it != userOrgRoleJSON.end(); ++it)
+	{
+		if (it.value()["UserID"] == userId && it.value()["OrganisationID"] == orgId)
+		{
+			recordSet.push_back(std::to_string(true));
+			recordSet.push_back(it.value()["Role"].dump());
+			return recordSet;
+		}
+	}
+
+	recordSet.push_back("Could not find organisation with id: " + std::to_string(orgId));
+	return recordSet;
+}
+
+std::vector<std::string> DBManager::deleteOrg(int orgId)
+{
+	std::vector<std::string> recordSet;
+	nlohmann::json orgsJSON;
+	nlohmann::json userOrgRoleJSON;
+
+	// Get the JSON from the file
+	try
+	{
+		orgsJSON = getJSONFromFile("orgs.json");
+		userOrgRoleJSON = getJSONFromFile("userOrgRole.json");
+	}
+	catch (std::string ex)
+	{
+		recordSet.push_back("Could'n open user.json or userOrgRole.json file");
+		return recordSet;
+	}
+
+	for (auto it = orgsJSON.begin(); it != orgsJSON.end(); ++it)
+	{
+		if (it.value()["ID"] == orgId)
+		{
+			orgsJSON.erase(it);
+			if (!setJSONFile(orgsJSON, "orgs.json"))
+			{
+				recordSet.push_back("Could'n open orgs.json file");
+				return recordSet;
+			}
+		}
+	}
+
+	for (auto it = userOrgRoleJSON.begin(); it != userOrgRoleJSON.end(); ++it)
+	{	
+		if (it.value()["OrganisationID"] == orgId)
+		{
+			userOrgRoleJSON.erase(it);
+		}
+	}
+	
+	if (!setJSONFile(userOrgRoleJSON, "userOrgRole.json"))
+	{
+		recordSet.push_back("Could'n open userOrgRole.json file");
+	}
+
+	return recordSet;
+}
+
+std::vector<std::string> DBManager::updateOrg(int orgId, crow::query_string data)
+{
+	std::vector<std::string> recordSet;
+	nlohmann::json orgJSON;
+
+	// Get the JSON from the file
+	try
+	{
+		orgJSON = getJSONFromFile("orgs.json");
+	}
+	catch (std::string ex)
+	{
+		recordSet.push_back("Could'n open orgs.json file");
+		return recordSet;
+	}
+
+	for (auto it = orgJSON.begin(); it != orgJSON.end(); ++it)
+	{
+		if (it.value()["ID"] == orgId)
+		{
+			it.value()["Name"] = std::string(data.get("orgName")).empty() ? it.value()["Name"] : data.get("orgName");
+			it.value()["Password"] = std::string(data.get("password")).empty() ? it.value()["Password"] : data.get("password");
+
+			if (!setJSONFile(orgJSON, "orgs.json"))
+			{
+				recordSet.push_back("Could'n open orgs.json file");
+			}
+
+			return recordSet;
+		}
+	}
+
+	// If the execution goes here, there should be smt very wrong
+	recordSet.push_back("Could not find org with id: " + std::to_string(orgId));
+	return recordSet;
+}
+
+OrgInfo DBManager::getOrgInfo(std::string orgName)
+{
+	OrgInfo returnValue;
+
+	// Please don't broke here
+	returnValue.id = std::stoi(getOrgIdByName(orgName)[0]);
+	returnValue.name = orgName;
+
+	try
+	{
+		returnValue.users = getOrgUsersByOrgId(returnValue.id);
+	}
+	catch (std::string ex)
+	{
+		returnValue.errors.push_back(ex);
+		return returnValue;
+	}
+
+	return returnValue;
+}
+
+std::vector<OrgInfo> DBManager::getAllOrgsInfo()
+{
+	std::vector<OrgInfo> recordSet;
+
+	nlohmann::json orgsJSON;
+
+	// Get the JSON from the file
+	try
+	{
+		orgsJSON = getJSONFromFile("orgs.json");
+	}
+	catch (std::string ex)
+	{
+		recordSet[0].errors.push_back("Could'n open orgs.json file");
+		return recordSet;
+	}
+
+	for (auto it = orgsJSON.begin(); it != orgsJSON.end(); ++it)
+	{
+		recordSet.push_back({ it.value()["ID"], it.value()["Name"] });
+	}
+
+	return recordSet;
+}
+
+/*
 std::vector<std::string> DBManager::isUserAdminInOrg(int userId, int orgId)
 {
 	std::vector<std::string> recordSet;
@@ -536,6 +698,7 @@ std::vector<std::string> DBManager::isUserAdminInOrg(int userId, int orgId)
 	recordSet.push_back("Could not find organisation with id: " + std::to_string(orgId));
 	return recordSet;
 }
+*/
 
 nlohmann::json DBManager::getJSONFromFile(std::string filename)
 {
@@ -588,7 +751,7 @@ int DBManager::getLastId(nlohmann::json json)
 	}
 }
 
-bool DBManager::getUserByField(nlohmann::json json, std::string field, std::string fieldData)
+bool DBManager::checkIfValueExistsInField(nlohmann::json json, std::string field, std::string fieldData)
 {
 	for (auto it = json.begin(); it != json.end(); ++it)
 	{
@@ -609,4 +772,31 @@ bool DBManager::getUserByField(nlohmann::json json, std::string field, std::stri
 	}
 
 	return false;
+}
+
+std::vector<OrgUser> DBManager::getOrgUsersByOrgId(int orgId)
+{
+	std::vector<OrgUser> recordSet;
+
+	nlohmann::json userOrgRoleJSON;
+
+	// Get the JSON from the file
+	try
+	{
+		userOrgRoleJSON = getJSONFromFile("userOrgRole.json");
+	}
+	catch (std::string ex)
+	{
+		throw "Could'n open userOrgRole.json file";
+	}
+
+	for (auto it = userOrgRoleJSON.begin(); it != userOrgRoleJSON.end(); ++it)
+	{
+		if (it.value()["OrganisationID"] == orgId)
+		{
+			recordSet.push_back({ it.value()["UserID"], it.value()["Role"] });
+		}
+	}
+
+	return recordSet;
 }

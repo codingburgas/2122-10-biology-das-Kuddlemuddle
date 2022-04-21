@@ -47,3 +47,33 @@ crow::json::wvalue ResponseJSONManager::createProfileJSONResponse(std::vector<st
 
 	return resBody;
 }
+
+crow::json::wvalue ResponseJSONManager::createOrgJSONResponse(OrgInfo data)
+{
+	crow::json::wvalue resBody;
+
+	resBody["type"] = "get-organisation-success";
+	resBody["org-id"] = data.id;
+	resBody["org-name"] = data.name;
+
+	for (size_t i = 0; i < data.users.size(); i++)
+	{
+		resBody["org-users"][i] = { {"user-id:", data.users[i].id} , {"role-id", data.users[i].role} };
+	}
+
+	return resBody;
+}
+
+crow::json::wvalue ResponseJSONManager::createOrgsJSONResponse(std::vector<OrgInfo> data)
+{
+	crow::json::wvalue resBody;
+
+	resBody["type"] = "get-organisation-success";
+	
+	for (size_t i = 0; i < data.size(); i++)
+	{
+		resBody["orgs"][i] = { {"org-id:", data[i].id} , {"org-name", data[i].name} };
+	}
+
+	return resBody;
+}
