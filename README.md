@@ -19,17 +19,8 @@
 </p>
 
 ---
-## Table of contents 📖
-+ [About](#about)
-+ [Demo of the project](#demo)
-+ [Documents](#docs)
-+ [How it works](#howwork)
-+ [Usage](#usage)
-+ [Installation](#installation)
-+ [Our team](#team)
-
 ## About 💻 <a name = "about"></a>
-Explaining a variety of Biology-related concepts in an easily-accessible way with graphics and quzzez.
+Explaining a variety of Biology-related concepts in an easily-accessible way with graphics and quzzes.
 
 ## Demo of our project 🎥 <a name = "demo"></a>
 <img src = "" alt = "demo img 1">
@@ -51,7 +42,7 @@ You can start with downloading our project form [GitHub](https://github.com/codi
 
 OR
 
-Pasting this line of code in **CMD**:
+Pasting this line of code in **your favourite Terminal**:
 
 ```
 git clone https://github.com/codingburgas/2122-10-biology-YVSimeonova19.git
