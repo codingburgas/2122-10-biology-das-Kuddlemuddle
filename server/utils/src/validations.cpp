@@ -102,6 +102,35 @@ std::vector<std::string> ValidationManager::isJoinOrgDataValid(crow::query_strin
 	return incorrectValidation;
 }
 
+std::vector<std::string> ValidationManager::isCourseDataValid(crow::query_string data, bool allowNulls)
+{
+	std::vector<std::string> incorrectValidation;
+
+	std::vector<std::string> fields =
+	{
+		"courseName",
+		"password"
+	};
+
+	for (auto field : fields)
+	{
+		if (allowNulls)
+		{
+			if (std::string(data.get(field)) == "")
+			{
+				continue;
+			}
+		}
+
+		if (!(getValidationHandler(field)(data.get(field))))
+		{
+			incorrectValidation.push_back(field);
+		}
+	}
+
+	return incorrectValidation;
+}
+
 ValidationHandler ValidationManager::getValidationHandler(std::string field)
 {
 	// Sorry, you cannot have string in switch statements :(
@@ -110,7 +139,7 @@ ValidationHandler ValidationManager::getValidationHandler(std::string field)
 		return (
 			[](std::string data) -> bool
 			{
-				const std::regex valRegex("^(?=.*[A-ZÀ-ßà-ÿa-z])([A-ZÀ-ß])([a-zà-ÿ]{2,29})$");
+				const std::regex valRegex("^(?=.*[A-Zï¿½-ï¿½ï¿½-ï¿½a-z])([A-Zï¿½-ï¿½])([a-zï¿½-ï¿½]{2,29})$");
 
 				return std::regex_match(data, valRegex);
 			}
@@ -170,7 +199,7 @@ ValidationHandler ValidationManager::getValidationHandler(std::string field)
 			}
 		);
 	}
-	else if (field == "orgName")
+	else if (field == "orgName" || field == "courseName")
 	{
 		return (
 			[](std::string data) -> bool

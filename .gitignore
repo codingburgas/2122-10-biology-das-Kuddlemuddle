@@ -354,6 +354,8 @@ MigrationBackup/
 users.json
 orgs.json
 userOrgRole.json
+courses.json
+userCourseRole.json
 
 # Static folder
 static

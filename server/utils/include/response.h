@@ -9,4 +9,5 @@ public:
 	crow::json::wvalue createProfileJSONResponse(std::vector<std::string> fields);
 	crow::json::wvalue createOrgJSONResponse(OrgInfo data);
 	crow::json::wvalue createOrgsJSONResponse(std::vector<OrgInfo> data);
+	crow::json::wvalue createCourseJSONResponse(CourseInfo data);
 };

@@ -61,6 +61,11 @@ crow::json::wvalue ResponseJSONManager::createOrgJSONResponse(OrgInfo data)
 		resBody["org-users"][i] = { {"user-id:", data.users[i].id} , {"role-id", data.users[i].role} };
 	}
 
+	for (size_t i = 0; i < data.courses.size(); i++)
+	{
+		resBody["org-courses"][i] = { {"course-id:", data.courses[i].id} , {"course-name", data.courses[i].name} };
+	}
+
 	return resBody;
 }
 
@@ -73,6 +78,23 @@ crow::json::wvalue ResponseJSONManager::createOrgsJSONResponse(std::vector<OrgIn
 	for (size_t i = 0; i < data.size(); i++)
 	{
 		resBody["orgs"][i] = { {"org-id:", data[i].id} , {"org-name", data[i].name} };
+	}
+
+	return resBody;
+}
+
+crow::json::wvalue ResponseJSONManager::createCourseJSONResponse(CourseInfo data)
+{
+	crow::json::wvalue resBody;
+
+	resBody["type"] = "get-organisation-success";
+	resBody["course-id"] = data.id;
+	resBody["course-name"] = data.name;
+	resBody["org-id"] = data.orgId;
+
+	for (size_t i = 0; i < data.users.size(); i++)
+	{
+		resBody["course-users"][i] = { {"user-id:", data.users[i].id} , {"role-id", data.users[i].role} };
 	}
 
 	return resBody;

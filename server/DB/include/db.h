@@ -21,13 +21,21 @@ struct OrgUser
 	int role;
 };
 
+struct CourseInfo
+{
+	int id;
+	int orgId;
+	std::string name;
+	std::vector<OrgUser> users;
+	std::vector<std::string> errors;
+};
+
 struct OrgInfo
 {
 	int id;
 	std::string name;
 	std::vector<OrgUser> users;
-	// Should add courses
-	// std::vector<Courses> courses
+	std::vector<CourseInfo> courses;
 	std::vector<std::string> errors;
 };
 
@@ -49,11 +57,23 @@ public:
 	std::vector<std::string> updateOrg(int orgId, crow::query_string data);
 	OrgInfo getOrgInfo(std::string orgName);
 	std::vector<OrgInfo> getAllOrgsInfo();
+	std::vector<std::string> createCourse(crow::query_string data);
+	std::vector<std::string> doesPasswordMatchCourse(std::string password, int courseId);
+	std::vector<std::string> addUserToCourse(int userId, int courseId, UserRolesInOrgs userRolesInOrgs, bool createNewEntry = true);
+	CourseInfo getCourseInfo(int courseId);
+	//std::vector<std::string> getCourseIdByName(std::string courseName);
+	std::vector<std::string> getCourseNameById(int id);
+	std::vector<std::string> isUserInCourseAndGetRole(int userId, int courseId);
+	std::vector<CourseInfo> getAllCoursesInOrgWithID(int orgId);
+	std::vector<std::string> deleteCourse(int courseId);
+	std::vector<OrgUser> getCourseUsersByCourseId(int courseId);
+	std::vector<std::string> updateCourse(int courseId, crow::query_string data);
 private:
 	nlohmann::json getJSONFromFile(std::string filename);
 	bool setJSONFile(nlohmann::json json, std::string filename);
 	int getLastId(nlohmann::json json);
-	// Might need to be changed to get the user class
 	bool checkIfValueExistsInField(nlohmann::json json, std::string field, std::string fieldData);
+	bool checkIfValueExistsInField(nlohmann::json json, std::string field, std::string fieldData, std::string field2, std::string fieldData2);
 	std::vector<OrgUser> getOrgUsersByOrgId(int orgId);
+	std::vector<std::string> getCourseOrgById(int id);
 };

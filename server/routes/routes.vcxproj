@@ -167,7 +167,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(ProjectDir)include;$(SolutionDir)DB\include;$(SolutionDir)utils\include;$(SolutionDir)middlewares\include;$(SolutionDir)server\include;D:\lib\boost_1_77_0;C:\StoyanJR\boost_1_78_0\boost_1_78_0</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;$(SolutionDir)DB\include;$(SolutionDir)utils\include;$(SolutionDir)middlewares\include;$(SolutionDir)server\include;D:\lib\boost_1_77_0;C:\StoyanJR\boost_1_78_0\boost_1_78_0;C:\boost_1_79_0\boost_1_79_0</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
