@@ -1070,7 +1070,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware> &a
 					return;
 				}
 
-				std::vector<std::string> recordSet = dbManager.isUserInOrgAndGetRole(ctx.userId, courseInfo.id);
+				std::vector<std::string> recordSet = dbManager.isUserInOrgAndGetRole(ctx.userId, courseInfo.orgId);
 
 				// User is not admin
 				if (recordSet[0] != "1" || recordSet[1] != "2")
@@ -1086,7 +1086,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware> &a
 					return;
 				}
 
-				recordSet = dbManager.isUserInOrgAndGetRole(std::stoi(reqData.get("teacherId")), courseInfo.id);
+				recordSet = dbManager.isUserInOrgAndGetRole(std::stoi(reqData.get("teacherId")), courseInfo.orgId);
 
 				// User is not admin
 				if (recordSet[0] != "1" || recordSet[1] != "1")
@@ -1191,6 +1191,8 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware> &a
 					return;
 				}
 
+				courseInfo.topics = dbManager.getAllTopicsInCourseWithID(courseId);
+
 				res = responseJSONManager.createCourseJSONResponse(courseInfo);
 				res.end();
 				return;
@@ -1291,58 +1293,9 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware> &a
 					return;
 				}
 
-				CourseInfo courseInfo = dbManager.getCourseInfo(courseId);
+				recordSet = dbManager.canUserAccessCourse(courseId, ctx.userId, true);
 
-				if (!courseInfo.errors.empty())
-				{
-					std::string log = "Failed to get course info for course with name: " + std::to_string(courseId) + ". Reasons: ";
-
-					for (auto el : courseInfo.errors)
-					{
-						log += el + " ";
-					}
-
-					CROW_LOG_WARNING << log;
-
-					res = responseJSONManager.createJSONResponse(false, courseInfo.errors, "join-course");
-					res.end();
-					return;
-				}
-
-				recordSet = dbManager.isUserInOrgAndGetRole(ctx.userId, courseInfo.orgId);
-
-				// Error happend
-				if (recordSet[0] != "1" || recordSet[1] == "0")
-				{
-					std::string log = "Failed to update course info with id: " + std::to_string(courseId) + ". Reason: User is unauthorised";
-					recordSet[0] = "User is unauthorised";
-
-					CROW_LOG_WARNING << log;
-
-					res = responseJSONManager.createJSONResponse(false, recordSet, "course-update");
-					res.code = 403;
-					res.end();
-					return;
-				}
-
-				std::vector<OrgUser> userInCourse = dbManager.getCourseUsersByCourseId(courseId);
-				
-				bool isUserAuthorised = false;
-				
-				if (recordSet[1] == "2")
-				{
-					isUserAuthorised = true;
-				}
-
-				for (auto& el : userInCourse)
-				{
-					if (el.id == ctx.userId && el.role == 1)
-					{
-						isUserAuthorised = true;
-					}
-				}
-
-				if (!isUserAuthorised)
+				if (recordSet[0] != "1")
 				{
 					std::string log = "Failed to update course info with id: " + std::to_string(courseId) + ". Reason: User is unauthorised";
 					recordSet[0] = "User is unauthorised";
@@ -1374,6 +1327,239 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware> &a
 				}
 
 				res = responseJSONManager.createJSONResponse(true, recordSet, "course-update");
+				res.end();
+				return;
+			});
+
+	CROW_BP_ROUTE(api, "/createNewTopic")
+		.methods(crow::HTTPMethod::Post)
+		.middlewares<crow::App<crow::CORSHandler, AuthorisationMiddleware>, AuthorisationMiddleware>()
+		//CROW_MIDDLEWARES(app, AuthorisationMiddleware)
+		([&](const crow::request& req, crow::response& res)
+			{
+				auto reqData = crow::query_string("?" + req.body);
+				auto& ctx = app.get_context<AuthorisationMiddleware>(req);
+
+				CROW_LOG_INFO << "User with id: " << ctx.userId << " is trying to create new topic with name: " << reqData.get("topicName") << " in course with id: " << reqData.get("courseId");
+
+				std::vector<std::string> recordSet = dbManager.canUserAccessCourse(std::stoi(reqData.get("courseId")), ctx.userId, true);
+
+				if (recordSet[0] != "1")
+				{
+					std::string log = "Failed to create new topic with name: " + std::string(reqData.get("topicName")) + ". Reason: User is unauthorised";
+					recordSet[0] = "User is unauthorised";
+
+					CROW_LOG_WARNING << log;
+
+					res = responseJSONManager.createJSONResponse(false, recordSet, "topic-register");
+					res.code = 403;
+					res.end();
+					return;
+				}
+
+				// TODO: Hash password
+
+				recordSet = dbManager.createTopic(reqData);
+
+				// If saving to database fails
+				if (recordSet.size() != 0)
+				{
+					std::string log = "Failed to save topic with name: " + std::string(reqData.get("topicName")) + " to the database. Reason/s: ";
+
+					for (auto el : recordSet)
+					{
+						log += el + " ";
+					}
+
+					CROW_LOG_WARNING << log;
+
+					res = responseJSONManager.createJSONResponse(false, recordSet, "topic-register");
+					res.end();
+					return;
+				}
+
+				CROW_LOG_INFO << "Topic with name: " + std::string(reqData.get("topicName")) + " is successfully saved into the database.";
+
+				// Create and send request
+				res = responseJSONManager.createJSONResponse(true, recordSet, "topic-register");
+				res.end();
+				return;
+			});
+
+	CROW_BP_ROUTE(api, "/topics/<int>")
+		.methods(crow::HTTPMethod::Get)
+		.middlewares<crow::App<crow::CORSHandler, AuthorisationMiddleware>, AuthorisationMiddleware>()
+		([&](const crow::request& req, crow::response& res, int topicId)
+			{
+				auto& ctx = app.get_context<AuthorisationMiddleware>(req);
+
+				CROW_LOG_INFO << "User with id: " << ctx.userId << " is trying to get information for topic: " << topicId;
+
+				TopicInfo topicInfo = dbManager.getTopicInfo(topicId);
+
+				if (!topicInfo.errors.empty())
+				{
+					std::string log = "Failed to get topic info for topic with id: " + std::to_string(topicId) + ". Reasons: ";
+
+					for (auto el : topicInfo.errors)
+					{
+						log += el + " ";
+					}
+
+					CROW_LOG_WARNING << log;
+
+					res = responseJSONManager.createJSONResponse(false, topicInfo.errors, "get-topic");
+					res.end();
+					return;
+				}
+
+				std::vector<std::string> recordSet = dbManager.canUserAccessCourse(topicInfo.courseId, ctx.userId);
+
+				if (recordSet[0] != "1")
+				{
+					std::string log = "Failed to get topic with id: " + std::to_string(topicId) + ". Reason: User is unauthorised";
+					recordSet[0] = "User is unauthorised";
+
+					CROW_LOG_WARNING << log;
+
+					res = responseJSONManager.createJSONResponse(false, recordSet, "get-topic");
+					res.code = 403;
+					res.end();
+					return;
+				}
+
+				res = responseJSONManager.createTopicJSONResponse(topicInfo);
+				res.end();
+				return;
+			});
+
+	CROW_BP_ROUTE(api, "/topics/<int>")
+		.methods(crow::HTTPMethod::Delete)
+		.middlewares<crow::App<crow::CORSHandler, AuthorisationMiddleware>, AuthorisationMiddleware>()
+		([&](const crow::request& req, crow::response& res, int topicId)
+			{
+				auto& ctx = app.get_context<AuthorisationMiddleware>(req);
+
+				CROW_LOG_INFO << "User with id: " << ctx.userId << " is trying to delete topic with id: " << topicId;
+
+				TopicInfo topicInfo = dbManager.getTopicInfo(topicId);
+
+				if (!topicInfo.errors.empty())
+				{
+					std::string log = "Failed to delete topic with id: " + std::to_string(topicId) + ". Reasons: ";
+
+					for (auto el : topicInfo.errors)
+					{
+						log += el + " ";
+					}
+
+					CROW_LOG_WARNING << log;
+
+					res = responseJSONManager.createJSONResponse(false, topicInfo.errors, "topic-deletion");
+					res.end();
+					return;
+				}
+
+				std::vector<std::string> recordSet = dbManager.canUserAccessCourse(topicInfo.courseId, ctx.userId, true);
+
+				if (recordSet[0] != "1")
+				{
+					std::string log = "Failed to delete topic with id: " + std::to_string(topicId) + ". Reason: User is unauthorised";
+					recordSet[0] = "User is unauthorised";
+
+					CROW_LOG_WARNING << log;
+
+					res = responseJSONManager.createJSONResponse(false, recordSet, "topic-deletion");
+					res.code = 403;
+					res.end();
+					return;
+				}
+
+				recordSet = dbManager.deleteTopic(topicId);
+
+				if (recordSet.size() != 0)
+				{
+					std::string log = "Failed to delete topic. Reason: ";
+
+					for (auto el : recordSet)
+					{
+						log += el + " ";
+					}
+
+					CROW_LOG_WARNING << log;
+
+					res = responseJSONManager.createJSONResponse(false, recordSet, "topic-deletion");
+					res.end();
+					return;
+				}
+
+				res = responseJSONManager.createJSONResponse(true, recordSet, "topic-deletion");
+				res.end();
+				return;
+			});
+
+	CROW_BP_ROUTE(api, "/topics/<int>")
+		.methods(crow::HTTPMethod::Patch)
+		.middlewares<crow::App<crow::CORSHandler, AuthorisationMiddleware>, AuthorisationMiddleware>()
+		([&](const crow::request& req, crow::response& res, int topicId)
+			{
+				auto& ctx = app.get_context<AuthorisationMiddleware>(req);
+				auto updateData = crow::query_string("?" + req.body);
+
+				CROW_LOG_INFO << "User with id: " << ctx.userId << " is trying to update information for topic with id: " << topicId;
+
+				TopicInfo topicInfo = dbManager.getTopicInfo(topicId);
+
+				if (!topicInfo.errors.empty())
+				{
+					std::string log = "Failed to update topic with id: " + std::to_string(topicId) + ". Reasons: ";
+
+					for (auto el : topicInfo.errors)
+					{
+						log += el + " ";
+					}
+
+					CROW_LOG_WARNING << log;
+
+					res = responseJSONManager.createJSONResponse(false, topicInfo.errors, "topic-update");
+					res.end();
+					return;
+				}
+
+				std::vector<std::string> recordSet = dbManager.canUserAccessCourse(topicInfo.courseId, ctx.userId, true);
+
+				if (recordSet[0] != "1")
+				{
+					std::string log = "Failed to update topic with id: " + std::to_string(topicId) + ". Reason: User is unauthorised";
+					recordSet[0] = "User is unauthorised";
+
+					CROW_LOG_WARNING << log;
+
+					res = responseJSONManager.createJSONResponse(false, recordSet, "topic-update");
+					res.code = 403;
+					res.end();
+					return;
+				}
+
+				recordSet = dbManager.updateTopic(topicId, updateData);
+
+				if (recordSet.size() != 0)
+				{
+					std::string log = "Failed to update topic. Reason: ";
+
+					for (auto el : recordSet)
+					{
+						log += el + " ";
+					}
+
+					CROW_LOG_WARNING << log;
+
+					res = responseJSONManager.createJSONResponse(false, recordSet, "topic-update");
+					res.end();
+					return;
+				}
+
+				res = responseJSONManager.createJSONResponse(true, recordSet, "topic-update");
 				res.end();
 				return;
 			});

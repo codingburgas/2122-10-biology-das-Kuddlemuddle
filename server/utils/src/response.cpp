@@ -87,7 +87,7 @@ crow::json::wvalue ResponseJSONManager::createCourseJSONResponse(CourseInfo data
 {
 	crow::json::wvalue resBody;
 
-	resBody["type"] = "get-organisation-success";
+	resBody["type"] = "get-course-success";
 	resBody["course-id"] = data.id;
 	resBody["course-name"] = data.name;
 	resBody["org-id"] = data.orgId;
@@ -97,5 +97,23 @@ crow::json::wvalue ResponseJSONManager::createCourseJSONResponse(CourseInfo data
 		resBody["course-users"][i] = { {"user-id:", data.users[i].id} , {"role-id", data.users[i].role} };
 	}
 
+	for (size_t i = 0; i < data.topics.size(); i++)
+	{
+		resBody["course-topics"][i] = { {"topic-id:", data.topics[i].id} , {"topic-name", data.topics[i].name} };
+	}
+
 	return resBody;
 }
+
+crow::json::wvalue ResponseJSONManager::createTopicJSONResponse(TopicInfo data)
+{
+	crow::json::wvalue resBody;
+
+	resBody["type"] = "get-organisation-success";
+	resBody["topic-id"] = data.id;
+	resBody["topic-name"] = data.name;
+	resBody["course-id"] = data.courseId;
+
+	return resBody;
+}
+

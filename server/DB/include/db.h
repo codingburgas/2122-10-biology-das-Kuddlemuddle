@@ -21,12 +21,24 @@ struct OrgUser
 	int role;
 };
 
+struct TopicInfo
+{
+	int id;
+	int courseId;
+	std::string name;
+	//Add test and lessons
+	//std::vector<LessonInfo> lessons
+	//std::vector<TestInfo> tests
+	std::vector<std::string> errors;
+};
+
 struct CourseInfo
 {
 	int id;
 	int orgId;
 	std::string name;
 	std::vector<OrgUser> users;
+	std::vector<TopicInfo> topics;
 	std::vector<std::string> errors;
 };
 
@@ -68,6 +80,12 @@ public:
 	std::vector<std::string> deleteCourse(int courseId);
 	std::vector<OrgUser> getCourseUsersByCourseId(int courseId);
 	std::vector<std::string> updateCourse(int courseId, crow::query_string data);
+	std::vector<std::string> canUserAccessCourse(int courseId, int userId, bool userCanEdit = false);
+	std::vector<std::string> createTopic(crow::query_string data);
+	TopicInfo getTopicInfo(int topicId);
+	std::vector<TopicInfo> getAllTopicsInCourseWithID(int courseId);
+	std::vector<std::string> deleteTopic(int courseId);
+	std::vector<std::string> updateTopic(int topicId, crow::query_string data);
 private:
 	nlohmann::json getJSONFromFile(std::string filename);
 	bool setJSONFile(nlohmann::json json, std::string filename);
@@ -76,4 +94,6 @@ private:
 	bool checkIfValueExistsInField(nlohmann::json json, std::string field, std::string fieldData, std::string field2, std::string fieldData2);
 	std::vector<OrgUser> getOrgUsersByOrgId(int orgId);
 	std::vector<std::string> getCourseOrgById(int id);
+	std::vector<std::string> getTopicCourseById(int id);
+	std::vector<std::string> getTopicNameById(int id);
 };
