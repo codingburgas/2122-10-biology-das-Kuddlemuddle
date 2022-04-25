@@ -1428,6 +1428,8 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware> &a
 					return;
 				}
 
+				topicInfo.lessons = dbManager.getAllLessonInTopicWithID(topicId);
+
 				res = responseJSONManager.createTopicJSONResponse(topicInfo);
 				res.end();
 				return;
@@ -1560,6 +1562,261 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware> &a
 				}
 
 				res = responseJSONManager.createJSONResponse(true, recordSet, "topic-update");
+				res.end();
+				return;
+			});
+
+	CROW_BP_ROUTE(api, "/createNewLesson")
+		.methods(crow::HTTPMethod::Post)
+		.middlewares<crow::App<crow::CORSHandler, AuthorisationMiddleware>, AuthorisationMiddleware>()
+		//CROW_MIDDLEWARES(app, AuthorisationMiddleware)
+		([&](const crow::request& req, crow::response& res)
+			{
+				auto reqData = crow::query_string("?" + req.body);
+				auto& ctx = app.get_context<AuthorisationMiddleware>(req);
+
+				CROW_LOG_INFO << "User with id: " << ctx.userId << " is trying to create new lesson with name: " << reqData.get("lessonName") << " in topic with id: " << reqData.get("topicId");
+
+				TopicInfo topicInfo = dbManager.getTopicInfo(std::stoi(reqData.get("topicId")));
+
+				if (!topicInfo.errors.empty())
+				{
+					std::string log = "Failed to get topic info for topic with id: " + std::string(reqData.get("topicId")) + ". Reasons: ";
+
+					for (auto el : topicInfo.errors)
+					{
+						log += el + " ";
+					}
+
+					CROW_LOG_WARNING << log;
+
+					res = responseJSONManager.createJSONResponse(false, topicInfo.errors, "lesson-register");
+					res.end();
+					return;
+				}
+
+				std::vector<std::string> recordSet = dbManager.canUserAccessCourse(std::stoi(reqData.get("topicId")), ctx.userId, true);
+
+				if (recordSet[0] != "1")
+				{
+					std::string log = "Failed to create new lesson with name: " + std::string(reqData.get("lessonName")) + ". Reason: User is unauthorised";
+					recordSet[0] = "User is unauthorised";
+
+					CROW_LOG_WARNING << log;
+
+					res = responseJSONManager.createJSONResponse(false, recordSet, "lesson-register");
+					res.code = 403;
+					res.end();
+					return;
+				}
+
+				recordSet = dbManager.createLesson(reqData);
+
+				// If saving to database fails
+				if (recordSet.size() != 0)
+				{
+					std::string log = "Failed to save lesson with name: " + std::string(reqData.get("lessonName")) + " to the database. Reason/s: ";
+
+					for (auto el : recordSet)
+					{
+						log += el + " ";
+					}
+
+					CROW_LOG_WARNING << log;
+
+					res = responseJSONManager.createJSONResponse(false, recordSet, "lesson-register");
+					res.end();
+					return;
+				}
+
+				CROW_LOG_INFO << "Lesson with name: " + std::string(reqData.get("lessonName")) + " is successfully saved into the database.";
+
+				// Create and send request
+				res = responseJSONManager.createJSONResponse(true, recordSet, "lesson-register");
+				res.end();
+				return;
+			});
+
+	CROW_BP_ROUTE(api, "/lessons/<int>")
+		.methods(crow::HTTPMethod::Get)
+		.middlewares<crow::App<crow::CORSHandler, AuthorisationMiddleware>, AuthorisationMiddleware>()
+		([&](const crow::request& req, crow::response& res, int lessonId)
+			{
+				auto& ctx = app.get_context<AuthorisationMiddleware>(req);
+
+				CROW_LOG_INFO << "User with id: " << ctx.userId << " is trying to get information for lesson with id: " << lessonId;
+
+				LessonInfo lessonInfo = dbManager.getLessonInfo(lessonId);
+
+				if (!lessonInfo.errors.empty())
+				{
+					std::string log = "Failed to get lesson info for topic with id: " + std::to_string(lessonId) + ". Reasons: ";
+
+					for (auto el : lessonInfo.errors)
+					{
+						log += el + " ";
+					}
+
+					CROW_LOG_WARNING << log;
+
+					res = responseJSONManager.createJSONResponse(false, lessonInfo.errors, "get-lesson");
+					res.end();
+					return;
+				}
+
+				TopicInfo topicInfo = dbManager.getTopicInfo(lessonInfo.topicId);
+
+				std::vector<std::string> recordSet = dbManager.canUserAccessCourse(topicInfo.courseId, ctx.userId);
+
+				if (recordSet[0] != "1")
+				{
+					std::string log = "Failed to get lesson with id: " + std::to_string(lessonId) + ". Reason: User is unauthorised";
+					recordSet[0] = "User is unauthorised";
+
+					CROW_LOG_WARNING << log;
+
+					res = responseJSONManager.createJSONResponse(false, recordSet, "get-lesson");
+					res.code = 403;
+					res.end();
+					return;
+				}
+
+				res = responseJSONManager.createLessonJSONResponse(lessonInfo);
+				res.end();
+				return;
+			});
+
+	CROW_BP_ROUTE(api, "/lessons/<int>")
+		.methods(crow::HTTPMethod::Delete)
+		.middlewares<crow::App<crow::CORSHandler, AuthorisationMiddleware>, AuthorisationMiddleware>()
+		([&](const crow::request& req, crow::response& res, int lessonId)
+			{
+				auto& ctx = app.get_context<AuthorisationMiddleware>(req);
+
+				CROW_LOG_INFO << "User with id: " << ctx.userId << " is trying to delete lesson with id: " << lessonId;
+
+				LessonInfo lessonInfo = dbManager.getLessonInfo(lessonId);
+
+				if (!lessonInfo.errors.empty())
+				{
+					std::string log = "Failed to delete lesson with id: " + std::to_string(lessonId) + ". Reasons: ";
+
+					for (auto el : lessonInfo.errors)
+					{
+						log += el + " ";
+					}
+
+					CROW_LOG_WARNING << log;
+
+					res = responseJSONManager.createJSONResponse(false, lessonInfo.errors, "lesson-deletion");
+					res.end();
+					return;
+				}
+
+				TopicInfo topicInfo = dbManager.getTopicInfo(lessonInfo.topicId);
+
+				std::vector<std::string> recordSet = dbManager.canUserAccessCourse(topicInfo.courseId, ctx.userId, true);
+
+				if (recordSet[0] != "1")
+				{
+					std::string log = "Failed to delete lesson with id: " + std::to_string(lessonId) + ". Reason: User is unauthorised";
+					recordSet[0] = "User is unauthorised";
+
+					CROW_LOG_WARNING << log;
+
+					res = responseJSONManager.createJSONResponse(false, recordSet, "lesson-deletion");
+					res.code = 403;
+					res.end();
+					return;
+				}
+
+				recordSet = dbManager.deleteLesson(lessonId);
+
+				if (recordSet.size() != 0)
+				{
+					std::string log = "Failed to delete lesson. Reason: ";
+
+					for (auto el : recordSet)
+					{
+						log += el + " ";
+					}
+
+					CROW_LOG_WARNING << log;
+
+					res = responseJSONManager.createJSONResponse(false, recordSet, "lesson-deletion");
+					res.end();
+					return;
+				}
+
+				res = responseJSONManager.createJSONResponse(true, recordSet, "lesson-deletion");
+				res.end();
+				return;
+			});
+
+	CROW_BP_ROUTE(api, "/lessons/<int>")
+		.methods(crow::HTTPMethod::Patch)
+		.middlewares<crow::App<crow::CORSHandler, AuthorisationMiddleware>, AuthorisationMiddleware>()
+		([&](const crow::request& req, crow::response& res, int lessonId)
+			{
+				auto& ctx = app.get_context<AuthorisationMiddleware>(req);
+				auto updateData = crow::query_string("?" + req.body);
+
+				CROW_LOG_INFO << "User with id: " << ctx.userId << " is trying to update information for lesson with id: " << lessonId;
+
+				LessonInfo lessonInfo = dbManager.getLessonInfo(lessonId);
+
+				if (!lessonInfo.errors.empty())
+				{
+					std::string log = "Failed to update lesson with id: " + std::to_string(lessonId) + ". Reasons: ";
+
+					for (auto el : lessonInfo.errors)
+					{
+						log += el + " ";
+					}
+
+					CROW_LOG_WARNING << log;
+
+					res = responseJSONManager.createJSONResponse(false, lessonInfo.errors, "leson-update");
+					res.end();
+					return;
+				}
+
+				TopicInfo topicInfo = dbManager.getTopicInfo(lessonInfo.topicId);
+
+				std::vector<std::string> recordSet = dbManager.canUserAccessCourse(topicInfo.courseId, ctx.userId, true);
+
+				if (recordSet[0] != "1")
+				{
+					std::string log = "Failed to update lesson with id: " + std::to_string(lessonId) + ". Reason: User is unauthorised";
+					recordSet[0] = "User is unauthorised";
+
+					CROW_LOG_WARNING << log;
+
+					res = responseJSONManager.createJSONResponse(false, recordSet, "lesson-update");
+					res.code = 403;
+					res.end();
+					return;
+				}
+
+				recordSet = dbManager.updateLesson(lessonId, updateData);
+
+				if (recordSet.size() != 0)
+				{
+					std::string log = "Failed to update lesson. Reason: ";
+
+					for (auto el : recordSet)
+					{
+						log += el + " ";
+					}
+
+					CROW_LOG_WARNING << log;
+
+					res = responseJSONManager.createJSONResponse(false, recordSet, "lesson-update");
+					res.end();
+					return;
+				}
+
+				res = responseJSONManager.createJSONResponse(true, recordSet, "lesson-update");
 				res.end();
 				return;
 			});

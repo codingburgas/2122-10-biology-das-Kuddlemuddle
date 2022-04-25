@@ -21,14 +21,23 @@ struct OrgUser
 	int role;
 };
 
+struct LessonInfo
+{
+	int id;
+	int topicId;
+	std::string name;
+	std::string data;
+	std::vector<std::string> errors;
+};
+
 struct TopicInfo
 {
 	int id;
 	int courseId;
 	std::string name;
-	//Add test and lessons
-	//std::vector<LessonInfo> lessons
-	//std::vector<TestInfo> tests
+	std::vector<LessonInfo> lessons;
+	//Add tests
+	//std::vector<TestInfo> tests;
 	std::vector<std::string> errors;
 };
 
@@ -86,6 +95,11 @@ public:
 	std::vector<TopicInfo> getAllTopicsInCourseWithID(int courseId);
 	std::vector<std::string> deleteTopic(int courseId);
 	std::vector<std::string> updateTopic(int topicId, crow::query_string data);
+	std::vector<std::string> createLesson(crow::query_string data);
+	LessonInfo getLessonInfo(int lessonId);
+	std::vector<LessonInfo> getAllLessonInTopicWithID(int topicId);
+	std::vector<std::string> deleteLesson(int lessonId);
+	std::vector<std::string> updateLesson(int lessonId, crow::query_string data);
 private:
 	nlohmann::json getJSONFromFile(std::string filename);
 	bool setJSONFile(nlohmann::json json, std::string filename);
@@ -96,4 +110,7 @@ private:
 	std::vector<std::string> getCourseOrgById(int id);
 	std::vector<std::string> getTopicCourseById(int id);
 	std::vector<std::string> getTopicNameById(int id);
+	std::vector<std::string> getLessonTopicById(int id);
+	std::vector<std::string> getLessonNameById(int id);
+	std::vector<std::string> getLessonDataById(int id);
 };

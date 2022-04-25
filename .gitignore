@@ -357,6 +357,7 @@ userOrgRole.json
 courses.json
 userCourseRole.json
 topics.json
+lessons.json
 
 # Static folder
 static

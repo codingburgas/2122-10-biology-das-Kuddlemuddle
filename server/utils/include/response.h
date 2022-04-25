@@ -11,4 +11,5 @@ public:
 	crow::json::wvalue createOrgsJSONResponse(std::vector<OrgInfo> data);
 	crow::json::wvalue createCourseJSONResponse(CourseInfo data);
 	crow::json::wvalue createTopicJSONResponse(TopicInfo data);
+	crow::json::wvalue createLessonJSONResponse(LessonInfo data);
 };

@@ -1295,11 +1295,13 @@ std::vector<std::string> DBManager::deleteTopic(int topicId)
 {
 	std::vector<std::string> recordSet;
 	nlohmann::json topicsJSON;
+	nlohmann::json lessonsJSON;
 
 	// Get the JSON from the file
 	try
 	{
 		topicsJSON = getJSONFromFile("topics.json");
+		lessonsJSON = getJSONFromFile("lessons.json");
 	}
 	catch (std::string ex)
 	{
@@ -1322,6 +1324,14 @@ std::vector<std::string> DBManager::deleteTopic(int topicId)
 		else
 		{
 			++it;
+		}
+	}
+
+	for (auto it = lessonsJSON.begin(); it != lessonsJSON.end(); ++it)
+	{
+		if (it.value()["TopicID"] == std::to_string(topicId))
+		{
+			deleteLesson(it.value()["ID"]);
 		}
 	}
 
@@ -1361,6 +1371,182 @@ std::vector<std::string> DBManager::updateTopic(int topicId, crow::query_string 
 
 	// If the execution goes here, there should be smt very wrong
 	recordSet.push_back("Could not find topic with id: " + std::to_string(topicId));
+	return recordSet;
+}
+
+std::vector<std::string> DBManager::createLesson(crow::query_string data)
+{
+	std::vector<std::string> recordSet;
+
+	nlohmann::json lessonsJSON;
+
+	// Get the JSON from the file
+	try
+	{
+		lessonsJSON = getJSONFromFile("lessons.json");
+	}
+	catch (std::string ex)
+	{
+		recordSet.push_back("Could'n open lessons.json file");
+		return recordSet;
+	}
+
+	// Check for duplicate name
+	if (checkIfValueExistsInField(lessonsJSON, "Name", data.get("lessonName"), "TopicID", data.get("topicId")))
+	{
+		recordSet.push_back("There is already a lesson with this name: " + std::string(data.get("lessonName")));
+		return recordSet;
+	}
+
+	// Check if json is []
+	if (lessonsJSON.is_array())
+	{
+		if (lessonsJSON.empty())
+		{
+			lessonsJSON = nullptr;
+		}
+	}
+
+	// Add the user to the JSON
+	lessonsJSON.push_back(
+		{
+		{ "ID", getLastId(lessonsJSON) + 1},
+		{ "Name", data.get("lessonName") },
+		{ "Data", data.get("lessonData") },
+		{ "TopicID", data.get("topicId") }
+		}
+	);
+
+	// Save the json to the file
+	if (!setJSONFile(lessonsJSON, "lessons.json"))
+	{
+		recordSet.push_back("Could'n open lessons.json file");
+		return recordSet;
+	}
+
+	return recordSet;
+}
+
+LessonInfo DBManager::getLessonInfo(int lessonId)
+{
+	LessonInfo returnValue;
+
+	returnValue.id = lessonId;
+
+	if (getLessonNameById(lessonId).empty())
+	{
+		returnValue.errors.push_back("Can not find lesson with id: " + std::to_string(lessonId));
+		return returnValue;
+	}
+	
+	returnValue.name = getLessonNameById(lessonId)[0];
+	returnValue.topicId = std::stoi(getLessonTopicById(lessonId)[0]);
+	returnValue.data = getLessonDataById(lessonId)[0];
+
+	return returnValue;
+}
+
+std::vector<LessonInfo> DBManager::getAllLessonInTopicWithID(int topicId)
+{
+	std::vector<LessonInfo> recordSet;
+
+	nlohmann::json lessonsJSON;
+
+	// Get the JSON from the file
+	try
+	{
+		lessonsJSON = getJSONFromFile("lessons.json");
+	}
+	catch (std::string ex)
+	{
+		recordSet[0].errors.push_back("Could'n open lessons.json file");
+		return recordSet;
+	}
+
+	for (auto it = lessonsJSON.begin(); it != lessonsJSON.end(); ++it)
+	{
+		if (it.value()["TopicID"] == std::to_string(topicId))
+		{
+			recordSet.push_back({ it.value()["ID"], topicId,  it.value()["Name"] });
+		}
+	}
+
+	return recordSet;
+}
+
+
+std::vector<std::string> DBManager::deleteLesson(int lessonId)
+{
+	std::vector<std::string> recordSet;
+	nlohmann::json lessonsJSON;
+
+	// Get the JSON from the file
+	try
+	{
+		lessonsJSON = getJSONFromFile("lessons.json");
+	}
+	catch (std::string ex)
+	{
+		recordSet.push_back("Could'n open lessons.json file");
+		return recordSet;
+	}
+
+	auto it = lessonsJSON.cbegin();
+	for (; it != lessonsJSON.cend();)
+	{
+		if (it.value()["ID"] == lessonId)
+		{
+			it = lessonsJSON.erase(it);
+			if (!setJSONFile(lessonsJSON, "lessons.json"))
+			{
+				recordSet.push_back("Could'n open lessons.json file");
+				return recordSet;
+			}
+		}
+		else
+		{
+			++it;
+		}
+	}
+
+	return recordSet;
+}
+
+
+std::vector<std::string> DBManager::updateLesson(int lessonId, crow::query_string data)
+{
+	std::vector<std::string> recordSet;
+	nlohmann::json lessonsJSON;
+
+	// Get the JSON from the file
+	try
+	{
+		lessonsJSON = getJSONFromFile("lessons.json");
+	}
+	catch (std::string ex)
+	{
+		recordSet.push_back("Could'n open lessons.json file");
+		return recordSet;
+	}
+
+	for (auto it = lessonsJSON.begin(); it != lessonsJSON.end(); ++it)
+	{
+		if (it.value()["ID"] == lessonId)
+		{
+			it.value()["Name"] = std::string(data.get("lessonName")).empty() ? it.value()["Name"] : data.get("lessonName");
+			it.value()["Data"] = std::string(data.get("lessonData")).empty() ? it.value()["Data"] : data.get("lessonData");
+
+			if (!setJSONFile(lessonsJSON, "lessons.json"))
+			{
+				recordSet.push_back("Could'n open lessons.json file");
+			}
+
+			return recordSet;
+		}
+	}
+
+	// If the execution goes here, there should be smt very wrong
+	recordSet.push_back("Could not find lessons with id: " + std::to_string(lessonId));
 	return recordSet;
 }
 
@@ -1612,6 +1798,87 @@ std::vector<std::string> DBManager::getTopicNameById(int id)
 		if (it.value()["ID"] == id)
 		{
 			recordSet.push_back(it.value()["Name"]);
+		}
+	}
+
+	return recordSet;
+}
+
+std::vector<std::string> DBManager::getLessonTopicById(int id)
+{
+	std::vector<std::string> recordSet;
+
+	nlohmann::json lessonsJSON;
+
+	// Get the JSON from the file
+	try
+	{
+		lessonsJSON = getJSONFromFile("lessons.json");
+	}
+	catch (std::string ex)
+	{
+		throw "Could'n open lessons.json file";
+	}
+
+	for (auto it = lessonsJSON.begin(); it != lessonsJSON.end(); ++it)
+	{
+		if (it.value()["ID"] == id)
+		{
+			recordSet.push_back(it.value()["TopicID"]);
+		}
+	}
+
+	return recordSet;
+}
+
+std::vector<std::string> DBManager::getLessonNameById(int id)
+{
+	std::vector<std::string> recordSet;
+
+	nlohmann::json lessonsJSON;
+
+	// Get the JSON from the file
+	try
+	{
+		lessonsJSON = getJSONFromFile("lessons.json");
+	}
+	catch (std::string ex)
+	{
+		throw "Could'n open lessons.json file";
+	}
+
+	for (auto it = lessonsJSON.begin(); it != lessonsJSON.end(); ++it)
+	{
+		if (it.value()["ID"] == id)
+		{
+			recordSet.push_back(it.value()["Name"]);
+		}
+	}
+
+	return recordSet;
+}
+
+std::vector<std::string> DBManager::getLessonDataById(int id)
+{
+	std::vector<std::string> recordSet;
+
+	nlohmann::json lessonsJSON;
+
+	// Get the JSON from the file
+	try
+	{
+		lessonsJSON = getJSONFromFile("lessons.json");
+	}
+	catch (std::string ex)
+	{
+		throw "Could'n open lessons.json file";
+	}
+
+	for (auto it = lessonsJSON.begin(); it != lessonsJSON.end(); ++it)
+	{
+		if (it.value()["ID"] == id)
+		{
+			recordSet.push_back(it.value()["Data"]);
 		}
 	}
 
