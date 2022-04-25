@@ -119,6 +119,11 @@ crow::json::wvalue ResponseJSONManager::createTopicJSONResponse(TopicInfo data)
 		resBody["topic-lessons"][i] = { {"lesson-id:", data.lessons[i].id} , {"lesson-name", data.lessons[i].name} };
 	}
 
+	for (size_t i = 0; i < data.quizzes.size(); i++)
+	{
+		resBody["topic-quizzes"][i] = { {"quiz-id:", data.quizzes[i].id} , {"quiz-name", data.quizzes[i].name} };
+	}
+
 	return resBody;
 }
 
@@ -135,3 +140,14 @@ crow::json::wvalue ResponseJSONManager::createLessonJSONResponse(LessonInfo data
 	return resBody;
 }
 
+crow::json::wvalue ResponseJSONManager::createQuizJSONResponse(QuizInfo data)
+{
+	crow::json::wvalue resBody;
+
+	resBody["type"] = "get-quiz-success";
+	resBody["quiz-id"] = data.id;
+	resBody["quiz-name"] = data.name;
+	resBody["topic-id"] = data.topicId;
+
+	return resBody;
+}

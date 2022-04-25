@@ -14,7 +14,7 @@ int main()
     crow::App<crow::CORSHandler, AuthorisationMiddleware> app;
 
     // Change the default handler to a new one
-    // with output to a file and a SEQ
+    // with output to a file and a SEQ (or any other graylog server)
     LoggerHandler loggerHandler;
     loggerHandler.initLogs();
 

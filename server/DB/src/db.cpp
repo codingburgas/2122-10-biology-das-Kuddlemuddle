@@ -663,6 +663,7 @@ OrgInfo DBManager::getOrgInfo(std::string orgName)
 	// Please don't broke here
 	returnValue.id = std::stoi(getOrgIdByName(orgName)[0]);
 	returnValue.name = orgName;
+	returnValue.courses = getAllCoursesInOrgWithID(returnValue.id);
 
 	try
 	{
@@ -866,16 +867,16 @@ CourseInfo DBManager::getCourseInfo(int courseId)
 	CourseInfo returnValue;
 
 	returnValue.id = courseId;
-	returnValue.name = getCourseNameById(courseId)[0];
-
-	if (getCourseOrgById(returnValue.id).empty())
+	if (getFieldDataInJSONByCriteria("courses.json", courseId, "ID", "Name").empty())
 	{
 		returnValue.errors.push_back("Can not find course with id: " + std::to_string(courseId));
 		return returnValue;
 	}
 
-	returnValue.orgId = std::stoi(getCourseOrgById(returnValue.id)[0]);
-
+	returnValue.name = getFieldDataInJSONByCriteria("courses.json", courseId, "ID", "Name")[0];
+	returnValue.orgId = std::stoi(getFieldDataInJSONByCriteria("courses.json", returnValue.id, "ID", "OrgID")[0]);
+	returnValue.topics = getAllTopicsInCourseWithID(courseId);
+	
 	try
 	{
 		returnValue.users = getCourseUsersByCourseId(returnValue.id);
@@ -1062,15 +1063,17 @@ TopicInfo DBManager::getTopicInfo(int topicId)
 	TopicInfo returnValue;
 
 	returnValue.id = topicId;
-	returnValue.name = getTopicNameById(topicId)[0];
-
-	if (getTopicCourseById(returnValue.id).empty())
+	
+	if (getFieldDataInJSONByCriteria("topics.json", topicId, "ID", "Name").empty())
 	{
 		returnValue.errors.push_back("Can not find topic with id: " + std::to_string(topicId));
 		return returnValue;
 	}
 
-	returnValue.courseId = std::stoi(getTopicCourseById(returnValue.id)[0]);
+	returnValue.name = getFieldDataInJSONByCriteria("topics.json", topicId, "ID", "Name")[0];
+	returnValue.courseId = std::stoi(getFieldDataInJSONByCriteria("topics.json", topicId, "ID", "CourseID")[0]);
+	returnValue.lessons = getAllLessonInTopicWithID(topicId);
+	returnValue.quizzes = getAllQuizzesInTopicWithID(topicId);
 
 	return returnValue;
 }
@@ -1106,36 +1109,6 @@ std::vector<std::string> DBManager::getCourseIdByName(std::string courseName)
 	return recordSet;
 }
 */
-
-std::vector<std::string> DBManager::getCourseNameById(int id)
-{
-	std::vector<std::string> recordSet;
-
-	nlohmann::json coursesJSON;
-
-	// Get the JSON from the file
-	try
-	{
-		coursesJSON = getJSONFromFile("courses.json");
-	}
-	catch (std::string ex)
-	{
-		recordSet.push_back("Could'n open courses.json file");
-		return recordSet;
-	}
-
-	for (auto it = coursesJSON.begin(); it != coursesJSON.end(); ++it)
-	{
-		if (it.value()["ID"] == id)
-		{
-			recordSet.push_back(it.value()["Name"]);
-			return recordSet;
-		}
-	}
-
-	recordSet.push_back("Could not find course with id: " + std::to_string(id));
-	return recordSet;
-}
 
 std::vector<std::string> DBManager::isUserInCourseAndGetRole(int userId, int courseId)
 {
@@ -1296,12 +1269,14 @@ std::vector<std::string> DBManager::deleteTopic(int topicId)
 	std::vector<std::string> recordSet;
 	nlohmann::json topicsJSON;
 	nlohmann::json lessonsJSON;
+	nlohmann::json quizzesJSON;
 
 	// Get the JSON from the file
 	try
 	{
 		topicsJSON = getJSONFromFile("topics.json");
 		lessonsJSON = getJSONFromFile("lessons.json");
+		quizzesJSON = getJSONFromFile("quizzes.json");
 	}
 	catch (std::string ex)
 	{
@@ -1332,6 +1307,14 @@ std::vector<std::string> DBManager::deleteTopic(int topicId)
 		if (it.value()["TopicID"] == std::to_string(topicId))
 		{
 			deleteLesson(it.value()["ID"]);
+		}
+	}
+
+	for (auto it = quizzesJSON.begin(); it != quizzesJSON.end(); ++it)
+	{
+		if (it.value()["TopicID"] == std::to_string(topicId))
+		{
+			deleteQuiz(it.value()["ID"]);
 		}
 	}
 
@@ -1433,15 +1416,15 @@ LessonInfo DBManager::getLessonInfo(int lessonId)
 
 	returnValue.id = lessonId;
 
-	if (getLessonNameById(lessonId).empty())
+	if (getFieldDataInJSONByCriteria("lessons.json", lessonId, "ID", "Name").empty())
 	{
 		returnValue.errors.push_back("Can not find lesson with id: " + std::to_string(lessonId));
 		return returnValue;
 	}
 	
-	returnValue.name = getLessonNameById(lessonId)[0];
-	returnValue.topicId = std::stoi(getLessonTopicById(lessonId)[0]);
-	returnValue.data = getLessonDataById(lessonId)[0];
+	returnValue.name = getFieldDataInJSONByCriteria("lessons.json", lessonId, "ID", "Name")[0];
+	returnValue.topicId = std::stoi(getFieldDataInJSONByCriteria("lessons.json", lessonId, "ID", "TopicID")[0]);
+	returnValue.data = getFieldDataInJSONByCriteria("lessons.json", lessonId, "ID", "Data")[0];
 
 	return returnValue;
 }
@@ -1547,6 +1530,178 @@ std::vector<std::string> DBManager::updateLesson(int lessonId, crow::query_strin
 
 	// If the execution goes here, there should be smt very wrong
 	recordSet.push_back("Could not find lessons with id: " + std::to_string(lessonId));
+	return recordSet;
+}
+
+std::vector<std::string> DBManager::createQuiz(crow::query_string data)
+{
+	std::vector<std::string> recordSet;
+
+	nlohmann::json quizzesJSON;
+
+	// Get the JSON from the file
+	try
+	{
+		quizzesJSON = getJSONFromFile("quizzes.json");
+	}
+	catch (std::string ex)
+	{
+		recordSet.push_back("Could'n open quizzes.json file");
+		return recordSet;
+	}
+
+	// Check for duplicate name
+	if (checkIfValueExistsInField(quizzesJSON, "Name", data.get("quizName"), "TopicID", data.get("topicId")))
+	{
+		recordSet.push_back("There is already a quiz with this name: " + std::string(data.get("quizName")));
+		return recordSet;
+	}
+
+	// Check if json is []
+	if (quizzesJSON.is_array())
+	{
+		if (quizzesJSON.empty())
+		{
+			quizzesJSON = nullptr;
+		}
+	}
+
+	// Add the user to the JSON
+	quizzesJSON.push_back(
+		{
+		{ "ID", getLastId(quizzesJSON) + 1},
+		{ "Name", data.get("quizName") },
+		{ "TopicID", data.get("topicId") }
+		}
+	);
+
+	// Save the json to the file
+	if (!setJSONFile(quizzesJSON, "quizzes.json"))
+	{
+		recordSet.push_back("Could'n open quizzes.json file");
+		return recordSet;
+	}
+
+	return recordSet;
+}
+
+QuizInfo DBManager::getQuizInfo(int quizId)
+{
+	QuizInfo returnValue;
+
+	returnValue.id = quizId;
+
+	if (getFieldDataInJSONByCriteria("quizzes.json", quizId, "ID", "Name").empty())
+	{
+		returnValue.errors.push_back("Can not find quiz with id: " + std::to_string(quizId));
+		return returnValue;
+	}
+
+	returnValue.name = getFieldDataInJSONByCriteria("quizzes.json", quizId, "ID", "Name")[0];
+	returnValue.topicId = std::stoi(getFieldDataInJSONByCriteria("quizzes.json", quizId, "ID", "TopicID")[0]);
+	//returnValue.data = getFieldDataInJSONByCriteria("quizzes.json", quizId, "ID", "Data")[0];
+
+	return returnValue;
+}
+
+std::vector<std::string> DBManager::deleteQuiz(int quizId)
+{
+	std::vector<std::string> recordSet;
+	nlohmann::json quizzesJSON;
+
+	// Get the JSON from the file
+	try
+	{
+		quizzesJSON = getJSONFromFile("quizzes.json");
+	}
+	catch (std::string ex)
+	{
+		recordSet.push_back("Could'n open quizzes.json file");
+		return recordSet;
+	}
+
+	auto it = quizzesJSON.cbegin();
+	for (; it != quizzesJSON.cend();)
+	{
+		if (it.value()["ID"] == quizId)
+		{
+			it = quizzesJSON.erase(it);
+			if (!setJSONFile(quizzesJSON, "quizzes.json"))
+			{
+				recordSet.push_back("Could'n open quizzes.json file");
+				return recordSet;
+			}
+		}
+		else
+		{
+			++it;
+		}
+	}
+
+	return recordSet;
+}
+
+std::vector<std::string> DBManager::updateQuiz(int quizId, crow::query_string data)
+{
+	std::vector<std::string> recordSet;
+	nlohmann::json quizzesJSON;
+
+	// Get the JSON from the file
+	try
+	{
+		quizzesJSON = getJSONFromFile("quizzes.json");
+	}
+	catch (std::string ex)
+	{
+		recordSet.push_back("Could'n open quizzes.json file");
+		return recordSet;
+	}
+
+	for (auto it = quizzesJSON.begin(); it != quizzesJSON.end(); ++it)
+	{
+		if (it.value()["ID"] == quizId)
+		{
+			it.value()["Name"] = std::string(data.get("quizName")).empty() ? it.value()["Name"] : data.get("quizName");
+
+			if (!setJSONFile(quizzesJSON, "quizzes.json"))
+			{
+				recordSet.push_back("Could'n open quizzes.json file");
+			}
+
+			return recordSet;
+		}
+	}
+
+	// If the execution goes here, there should be smt very wrong
+	recordSet.push_back("Could not find quiz with id: " + std::to_string(quizId));
+	return recordSet;
+}
+
+std::vector<QuizInfo> DBManager::getAllQuizzesInTopicWithID(int topicId)
+{
+	std::vector<QuizInfo> recordSet;
+
+	nlohmann::json quizzesJSON;
+
+	// Get the JSON from the file
+	try
+	{
+		quizzesJSON = getJSONFromFile("quizzes.json");
+	}
+	catch (std::string ex)
+	{
+		recordSet[0].errors.push_back("Could'n open quizzes.json file");
+		return recordSet;
+	}
+
+	for (auto it = quizzesJSON.begin(); it != quizzesJSON.end(); ++it)
+	{
+		if (it.value()["TopicID"] == std::to_string(topicId))
+		{
+			recordSet.push_back({ it.value()["ID"], topicId,  it.value()["Name"] });
+		}
+	}
+
 	return recordSet;
 }
 
@@ -1723,162 +1878,28 @@ std::vector<OrgUser> DBManager::getCourseUsersByCourseId(int courseId)
 	return recordSet;
 }
 
-std::vector<std::string> DBManager::getCourseOrgById(int id)
+std::vector<std::string> DBManager::getFieldDataInJSONByCriteria(std::string filename, int criteria, std::string criteriaField, std::string field)
 {
+
 	std::vector<std::string> recordSet;
 
-	nlohmann::json coursesJSON;
+	nlohmann::json JSON;
 
 	// Get the JSON from the file
 	try
 	{
-		coursesJSON = getJSONFromFile("courses.json");
+		JSON = getJSONFromFile(filename);
 	}
 	catch (std::string ex)
 	{
-		throw "Could'n open courses.json file";
+		throw "Could'n open " + filename + " file";
 	}
 
-	for (auto it = coursesJSON.begin(); it != coursesJSON.end(); ++it)
+	for (auto it = JSON.begin(); it != JSON.end(); ++it)
 	{
-		if (it.value()["ID"] == id)
+		if (it.value()[criteriaField] == criteria)
 		{
-			recordSet.push_back(it.value()["OrgID"]);
-		}
-	}
-
-	return recordSet;
-}
-
-std::vector<std::string> DBManager::getTopicCourseById(int id)
-{
-	std::vector<std::string> recordSet;
-
-	nlohmann::json topicsJSON;
-
-	// Get the JSON from the file
-	try
-	{
-		topicsJSON = getJSONFromFile("topics.json");
-	}
-	catch (std::string ex)
-	{
-		throw "Could'n open topics.json file";
-	}
-
-	for (auto it = topicsJSON.begin(); it != topicsJSON.end(); ++it)
-	{
-		if (it.value()["ID"] == id)
-		{
-			recordSet.push_back(it.value()["CourseID"]);
-		}
-	}
-
-	return recordSet;
-}
-
-std::vector<std::string> DBManager::getTopicNameById(int id)
-{
-	std::vector<std::string> recordSet;
-
-	nlohmann::json topicsJSON;
-
-	// Get the JSON from the file
-	try
-	{
-		topicsJSON = getJSONFromFile("topics.json");
-	}
-	catch (std::string ex)
-	{
-		throw "Could'n open topics.json file";
-	}
-
-	for (auto it = topicsJSON.begin(); it != topicsJSON.end(); ++it)
-	{
-		if (it.value()["ID"] == id)
-		{
-			recordSet.push_back(it.value()["Name"]);
-		}
-	}
-
-	return recordSet;
-}
-
-std::vector<std::string> DBManager::getLessonTopicById(int id)
-{
-	std::vector<std::string> recordSet;
-
-	nlohmann::json lessonsJSON;
-
-	// Get the JSON from the file
-	try
-	{
-		lessonsJSON = getJSONFromFile("lessons.json");
-	}
-	catch (std::string ex)
-	{
-		throw "Could'n open lessons.json file";
-	}
-
-	for (auto it = lessonsJSON.begin(); it != lessonsJSON.end(); ++it)
-	{
-		if (it.value()["ID"] == id)
-		{
-			recordSet.push_back(it.value()["TopicID"]);
-		}
-	}
-
-	return recordSet;
-}
-
-std::vector<std::string> DBManager::getLessonNameById(int id)
-{
-	std::vector<std::string> recordSet;
-
-	nlohmann::json lessonsJSON;
-
-	// Get the JSON from the file
-	try
-	{
-		lessonsJSON = getJSONFromFile("lessons.json");
-	}
-	catch (std::string ex)
-	{
-		throw "Could'n open lessons.json file";
-	}
-
-	for (auto it = lessonsJSON.begin(); it != lessonsJSON.end(); ++it)
-	{
-		if (it.value()["ID"] == id)
-		{
-			recordSet.push_back(it.value()["Name"]);
-		}
-	}
-
-	return recordSet;
-}
-
-std::vector<std::string> DBManager::getLessonDataById(int id)
-{
-	std::vector<std::string> recordSet;
-
-	nlohmann::json lessonsJSON;
-
-	// Get the JSON from the file
-	try
-	{
-		lessonsJSON = getJSONFromFile("lessons.json");
-	}
-	catch (std::string ex)
-	{
-		throw "Could'n open lessons.json file";
-	}
-
-	for (auto it = lessonsJSON.begin(); it != lessonsJSON.end(); ++it)
-	{
-		if (it.value()["ID"] == id)
-		{
-			recordSet.push_back(it.value()["Data"]);
+			recordSet.push_back(it.value()[field]);
 		}
 	}
 
