@@ -1,7 +1,8 @@
 #include <iostream>
 #include <conio.h>
 #include <windows.h>
-#include <APIHandler.h>
+
+
 using namespace std;
 
 bool consoleOpened = false; //Checks if console is opened now and extracts data from files
@@ -19,7 +20,7 @@ void gotoxy(int x, int y)  //Get the coordinates inside the console
 	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
 }
 
-void drawButton(int posy, string text, int size, int posx, int col)
+void drawButton(int posy, string text, int size, int posx, int col, string input = "")
 {
 	gotoxy(posx, posy); cout << char(201);
 
@@ -29,7 +30,7 @@ void drawButton(int posy, string text, int size, int posx, int col)
 	}
 
 	cout << char(187);
-	gotoxy(posx, posy + 1); cout << char(186); color(7); cout << text; color(col);cout << char(186) << endl;
+	gotoxy(posx, posy + 1); cout << char(186); color(7); cout << text << "| " << input << "      "; color(col); cout << char(186) << endl;
 	gotoxy(posx, posy + 2); cout << char(200);
 
 	for (int i = 0; i < size; i++)
@@ -40,7 +41,7 @@ void drawButton(int posy, string text, int size, int posx, int col)
 	cout << char(188);
 }
 
-void tr(string st) 
+void tr(string st)
 {
 	gotoxy(80, 10);  cout << "this is page bout " << st;
 }
@@ -77,7 +78,7 @@ int Menu() //Main menu with three options
 		drawButton(1, "        Log out         ", 24, 100, SetColor[3]);
 		color(7);
 
-		for (int i = 0; i < 130; i++) 
+		for (int i = 0; i < 130; i++)
 		{
 			gotoxy(i, 4); cout << char(205);
 		}
@@ -94,7 +95,7 @@ int Menu() //Main menu with three options
 			counter++;
 		}
 
-		if (key == '\r' && ckey % 2 == 0) // enter key
+		if (key == '\\\\r' && ckey % 2 == 0) // enter key
 		{
 			if (counter == 1)
 			{
@@ -117,45 +118,78 @@ int Menu() //Main menu with three options
 			{
 				break;
 			}
-			key = '\t';
+
 		}
 
-		
+
 		SetColor[0] = 7;
 		SetColor[1] = 7;
 		SetColor[2] = 7;
 		SetColor[3] = 7;
 
-		if (key == '\t') 
+		if (key == '\\\\t')
 		{
 			ckey++;
 		}
 
-		if(ckey %2 == 0) {
+		if (ckey % 2 == 0) {
 			if (counter == 1) { SetColor[0] = 2; }
 			if (counter == 2) { SetColor[1] = 2; }
 			if (counter == 3) { SetColor[2] = 2; }
 			if (counter == 4) { SetColor[3] = 12; }
 		}
-		
+
 	}
 
 	return 0;
 }
 
-int main() 
+int main()
 {
-	/*Menu();*/
-	RegisterData a;
-	APIHandler zed;
+	char key = ' ';
+	string vesko = "";
 
-	std::cin >> a.fname;
-	std::cin >> a.lname;
-	std::cin >> a.username;
-	std::cin >> a.email;
-	std::cin >> a.password;
-	
-	zed.registerHandler(a);
+	color(6);
+	do {
+		vesko += key;
+		gotoxy(30, 0); cout << "     _             _  __         _     _ _                          _     _ _      " << endl;
+		gotoxy(30, 1); cout << "  __| | __ _ ___  | |/ /   _  __| | __| | | ___ _ __ ___  _   _  __| | __| | | ___ " << endl;
+		gotoxy(30, 2); cout << " / _` |/ _` / __| | ' / | | |/ _` |/ _` | |/ _ \\ '_ ` _ \\| | | |/ _` |/ _` | |/ _ \\" << endl;
+		gotoxy(30, 3); cout << "| (_| | (_| \\__ \\ | . \\ |_| | (_| | (_| | |  __/ | | | | | |_| | (_| | (_| | |  __/" << endl;
+		gotoxy(30, 4); cout << " \\__,_|\\__,_|___/ |_|\\_\\__,_|\\__,_|\\__,_|_|\\___|_| |_| |_|\\__,_|\\__,_|\\__,_|_|\\___|" << endl;
+		gotoxy(15, 7); cout << "MMMMMMMMMMMMMNX0kxxxxxxk0XNMMMMMMMMMMMMMMM" << endl;
+		gotoxy(15, 8); cout << "MMMMMMMMMMMMMNX0kxxxxxxk0XNMMMMMMMMMMMMMMM" << endl;
+		drawButton(8, " Username ", 24, 70, 6, vesko);
+		gotoxy(15, 9); cout << "MMMMMMMMMNOd:'.            .':dONMMMMMMMMM" << endl;
+		gotoxy(15, 10); cout << "MMMMMMW0o'                      'o0WMMMMMM" << endl;
+		gotoxy(15, 11); cout << "MMMMW0c.                          .c0WMMMM" << endl;
+		gotoxy(15, 12); cout << "MMMNd.                              .dNMMM" << endl;
+		gotoxy(15, 13); cout << "MMXl             ,oxkkxl'             lXMM" << endl;
+		gotoxy(15, 14); cout << "MNo            .dNMMMMMMXc             oNM" << endl;
+		gotoxy(15, 15); cout << "MO.            ;XMMMMMMMMO.            .OM" << endl;
+		gotoxy(15, 16); cout << "Wl             .kWMMMMMMNo.             lW" << endl;
+		gotoxy(15, 17); cout << "N:              .cx000Od;.              :N" << endl;
+		gotoxy(15, 18); cout << "Nc             .;:lodooc:,.             cN" << endl;
+		gotoxy(15, 19); cout << "Wd.          'dKWMMMMMMMMN0l.          .dW" << endl;
+		gotoxy(15, 20); cout << "MK,         '0MMMMMMMMMMMMMWx.         ,KM" << endl;
+		gotoxy(15, 21); cout << "MWk.        ;0WMMMMMMMMMMMMWk.        .kWM" << endl;
+		gotoxy(15, 22); cout << "MMWk'       .,::::::::::::::,.       'kWMM" << endl;
+		gotoxy(15, 23); cout << "MMMWKc.                            .cKMMMM" << endl;
+		gotoxy(15, 24); cout << "MMMMMNO:.                        .:ONMMMMM" << endl;
+		gotoxy(15, 25); cout << "MMMMMMMW0o;.                  .;o0WMMMMMMM" << endl;
+		gotoxy(15, 26); cout << "MMMMMMMMMMWKkoc;,'......',;cokKWMMMMMMMMMM" << endl;
+		gotoxy(15, 27); cout << "MMMMMMMMMMMMMMMWWNNXXNNWMMWMMMMMMMMMMMMMMM" << endl;
+		gotoxy(15, 28); cout << "MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM" << endl;
+		color(6);
+
+		key = _getch();
+	} while (key != 'q');
+
+
+	/*Menu();*/
+
+
+
 
 
 }
