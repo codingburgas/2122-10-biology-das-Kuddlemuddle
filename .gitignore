@@ -360,6 +360,7 @@ topics.json
 lessons.json
 quizzes.json
 questions.json
+attempts.json
 
 # Static folder
 static

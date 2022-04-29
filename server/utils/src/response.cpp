@@ -170,3 +170,27 @@ crow::json::wvalue ResponseJSONManager::createQuestionJSONResponse(QuestionInfo 
 
 	return resBody;
 }
+
+crow::json::wvalue ResponseJSONManager::createAttemptJSONResponse(AttemptInfo data)
+{
+	crow::json::wvalue resBody;
+
+	resBody["type"] = "start-attempt-success";
+	resBody["is-in-progress"] = data.inProgress;
+	resBody["attempt-id"] = data.id;
+	resBody["attempt-quiz-id"] = data.quizId;
+	resBody["attempt-user-id"] = data.userId;
+
+	if (data.inProgress)
+	{
+		resBody["next-question-id"] = data.currentQuestionId;
+	}
+	else
+	{
+		resBody["score"] = data.score;
+		resBody["attempt-start"] = data.timeStart;
+		resBody["attempt-end"] = data.timeEnd;
+	}
+
+	return resBody;
+}

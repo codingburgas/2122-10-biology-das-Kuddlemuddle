@@ -21,6 +21,20 @@ struct OrgUser
 	int role;
 };
 
+struct AttemptInfo
+{
+	int id;
+	int quizId;
+	int userId;
+	int currentQuestionId;
+	int score;
+	time_t timeStart;
+	time_t timeEnd;
+	bool inProgress;
+	// Add answers
+	std::vector<std::string> errors;
+};
+
 struct QuestionInfo
 {
 	int id;
@@ -35,7 +49,7 @@ struct QuizInfo
 	int id;
 	int topicId;
 	std::string name;
-	// TODO: Add quesions
+	std::vector<AttemptInfo> attempts;
 	std::vector<QuestionInfo> questions;
 	std::vector<std::string> errors;
 };
@@ -121,6 +135,8 @@ public:
 	QuestionInfo getQuestionInfo(int quizId);
 	std::vector<std::string> deleteQuestion(int questionId);
 	std::vector<std::string> updateQuestion(int questionId, crow::query_string data);
+	std::vector<std::string> startAttempt(crow::query_string data, int userId);
+	AttemptInfo getAttemptInfo(int attemptId);
 private:
 	nlohmann::json getJSONFromFile(std::string filename);
 	bool setJSONFile(nlohmann::json json, std::string filename);

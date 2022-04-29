@@ -1718,12 +1718,12 @@ std::vector<std::string> DBManager::createQuestion(crow::query_string data)
 {
 	std::vector<std::string> recordSet;
 
-	nlohmann::json quizzesJSON;
+	nlohmann::json questionsJSON;
 
 	// Get the JSON from the file
 	try
 	{
-		quizzesJSON = getJSONFromFile("questions.json");
+		questionsJSON = getJSONFromFile("questions.json");
 	}
 	catch (std::string ex)
 	{
@@ -1732,25 +1732,25 @@ std::vector<std::string> DBManager::createQuestion(crow::query_string data)
 	}
 
 	// Check for duplicate name
-	if (checkIfValueExistsInField(quizzesJSON, "Question", data.get("question"), "QuizID", data.get("quizId")))
+	if (checkIfValueExistsInField(questionsJSON, "Question", data.get("question"), "QuizID", data.get("quizId")))
 	{
 		recordSet.push_back("There is already the same question in this quiz");
 		return recordSet;
 	}
 
 	// Check if json is []
-	if (quizzesJSON.is_array())
+	if (questionsJSON.is_array())
 	{
-		if (quizzesJSON.empty())
+		if (questionsJSON.empty())
 		{
-			quizzesJSON = nullptr;
+			questionsJSON = nullptr;
 		}
 	}
 
 	// Add the user to the JSON
-	quizzesJSON.push_back(
+	questionsJSON.push_back(
 		{
-		{ "ID", getLastId(quizzesJSON) + 1},
+		{ "ID", getLastId(questionsJSON) + 1},
 		{ "Question", data.get("question") },
 		{ "Answer", data.get("answer") },
 		{ "QuizID", data.get("quizId") }
@@ -1758,7 +1758,7 @@ std::vector<std::string> DBManager::createQuestion(crow::query_string data)
 	);
 
 	// Save the json to the file
-	if (!setJSONFile(quizzesJSON, "questions.json"))
+	if (!setJSONFile(questionsJSON, "questions.json"))
 	{
 		recordSet.push_back("Could'n open questions.json file");
 		return recordSet;
@@ -1858,6 +1858,91 @@ std::vector<std::string> DBManager::updateQuestion(int questionId, crow::query_s
 	// If the execution goes here, there should be smt very wrong
 	recordSet.push_back("Could not find question with id: " + std::to_string(questionId));
 	return recordSet;
+}
+
+std::vector<std::string> DBManager::startAttempt(crow::query_string data, int userId)
+{
+	std::vector<std::string> recordSet;
+
+	nlohmann::json attemptsJSON;
+
+	// Get the JSON from the file
+	try
+	{
+		attemptsJSON = getJSONFromFile("attempts.json");
+	}
+	catch (std::string ex)
+	{
+		recordSet.push_back("Could'n open attempts.json file");
+		return recordSet;
+	}
+
+	// Check for duplicate name
+	if (checkIfValueExistsInField(attemptsJSON, "QuizID", data.get("quizId"), "UserID", std::to_string(userId)))
+	{
+		recordSet.push_back("There is already the same attempt for this quiz");
+		return recordSet;
+	}
+
+	// Check if json is []
+	if (attemptsJSON.is_array())
+	{
+		if (attemptsJSON.empty())
+		{
+			attemptsJSON = nullptr;
+		}
+	}
+
+	time_t currentTime = time(0);
+	QuizInfo quizInfo = getQuizInfo(std::stoi(data.get("quizId")));
+
+	// Add the user to the JSON
+	attemptsJSON.push_back(
+		{
+		{ "ID", getLastId(attemptsJSON) + 1},
+		{ "TimeStart", currentTime },
+		{ "TimeEnd", NULL },
+		{ "CurrentQuestionID", quizInfo.questions[0].id },
+		{ "QuizID", data.get("quizId") },
+		{ "UserID", userId },
+		{ "Score", NULL },
+		{ "inProgress", true}
+		}
+	);
+
+	// Save the json to the file
+	if (!setJSONFile(attemptsJSON, "attempts.json"))
+	{
+		recordSet.push_back("Could'n open attempts.json file");
+		return recordSet;
+	}
+
+
+	recordSet.push_back("Attempt-id: " + std::to_string(getLastId(attemptsJSON)));
+	return recordSet;
+}
+
+AttemptInfo DBManager::getAttemptInfo(int attemptId)
+{
+	AttemptInfo returnValue;
+
+	returnValue.id = attemptId;
+
+	if (getFieldDataInJSONByCriteria("attempts.json", attemptId, "ID", "CurrentQuestionID").empty())
+	{
+		returnValue.errors.push_back("Can not find attempt with id: " + std::to_string(attemptId));
+		return returnValue;
+	}
+
+	returnValue.currentQuestionId = std::stoi(getFieldDataInJSONByCriteria("attempts.json", attemptId, "ID", "CurrentQuestionID")[0]);
+	returnValue.quizId = std::stoi(getFieldDataInJSONByCriteria("attempts.json", attemptId, "ID", "QuizID")[0]);
+	returnValue.score = std::stoi(getFieldDataInJSONByCriteria("attempts.json", attemptId, "ID", "Score")[0]);
+	returnValue.timeStart = std::stoi(getFieldDataInJSONByCriteria("attempts.json", attemptId, "ID", "TimeStart")[0]);
+	returnValue.timeEnd = std::stoi(getFieldDataInJSONByCriteria("attempts.json", attemptId, "ID", "TimeEnd")[0]);
+	returnValue.userId = std::stoi(getFieldDataInJSONByCriteria("attempts.json", attemptId, "ID", "UserID")[0]);
+	returnValue.inProgress = std::stoi(getFieldDataInJSONByCriteria("attempts.json", attemptId, "ID", "inProgress")[0]);
+
+	return returnValue;
 }
 
 std::vector<QuizInfo> DBManager::getAllQuizzesInTopicWithID(int topicId)
@@ -2081,7 +2166,14 @@ std::vector<std::string> DBManager::getFieldDataInJSONByCriteria(std::string fil
 	{
 		if (it.value()[criteriaField] == criteria)
 		{
-			recordSet.push_back(it.value()[field]);
+			if (it.value()[field].is_string())
+			{
+				recordSet.push_back(it.value()[field]);
+			}
+			else
+			{
+				recordSet.push_back(std::to_string(it.value()[field].get<int>()));
+			}
 		}
 	}
 
