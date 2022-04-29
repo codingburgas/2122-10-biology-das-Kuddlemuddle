@@ -139,7 +139,7 @@ ValidationHandler ValidationManager::getValidationHandler(std::string field)
 		return (
 			[](std::string data) -> bool
 			{
-				const std::regex valRegex("^(?=.*[A-Z�-��-�a-z])([A-Z�-�])([a-z�-�]{2,29})$");
+				const std::regex valRegex("^(?=.*[A-Za-z])([A-Z])([a-z]{2,29})$");
 
 				return std::regex_match(data, valRegex);
 			}

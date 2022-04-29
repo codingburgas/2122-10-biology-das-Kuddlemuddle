@@ -21,13 +21,22 @@ struct OrgUser
 	int role;
 };
 
+struct QuestionInfo
+{
+	int id;
+	int quizId;
+	std::string question;
+	std::string answer;
+	std::vector<std::string> errors;
+};
+
 struct QuizInfo
 {
 	int id;
 	int topicId;
 	std::string name;
 	// TODO: Add quesions
-	//std::vector<QuestionInfo> questions
+	std::vector<QuestionInfo> questions;
 	std::vector<std::string> errors;
 };
 
@@ -92,7 +101,6 @@ public:
 	std::vector<std::string> doesPasswordMatchCourse(std::string password, int courseId);
 	std::vector<std::string> addUserToCourse(int userId, int courseId, UserRolesInOrgs userRolesInOrgs, bool createNewEntry = true);
 	CourseInfo getCourseInfo(int courseId);
-	std::vector<std::string> getCourseIdByName(std::string courseName);
 	std::vector<std::string> isUserInCourseAndGetRole(int userId, int courseId);
 	std::vector<std::string> deleteCourse(int courseId);
 	std::vector<std::string> updateCourse(int courseId, crow::query_string data);
@@ -109,6 +117,10 @@ public:
 	QuizInfo getQuizInfo(int quizId);
 	std::vector<std::string> deleteQuiz(int quizId);
 	std::vector<std::string> updateQuiz(int quizId, crow::query_string data);
+	std::vector<std::string> createQuestion(crow::query_string data);
+	QuestionInfo getQuestionInfo(int quizId);
+	std::vector<std::string> deleteQuestion(int questionId);
+	std::vector<std::string> updateQuestion(int questionId, crow::query_string data);
 private:
 	nlohmann::json getJSONFromFile(std::string filename);
 	bool setJSONFile(nlohmann::json json, std::string filename);
@@ -122,4 +134,5 @@ private:
 	std::vector<TopicInfo> getAllTopicsInCourseWithID(int courseId);
 	std::vector<OrgUser> getCourseUsersByCourseId(int courseId);
 	std::vector<CourseInfo> getAllCoursesInOrgWithID(int orgId);
+	std::vector<QuestionInfo> getAllQuestionsInQuizWithID(int quizId);
 };

@@ -1842,7 +1842,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware> &a
 					return;
 				}
 
-				std::vector<std::string> recordSet = dbManager.canUserAccessCourse(std::stoi(reqData.get("topicId")), ctx.userId, true);
+				std::vector<std::string> recordSet = dbManager.canUserAccessCourse(topicInfo.courseId, ctx.userId, true);
 
 				if (recordSet[0] != "1")
 				{
@@ -2064,6 +2064,286 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware> &a
 				}
 
 				res = responseJSONManager.createJSONResponse(true, recordSet, "quiz-update");
+				res.end();
+				return;
+			});
+
+	CROW_BP_ROUTE(api, "/createNewQuestion")
+		.methods(crow::HTTPMethod::Post)
+		.middlewares<crow::App<crow::CORSHandler, AuthorisationMiddleware>, AuthorisationMiddleware>()
+		//CROW_MIDDLEWARES(app, AuthorisationMiddleware)
+		([&](const crow::request& req, crow::response& res)
+			{
+				auto reqData = crow::query_string("?" + req.body);
+				auto& ctx = app.get_context<AuthorisationMiddleware>(req);
+
+				CROW_LOG_INFO << "User with id: " << ctx.userId << " is trying to create new question in quiz with id: " << reqData.get("quizId");
+
+				QuizInfo quizInfo = dbManager.getQuizInfo(std::stoi(reqData.get("quizId")));
+
+				if (!quizInfo.errors.empty())
+				{
+					std::string log = "Failed to get quiz info for quiz with id: " + std::string(reqData.get("quizId")) + ". Reasons: ";
+
+					for (auto el : quizInfo.errors)
+					{
+						log += el + " ";
+					}
+
+					CROW_LOG_WARNING << log;
+
+					res = responseJSONManager.createJSONResponse(false, quizInfo.errors, "question-register");
+					res.end();
+					return;
+				}
+
+				TopicInfo topicInfo = dbManager.getTopicInfo(quizInfo.topicId);
+
+				if (!topicInfo.errors.empty())
+				{
+					std::string log = "Failed to get topic info for topic with id: " + std::to_string(quizInfo.topicId) + ". Reasons: ";
+
+					for (auto el : topicInfo.errors)
+					{
+						log += el + " ";
+					}
+
+					CROW_LOG_WARNING << log;
+
+					res = responseJSONManager.createJSONResponse(false, topicInfo.errors, "question-register");
+					res.end();
+					return;
+				}
+
+				std::vector<std::string> recordSet = dbManager.canUserAccessCourse(topicInfo.courseId, ctx.userId, true);
+
+				if (recordSet[0] != "1")
+				{
+					std::string log = "Failed to create new question in quiz with id: " + std::string(reqData.get("quizId")) + ". Reason: User is unauthorised";
+					recordSet[0] = "User is unauthorised";
+
+					CROW_LOG_WARNING << log;
+
+					res = responseJSONManager.createJSONResponse(false, recordSet, "question-register");
+					res.code = 403;
+					res.end();
+					return;
+				}
+
+				recordSet = dbManager.createQuestion(reqData);
+
+				// If saving to database fails
+				if (recordSet.size() != 0)
+				{
+					std::string log = "Failed to save question in quiz with id: " + std::string(reqData.get("quizId")) + " to the database. Reason/s: ";
+
+					for (auto el : recordSet)
+					{
+						log += el + " ";
+					}
+
+					CROW_LOG_WARNING << log;
+
+					res = responseJSONManager.createJSONResponse(false, recordSet, "question-register");
+					res.end();
+					return;
+				}
+
+				CROW_LOG_INFO << "Question in quiz with id: " + std::string(reqData.get("quizId")) + " is successfully saved into the database.";
+
+				// Create and send request
+				res = responseJSONManager.createJSONResponse(true, recordSet, "question-register");
+				res.end();
+				return;
+			});
+
+	CROW_BP_ROUTE(api, "/questions/<int>")
+		.methods(crow::HTTPMethod::Get)
+		.middlewares<crow::App<crow::CORSHandler, AuthorisationMiddleware>, AuthorisationMiddleware>()
+		([&](const crow::request& req, crow::response& res, int questionId)
+			{
+				auto& ctx = app.get_context<AuthorisationMiddleware>(req);
+
+				CROW_LOG_INFO << "User with id: " << ctx.userId << " is trying to get information for question with id: " << questionId;
+
+				QuestionInfo questionInfo = dbManager.getQuestionInfo(questionId);
+
+				if (!questionInfo.errors.empty())
+				{
+					std::string log = "Failed to get question info for question with id: " + std::to_string(questionId) + ". Reasons: ";
+
+					for (auto el : questionInfo.errors)
+					{
+						log += el + " ";
+					}
+
+					CROW_LOG_WARNING << log;
+
+					res = responseJSONManager.createJSONResponse(false, questionInfo.errors, "get-question");
+					res.end();
+					return;
+				}
+
+				// TODO: Add checks is user currently making attempt
+				QuizInfo quizInfo = dbManager.getQuizInfo(questionInfo.quizId);
+
+				TopicInfo topicInfo = dbManager.getTopicInfo(quizInfo.topicId);
+
+				std::vector<std::string> recordSet = dbManager.canUserAccessCourse(topicInfo.courseId, ctx.userId, true);
+
+				if (recordSet[0] != "1")
+				{
+					std::string log = "Failed to get quiz with id: " + std::to_string(questionId) + ". Reason: User is unauthorised";
+					recordSet[0] = "User is unauthorised";
+
+					CROW_LOG_WARNING << log;
+
+					res = responseJSONManager.createJSONResponse(false, recordSet, "get-question");
+					res.code = 403;
+					res.end();
+					return;
+				}
+
+				res = responseJSONManager.createQuestionJSONResponse(questionInfo);
+				res.end();
+				return;
+			});
+
+	CROW_BP_ROUTE(api, "/questions/<int>")
+		.methods(crow::HTTPMethod::Delete)
+		.middlewares<crow::App<crow::CORSHandler, AuthorisationMiddleware>, AuthorisationMiddleware>()
+		([&](const crow::request& req, crow::response& res, int questionId)
+			{
+				auto& ctx = app.get_context<AuthorisationMiddleware>(req);
+
+				CROW_LOG_INFO << "User with id: " << ctx.userId << " is trying to delete question with id: " << questionId;
+				
+				QuestionInfo questionInfo = dbManager.getQuestionInfo(questionId);
+
+				if (!questionInfo.errors.empty())
+				{
+					std::string log = "Failed to get question info for question with id: " + std::to_string(questionId) + ". Reasons: ";
+
+					for (auto el : questionInfo.errors)
+					{
+						log += el + " ";
+					}
+
+					CROW_LOG_WARNING << log;
+
+					res = responseJSONManager.createJSONResponse(false, questionInfo.errors, "question-deletion");
+					res.end();
+					return;
+				}
+
+				QuizInfo quizInfo = dbManager.getQuizInfo(questionInfo.quizId);
+
+				TopicInfo topicInfo = dbManager.getTopicInfo(quizInfo.topicId);
+
+				std::vector<std::string> recordSet = dbManager.canUserAccessCourse(topicInfo.courseId, ctx.userId, true);
+
+				if (recordSet[0] != "1")
+				{
+					std::string log = "Failed to delete question with id: " + std::to_string(questionId) + ". Reason: User is unauthorised";
+					recordSet[0] = "User is unauthorised";
+
+					CROW_LOG_WARNING << log;
+
+					res = responseJSONManager.createJSONResponse(false, recordSet, "question-deletion");
+					res.code = 403;
+					res.end();
+					return;
+				}
+
+				recordSet = dbManager.deleteQuestion(questionId);
+
+				if (recordSet.size() != 0)
+				{
+					std::string log = "Failed to delete question. Reason: ";
+
+					for (auto el : recordSet)
+					{
+						log += el + " ";
+					}
+
+					CROW_LOG_WARNING << log;
+
+					res = responseJSONManager.createJSONResponse(false, recordSet, "question-deletion");
+					res.end();
+					return;
+				}
+
+				res = responseJSONManager.createJSONResponse(true, recordSet, "question-deletion");
+				res.end();
+				return;
+			});
+
+	CROW_BP_ROUTE(api, "/questions/<int>")
+		.methods(crow::HTTPMethod::Patch)
+		.middlewares<crow::App<crow::CORSHandler, AuthorisationMiddleware>, AuthorisationMiddleware>()
+		([&](const crow::request& req, crow::response& res, int questionId)
+			{
+				auto& ctx = app.get_context<AuthorisationMiddleware>(req);
+				auto updateData = crow::query_string("?" + req.body);
+
+				CROW_LOG_INFO << "User with id: " << ctx.userId << " is trying to update information for question with id: " << questionId;
+
+				QuestionInfo questionInfo = dbManager.getQuestionInfo(questionId);
+
+				if (!questionInfo.errors.empty())
+				{
+					std::string log = "Failed to get question info for question with id: " + std::to_string(questionId) + ". Reasons: ";
+
+					for (auto el : questionInfo.errors)
+					{
+						log += el + " ";
+					}
+
+					CROW_LOG_WARNING << log;
+
+					res = responseJSONManager.createJSONResponse(false, questionInfo.errors, "question-update");
+					res.end();
+					return;
+				}
+
+				QuizInfo quizInfo = dbManager.getQuizInfo(questionInfo.quizId);
+
+				TopicInfo topicInfo = dbManager.getTopicInfo(quizInfo.topicId);
+
+				std::vector<std::string> recordSet = dbManager.canUserAccessCourse(topicInfo.courseId, ctx.userId, true);
+
+				if (recordSet[0] != "1")
+				{
+					std::string log = "Failed to update question with id: " + std::to_string(questionId) + ". Reason: User is unauthorised";
+					recordSet[0] = "User is unauthorised";
+
+					CROW_LOG_WARNING << log;
+
+					res = responseJSONManager.createJSONResponse(false, recordSet, "question-update");
+					res.code = 403;
+					res.end();
+					return;
+				}
+
+				recordSet = dbManager.updateQuestion(questionId, updateData);
+
+				if (recordSet.size() != 0)
+				{
+					std::string log = "Failed to update question. Reason: ";
+
+					for (auto el : recordSet)
+					{
+						log += el + " ";
+					}
+
+					CROW_LOG_WARNING << log;
+
+					res = responseJSONManager.createJSONResponse(false, recordSet, "question-update");
+					res.end();
+					return;
+				}
+
+				res = responseJSONManager.createJSONResponse(true, recordSet, "question-update");
 				res.end();
 				return;
 			});

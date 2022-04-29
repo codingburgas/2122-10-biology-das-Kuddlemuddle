@@ -359,6 +359,7 @@ userCourseRole.json
 topics.json
 lessons.json
 quizzes.json
+questions.json
 
 # Static folder
 static

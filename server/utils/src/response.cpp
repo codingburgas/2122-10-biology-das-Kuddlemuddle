@@ -148,6 +148,25 @@ crow::json::wvalue ResponseJSONManager::createQuizJSONResponse(QuizInfo data)
 	resBody["quiz-id"] = data.id;
 	resBody["quiz-name"] = data.name;
 	resBody["topic-id"] = data.topicId;
+	
+	for (size_t i = 0; i < data.questions.size(); i++)
+	{
+		resBody["quiz-questions"][i] = { {"question-id:", data.questions[i].id} };
+	}
+
+	return resBody;
+}
+
+crow::json::wvalue ResponseJSONManager::createQuestionJSONResponse(QuestionInfo data)
+{
+	crow::json::wvalue resBody;
+
+	resBody["type"] = "get-question-success";
+	resBody["question-id"] = data.id;
+	resBody["question-question"] = data.question;
+	// TODO: Add check if student
+	resBody["question-answer"] = data.answer;
+	resBody["quiz-id"] = data.quizId;
 
 	return resBody;
 }

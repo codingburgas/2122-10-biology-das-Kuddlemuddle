@@ -1169,6 +1169,33 @@ std::vector<CourseInfo> DBManager::getAllCoursesInOrgWithID(int orgId)
 	return recordSet;
 }
 
+std::vector<QuestionInfo> DBManager::getAllQuestionsInQuizWithID(int quizId)
+{
+	std::vector<QuestionInfo> recordSet;
+
+	nlohmann::json questionsJSON;
+
+	// Get the JSON from the file
+	try
+	{
+		questionsJSON = getJSONFromFile("questions.json");
+	}
+	catch (std::string ex)
+	{
+		throw "Could'n open questions.json file";
+	}
+
+	for (auto it = questionsJSON.begin(); it != questionsJSON.end(); ++it)
+	{
+		if (it.value()["QuizID"] == std::to_string(quizId))
+		{
+			recordSet.push_back({ it.value()["ID"] });
+		}
+	}
+
+	return recordSet;
+}
+
 std::vector<std::string> DBManager::deleteCourse(int courseId)
 {
 	std::vector<std::string> recordSet;
@@ -1599,7 +1626,7 @@ QuizInfo DBManager::getQuizInfo(int quizId)
 
 	returnValue.name = getFieldDataInJSONByCriteria("quizzes.json", quizId, "ID", "Name")[0];
 	returnValue.topicId = std::stoi(getFieldDataInJSONByCriteria("quizzes.json", quizId, "ID", "TopicID")[0]);
-	//returnValue.data = getFieldDataInJSONByCriteria("quizzes.json", quizId, "ID", "Data")[0];
+	returnValue.questions = getAllQuestionsInQuizWithID(quizId);
 
 	return returnValue;
 }
@@ -1608,15 +1635,17 @@ std::vector<std::string> DBManager::deleteQuiz(int quizId)
 {
 	std::vector<std::string> recordSet;
 	nlohmann::json quizzesJSON;
+	nlohmann::json questionsJSON;
 
 	// Get the JSON from the file
 	try
 	{
 		quizzesJSON = getJSONFromFile("quizzes.json");
+		questionsJSON = getJSONFromFile("questions.json");
 	}
 	catch (std::string ex)
 	{
-		recordSet.push_back("Could'n open quizzes.json file");
+		recordSet.push_back("Could'n open quizzes.json or questions.json file");
 		return recordSet;
 	}
 
@@ -1635,6 +1664,14 @@ std::vector<std::string> DBManager::deleteQuiz(int quizId)
 		else
 		{
 			++it;
+		}
+	}
+
+	for (auto it = questionsJSON.begin(); it != questionsJSON.end(); ++it)
+	{
+		if (it.value()["QuizID"] == std::to_string(quizId))
+		{
+			deleteQuestion(it.value()["ID"]);
 		}
 	}
 
@@ -1674,6 +1711,152 @@ std::vector<std::string> DBManager::updateQuiz(int quizId, crow::query_string da
 
 	// If the execution goes here, there should be smt very wrong
 	recordSet.push_back("Could not find quiz with id: " + std::to_string(quizId));
+	return recordSet;
+}
+
+std::vector<std::string> DBManager::createQuestion(crow::query_string data)
+{
+	std::vector<std::string> recordSet;
+
+	nlohmann::json quizzesJSON;
+
+	// Get the JSON from the file
+	try
+	{
+		quizzesJSON = getJSONFromFile("questions.json");
+	}
+	catch (std::string ex)
+	{
+		recordSet.push_back("Could'n open questions.json file");
+		return recordSet;
+	}
+
+	// Check for duplicate name
+	if (checkIfValueExistsInField(quizzesJSON, "Question", data.get("question"), "QuizID", data.get("quizId")))
+	{
+		recordSet.push_back("There is already the same question in this quiz");
+		return recordSet;
+	}
+
+	// Check if json is []
+	if (quizzesJSON.is_array())
+	{
+		if (quizzesJSON.empty())
+		{
+			quizzesJSON = nullptr;
+		}
+	}
+
+	// Add the user to the JSON
+	quizzesJSON.push_back(
+		{
+		{ "ID", getLastId(quizzesJSON) + 1},
+		{ "Question", data.get("question") },
+		{ "Answer", data.get("answer") },
+		{ "QuizID", data.get("quizId") }
+		}
+	);
+
+	// Save the json to the file
+	if (!setJSONFile(quizzesJSON, "questions.json"))
+	{
+		recordSet.push_back("Could'n open questions.json file");
+		return recordSet;
+	}
+
+	return recordSet;
+}
+
+QuestionInfo DBManager::getQuestionInfo(int questionId)
+{
+	QuestionInfo returnValue;
+
+	returnValue.id = questionId;
+
+	if (getFieldDataInJSONByCriteria("questions.json", questionId, "ID", "Question").empty())
+	{
+		returnValue.errors.push_back("Can not find question with id: " + std::to_string(questionId));
+		return returnValue;
+	}
+
+	returnValue.question = getFieldDataInJSONByCriteria("questions.json", questionId, "ID", "Question")[0];
+	returnValue.answer = getFieldDataInJSONByCriteria("questions.json", questionId, "ID", "Answer")[0];
+	returnValue.quizId = std::stoi(getFieldDataInJSONByCriteria("questions.json", questionId, "ID", "QuizID")[0]);
+
+	return returnValue;
+}
+
+std::vector<std::string> DBManager::deleteQuestion(int questionId)
+{
+	std::vector<std::string> recordSet;
+	nlohmann::json quizzesJSON;
+
+	// Get the JSON from the file
+	try
+	{
+		quizzesJSON = getJSONFromFile("questions.json");
+	}
+	catch (std::string ex)
+	{
+		recordSet.push_back("Could'n open questions.json file");
+		return recordSet;
+	}
+
+	auto it = quizzesJSON.cbegin();
+	for (; it != quizzesJSON.cend();)
+	{
+		if (it.value()["ID"] == questionId)
+		{
+			it = quizzesJSON.erase(it);
+			if (!setJSONFile(quizzesJSON, "questions.json"))
+			{
+				recordSet.push_back("Could'n open questions.json file");
+				return recordSet;
+			}
+		}
+		else
+		{
+			++it;
+		}
+	}
+
+	return recordSet;
+}
+
+std::vector<std::string> DBManager::updateQuestion(int questionId, crow::query_string data)
+{
+	std::vector<std::string> recordSet;
+	nlohmann::json questionsJSON;
+
+	// Get the JSON from the file
+	try
+	{
+		questionsJSON = getJSONFromFile("questions.json");
+	}
+	catch (std::string ex)
+	{
+		recordSet.push_back("Could'n open questions.json file");
+		return recordSet;
+	}
+
+	for (auto it = questionsJSON.begin(); it != questionsJSON.end(); ++it)
+	{
+		if (it.value()["ID"] == questionId)
+		{
+			it.value()["Question"] = std::string(data.get("question")).empty() ? it.value()["Question"] : data.get("question");
+			it.value()["Answer"] = std::string(data.get("answer")).empty() ? it.value()["Answer"] : data.get("answer");
+
+			if (!setJSONFile(questionsJSON, "questions.json"))
+			{
+				recordSet.push_back("Could'n open questions.json file");
+			}
+
+			return recordSet;
+		}
+	}
+
+	// If the execution goes here, there should be smt very wrong
+	recordSet.push_back("Could not find question with id: " + std::to_string(questionId));
 	return recordSet;
 }
 
@@ -1880,7 +2063,6 @@ std::vector<OrgUser> DBManager::getCourseUsersByCourseId(int courseId)
 
 std::vector<std::string> DBManager::getFieldDataInJSONByCriteria(std::string filename, int criteria, std::string criteriaField, std::string field)
 {
-
 	std::vector<std::string> recordSet;
 
 	nlohmann::json JSON;
