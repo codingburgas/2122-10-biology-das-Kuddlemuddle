@@ -17,7 +17,7 @@ void gotoxy(int x, int y)  //Get the coordinates inside the console
 	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
 }
 
-void drawButton(int posy, string text, int size, int posx, int col, string input = "")
+void drawBox(int posy, string text, int size, int posx, int col, string input = "")
 {
 	color(col);
 	gotoxy(posx, posy);gotoxy(posx, 2); cout << char(201);
@@ -85,27 +85,27 @@ RegisterData menuRegister() //Main menu with three options
 		gotoxy(30, 4); cout << " \\__,_|\\__,_|___/ |_|\\_\\__,_|\\__,_|\\__,_|_|\\___|_| |_| |_|\\__,_|\\__,_|\\__,_|_|\\___|" << endl;
 		gotoxy(15, 7); cout << "MMMMMMMMMMMMMNX0kXXXXXXk0XNMMMMMMMMMMMMMMM" << endl;
 		gotoxy(15, 8); cout << "MMMMMMMMMMMMMNX0kXXXXXXk0XNMMMMMMMMMMMMMMM" << endl;
-		drawButton(8, " First name ", 40, 65, colors[0], info[0]);
+		drawBox(8, " First name ", 40, 65, colors[0], info[0]);
 		gotoxy(15, 9); cout << "MMMMMMMMMNOd:'.            .':dONMMMMMMMMM" << endl;
 		gotoxy(15, 10); cout << "MMMMMMW0o'                      'o0WMMMMMM" << endl;
 		gotoxy(15, 11); cout << "MMMMW0c.                          .c0WMMMM" << endl;
 		gotoxy(15, 12); cout << "MMMNd.                              .dNMMM" << endl;
-		drawButton(12, " Last name  ", 40, 65, colors[1], info[1]);
+		drawBox(12, " Last name  ", 40, 65, colors[1], info[1]);
 		gotoxy(15, 13); cout << "MMXl             ,oxkkxl'             lXMM" << endl;
 		gotoxy(15, 14); cout << "MNo            .dNMMMMMMXc             oNM" << endl;
 		gotoxy(15, 15); cout << "MO.            ;XMMMMMMMMO.            .OM" << endl;
 		gotoxy(15, 16); cout << "Wl             .kWMMMMMMNo.             lW" << endl;
-		drawButton(16, " Username   ", 40, 65, colors[2], info[2]);
+		drawBox(16, " Username   ", 40, 65, colors[2], info[2]);
 		gotoxy(15, 17); cout << "N:              .cx000Od;.              :N" << endl;
 		gotoxy(15, 18); cout << "Nc             .;:lodooc:,.             cN" << endl;
 		gotoxy(15, 19); cout << "Wd.          'dKWMMMMMMMMN0l.          .dW" << endl;
 		gotoxy(15, 20); cout << "MK,         '0MMMMMMMMMMMMMWx.         ,KM" << endl;
-		drawButton(20, " Email      ", 40, 65, colors[3], info[3]);
+		drawBox(20, " Email      ", 40, 65, colors[3], info[3]);
 		gotoxy(15, 21); cout << "MWk.        ;0WMMMMMMMMMMMMWk.        .kWM" << endl;
 		gotoxy(15, 22); cout << "MMWk'       .,::::::::::::::,.       'kWMM" << endl;
 		gotoxy(15, 23); cout << "MMMWKc.                            .cKMMMM" << endl;
 		gotoxy(15, 24); cout << "MMMMMNO:.                        .:ONMMMMM" << endl;
-		drawButton(24, " Password   ", 40, 65, colors[4], info[4]);
+		drawBox(24, " Password   ", 40, 65, colors[4], info[4]);
 		gotoxy(15, 25); cout << "MMMMMMMW0o;.                  .;o0WMMMMMMM" << endl;
 		gotoxy(15, 26); cout << "MMMMMMMMMMWKkoc;,'......',;cokKWMMMMMMMMMM" << endl;
 		gotoxy(15, 27); cout << "MMMMMMMMMMMMMMMWWNNXXNNWMMWMMMMMMMMMMMMMMM" << endl;
@@ -131,11 +131,11 @@ RegisterData menuRegister() //Main menu with three options
 
 	} while (key != '\r' && iPut <= 4);
 
-	RegisterData accaunt = { info[0], info[1], info[2], info[3], info[4] };
+	RegisterData account = { info[0], info[1], info[2], info[3], info[4] };
 
 	APIHandler newprof;
-	newprof.registerHandler(accaunt);
-	return accaunt;
+	newprof.registerHandler(account);
+	return account;
 }
 
 void menuLogin()
@@ -157,12 +157,12 @@ void menuLogin()
 		gotoxy(30, 4); cout << " \\__,_|\\__,_|___/ |_|\\_\\__,_|\\__,_|\\__,_|_|\\___|_| |_| |_|\\__,_|\\__,_|\\__,_|_|\\___|" << endl;
 		gotoxy(15, 7); cout << "MMMMMMMMMMMMMNX0kXXXXXXk0XNMMMMMMMMMMMMMMM" << endl;
 		gotoxy(15, 8); cout << "MMMMMMMMMMMMMNX0kXXXXXXk0XNMMMMMMMMMMMMMMM" << endl;
-		drawButton(8, " Email      ", 40, 65, colors[0], info[0]);
+		drawBox(8, " Email      ", 40, 65, colors[0], info[0]);
 		gotoxy(15, 9); cout << "MMMMMMMMMNOd:'.            .':dONMMMMMMMMM" << endl;
 		gotoxy(15, 10); cout << "MMMMMMW0o'                      'o0WMMMMMM" << endl;
 		gotoxy(15, 11); cout << "MMMMW0c.                          .c0WMMMM" << endl;
 		gotoxy(15, 12); cout << "MMMNd.                              .dNMMM" << endl;
-		drawButton(12, " Password   ", 40, 65, colors[1], info[1]);
+		drawBox(12, " Password   ", 40, 65, colors[1], info[1]);
 		gotoxy(15, 13); cout << "MMXl             ,oxkkxl'             lXMM" << endl;
 		gotoxy(15, 14); cout << "MNo            .dNMMMMMMXc             oNM" << endl;
 		gotoxy(15, 15); cout << "MO.            ;XMMMMMMMMO.            .OM" << endl;
@@ -200,23 +200,22 @@ void menuLogin()
 
 	} while (key != '\r' && iPut <= 1);
 
-	LoginData accaunt = { info[0], info[1] };
+	LoginData account = { info[0], info[1] };
 }
 
 void accountPage(RegisterData acc)
 {
-	system("cls");
-	gotoxy(40, 3); color(6); cout << "A C C O U N T     S E T T I N G S"; color(7);
-	gotoxy(43, 5); cout << "First name  ";
-	gotoxy(58, 5); cout << acc.fname;
-	gotoxy(44, 7); cout << "Last name  ";
-	gotoxy(58, 7); cout << acc.lname;
-	gotoxy(37, 9); cout << "Accaunt Username  ";
-	gotoxy(58, 9); cout << acc.username;
-	gotoxy(40, 11); cout << "Email address  ";
-	gotoxy(58, 11); cout << acc.email;
-	gotoxy(45, 13); cout << "Password  ";
-	gotoxy(58, 13); cout << acc.password;
+	gotoxy(40, 6); color(6); cout << "A C C O U N T     S E T T I N G S"; color(7);
+	gotoxy(43, 8); cout << "First name  ";
+	gotoxy(58, 8); cout << acc.fname;
+	gotoxy(44, 10); cout << "Last name  ";
+	gotoxy(58, 10); cout << acc.lname;
+	gotoxy(37, 12); cout << "Account Username  ";
+	gotoxy(58, 12); cout << acc.username;
+	gotoxy(40, 14); cout << "Email address  ";
+	gotoxy(58, 14); cout << acc.email;
+	gotoxy(45, 16); cout << "Password  ";
+	gotoxy(58, 16); cout << acc.password;
 
 	char key; // Key to be entered
 	int SetColor[2] = { 2, 7 };
@@ -227,14 +226,14 @@ void accountPage(RegisterData acc)
 	{
 		// Button for history notebook section
 
-		gotoxy(46, 15); color(SetColor[0]); cout << "U P D A T E";
+		gotoxy(42, 18); color(SetColor[0]); cout << "U P D A T E";
 		if (counter == 0) {
-			gotoxy(54, 15); color(7); cout << "<--";
+			gotoxy(54, 18); color(7); cout << "<--";
 		}
 		if (counter == 1) {
-			gotoxy(54, 15); color(7); cout << "-->";
+			gotoxy(54, 18); color(7); cout << "-->";
 		}
-		gotoxy(58, 15); color(SetColor[1]); cout << "D E L E T E";
+		gotoxy(58, 18); color(SetColor[1]); cout << "D E L E T E";
 		key = _getch();
 
 		if (key == 75 && (counter == 1)) // 72 is the ASCII code for the up arrow
@@ -512,9 +511,124 @@ void panetTable() {
 
 }
 
-void navBar() {
 
+void drawButton(int posy, string text, int size, int posx, int col)
+{
+	gotoxy(posx, posy); cout << char(201);
+
+	for (int i = 0; i < size; i++)
+	{
+		cout << char(205);
+	}
+
+	cout << char(187);
+	gotoxy(posx, posy + 1); cout << char(186); color(7); cout << text; color(col); cout << char(186) << endl;
+	gotoxy(posx, posy + 2); cout << char(200);
+
+	for (int i = 0; i < size; i++)
+	{
+		cout << char(205);
+	}
+
+	cout << char(188);
 }
+
+void tr(string st)
+{
+	gotoxy(80, 10);  cout << "this is page bout " << st;
+}
+
+int Menu() //Main menu with three options
+{
+	char key; // Key to be entered
+	int SetColor[5] = { 2, 7, 7, 7, 7 };
+	int counter = 1;
+	int ckey = 0;
+	RegisterData acc = { "Vesko", "Stoyanov", "vesaka77", "veselincho_2@cod.bg", "vesilesi819" };
+	while (true)
+	{
+		// Button for history notebook section
+		gotoxy(0, 1); cout << "     Kuddlemuddle  ";
+
+		color(SetColor[0]);
+		drawButton(1, "       MY PROFILE       ", 24, 5, SetColor[0]);
+		color(7);
+
+
+		// Button for timeline section
+		color(SetColor[1]);
+		drawButton(1, "      ORGANIZATIONS     ", 24, 30, SetColor[1]);
+		color(7);
+
+		color(SetColor[2]);
+		drawButton(1, "        LOG OUT         ", 24, 100, SetColor[2]);
+		color(7);
+
+		for (int i = 0; i < 130; i++)
+		{
+			gotoxy(i, 4); cout << char(205);
+		}
+
+		key = _getch();
+
+		if (key == 75 && (counter >= 2 && counter <= 3)) // 72 is the ASCII code for the up arrow
+		{
+			counter--;
+		}
+
+		if (key == 77 && (counter >= 1 && counter <= 2)) // 80 is the ASCII code for the up arrow
+		{
+			counter++;
+		}
+
+		if (key == '\r' && ckey % 2 == 0) // enter key
+		{
+			if (counter == 1)
+			{
+				accountPage(acc);
+			}
+
+			if (counter == 2)
+			{
+				system("CLS");
+				tr("BioSphere");
+			}
+
+			if (counter == 3)
+			{
+				system("CLS");
+				tr("Sells");
+			}
+			if (counter == 4)
+			{
+				break;
+			}
+
+		}
+
+
+		SetColor[0] = 7;
+		SetColor[1] = 7;
+		SetColor[2] = 7;
+		SetColor[3] = 7;
+
+		if (key == '\t')
+		{
+			ckey++;
+		}
+
+		if (ckey % 2 == 0) {
+			if (counter == 1) { SetColor[0] = 2; }
+			if (counter == 2) { SetColor[1] = 2; }
+			if (counter == 3) { SetColor[2] = 2; }
+			if (counter == 4) { SetColor[3] = 12; }
+		}
+
+	}
+
+	return 0;
+}
+
 
 int main()
 {
@@ -525,5 +639,5 @@ int main()
 		"Kethering und scisorss", "Code block for Specialists", "Cooking restaurnat um France"};*/
 
 	
-	displayGrade(88);
+	Menu();
 }
