@@ -37,8 +37,8 @@ void drawButton(int posy, string text, int size, int posx, int col, string input
 	cout << char(187);
 
 	gotoxy(posx, posy + 1); cout << char(186); color(7);
-	cout << text << "  "; color(col); cout << char(186);  color(7); cout << input;
-	for (size_t i = 0; i < 26 - input.size(); i++)
+	cout << text << "  "; color(col); cout << char(186) << " ";  color(7); cout << input;
+	for (size_t i = 0; i < 25 - input.size(); i++)
 	{
 		cout << " ";
 	}
@@ -170,7 +170,7 @@ int main()
 
 	color(6);
 	do {
-		info[iPut] += key;
+
 		int colors[5] = { 7,7,7,7,7 };
 		colors[iPut] = 6;
 		gotoxy(30, 0); cout << "     _             _  __         _     _ _                          _     _ _      " << endl;
@@ -213,9 +213,20 @@ int main()
 			iPut++;
 			key = ' ';
 		}
-		if (iPut > 4) {
-			break;
+
+		else {
+			if (key == '\b') {
+				info[iPut] = info[iPut].c_str()
+			}
+			info[iPut] += key;
 		}
-	} while (key != 'q');
+
+
+	} while (key != '\r' && iPut <= 4);
+
+	RegisterData accaunt = { info[0], info[1], info[2], info[3], info[4] };
+
+	APIHandler newprof;
+	newprof.registerHandler(accaunt);
 
 }
