@@ -67,7 +67,7 @@ void drawButton(int posy, string text, int size, int posx, int col, string input
 	color(6);
 }
 
-int menuRegister() //Main menu with three options
+RegisterData menuRegister() //Main menu with three options
 {
 	char key = ' ';
 	int iPut = 0;
@@ -132,9 +132,10 @@ int menuRegister() //Main menu with three options
 	} while (key != '\r' && iPut <= 4);
 
 	RegisterData accaunt = { info[0], info[1], info[2], info[3], info[4] };
-
+	
 	APIHandler newprof;
 	newprof.registerHandler(accaunt);
+	return accaunt;
 }
 
 
@@ -203,8 +204,65 @@ void menuLogin()
 	LoginData accaunt = { info[0], info[1]};
 }
 
+
+void accountPage(RegisterData acc) {
+	gotoxy(40, 3); color(6); cout << "A C C A U N T     S E T T I N G S"; color(7);
+	gotoxy(43, 5); cout << "First name  ";
+	gotoxy(58, 5); cout << acc.fname;
+	gotoxy(44, 7); cout << "Last name  ";
+	gotoxy(58, 7); cout << acc.lname;
+	gotoxy(37, 9); cout << "Accaunt Username  ";
+	gotoxy(58, 9); cout << acc.username;
+	gotoxy(40, 11); cout << "Email address  ";
+	gotoxy(58, 11); cout << acc.email;
+	gotoxy(45, 13); cout << "Password  ";
+	gotoxy(58, 13); cout << acc.password;
+
+	char key; // Key to be entered
+	int SetColor[2] = { 2, 7 };
+	int counter = 0;
+	int ckey = 0;
+
+	while (true)
+	{
+		// Button for history notebook section
+		
+		gotoxy(46, 15); color(SetColor[0]); cout << "E D I T";
+		if (counter == 0) {
+			gotoxy(54, 15); color(7); cout << "<--";
+		}
+		if (counter == 1) {
+			gotoxy(54, 15); color(7); cout << "-->";
+		}
+		gotoxy(58, 15); color(SetColor[1]); cout << "D E L E T E";
+		key = _getch();
+
+		if (key == 75 && (counter == 1)) // 72 is the ASCII code for the up arrow
+		{
+			counter--;
+		}
+
+		if (key == 77 && (counter == 0)) // 80 is the ASCII code for the up arrow
+		{
+			counter++;
+		}
+
+		SetColor[0] = 7;
+		SetColor[1] = 7;
+
+		if (counter == 0) { SetColor[0] = 2; }
+		if (counter == 1) { SetColor[1] = 4; }
+		
+
+	}
+
+}
+
 int main()
 {
-	menuRegister();
+	/*RegisterData acc = menuRegister();
 	menuLogin();
+	accountPage(acc);*/
+	RegisterData acc = { "Veselin", "Stoyanov", "Vesaka777", "VNStoyanov@code.bg", "Xyz89231"};
+	accountPage(acc);
 }
