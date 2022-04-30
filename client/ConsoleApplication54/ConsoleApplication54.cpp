@@ -37,8 +37,19 @@ void drawButton(int posy, string text, int size, int posx, int col, string input
 	cout << char(187);
 
 	gotoxy(posx, posy + 1); cout << char(186); color(7);
-	cout << text << "  "; color(col); cout << char(186) << " ";  color(7); cout << input;
-	for (size_t i = 0; i < 25 - input.size(); i++)
+	cout << text << "  "; color(col); cout << char(186) << " ";
+	color(7);
+	size_t inputLength = 0;
+	if (input.size() > 24) {
+		cout << input.substr(input.size() - 24, input.size());
+		inputLength = 24;
+	}
+	else {
+		cout << input;
+		inputLength = input.size();
+	}
+
+	for (size_t i = 0; i < 25 - inputLength; i++)
 	{
 		cout << " ";
 	}
@@ -216,11 +227,13 @@ int main()
 
 		else {
 			if (key == '\b') {
-				info[iPut] = info[iPut].c_str()
+				info[iPut] = info[iPut].substr(0, info[iPut].size() - 1);
 			}
-			info[iPut] += key;
-		}
+			else {
+				info[iPut] += key;
+			}
 
+		}
 
 	} while (key != '\r' && iPut <= 4);
 
