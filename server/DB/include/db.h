@@ -137,12 +137,15 @@ public:
 	std::vector<std::string> updateQuestion(int questionId, crow::query_string data);
 	std::vector<std::string> startAttempt(crow::query_string data, int userId);
 	AttemptInfo getAttemptInfo(int attemptId);
+	int getAttemptIdByUserIdAndQuizId(int userId, int quizId);
+	std::vector<std::string> deleteAttempt(int attemptId);
 private:
 	nlohmann::json getJSONFromFile(std::string filename);
 	bool setJSONFile(nlohmann::json json, std::string filename);
 	int getLastId(nlohmann::json json);
 	bool checkIfValueExistsInField(nlohmann::json json, std::string field, std::string fieldData);
 	bool checkIfValueExistsInField(nlohmann::json json, std::string field, std::string fieldData, std::string field2, std::string fieldData2);
+	bool checkIfValueExistsInField(nlohmann::json json, std::string field, std::string fieldData, std::string field2, int fieldData2);
 	std::vector<OrgUser> getOrgUsersByOrgId(int orgId);
 	std::vector<std::string> getFieldDataInJSONByCriteria(std::string filename, int criteria, std::string criteriaField, std::string field);
 	std::vector<QuizInfo> getAllQuizzesInTopicWithID(int topicId);

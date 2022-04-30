@@ -157,15 +157,19 @@ crow::json::wvalue ResponseJSONManager::createQuizJSONResponse(QuizInfo data)
 	return resBody;
 }
 
-crow::json::wvalue ResponseJSONManager::createQuestionJSONResponse(QuestionInfo data)
+crow::json::wvalue ResponseJSONManager::createQuestionJSONResponse(QuestionInfo data, bool shareAnswer)
 {
 	crow::json::wvalue resBody;
 
 	resBody["type"] = "get-question-success";
 	resBody["question-id"] = data.id;
 	resBody["question-question"] = data.question;
-	// TODO: Add check if student
-	resBody["question-answer"] = data.answer;
+	
+	if (shareAnswer)
+	{
+		resBody["question-answer"] = data.answer;
+	}
+
 	resBody["quiz-id"] = data.quizId;
 
 	return resBody;

@@ -2193,6 +2193,19 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware> &a
 
 				if (recordSet[0] != "1")
 				{
+					int result = dbManager.getAttemptIdByUserIdAndQuizId(ctx.userId, questionInfo.quizId);
+
+					if (result != -1)
+					{
+						AttemptInfo attemptInfo = dbManager.getAttemptInfo(result);
+						if (ctx.userId == attemptInfo.userId && attemptInfo.currentQuestionId == questionId)
+						{
+							res = responseJSONManager.createQuestionJSONResponse(questionInfo, false);
+							res.end();
+							return;
+						}
+					}
+
 					std::string log = "Failed to get quiz with id: " + std::to_string(questionId) + ". Reason: User is unauthorised";
 					recordSet[0] = "User is unauthorised";
 
@@ -2487,6 +2500,75 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware> &a
 				}
 
 				res = responseJSONManager.createAttemptJSONResponse(attemptInfo);
+				res.end();
+				return;
+			});
+
+	CROW_BP_ROUTE(api, "/attempts/<int>")
+		.methods(crow::HTTPMethod::Delete)
+		.middlewares<crow::App<crow::CORSHandler, AuthorisationMiddleware>, AuthorisationMiddleware>()
+		([&](const crow::request& req, crow::response& res, int attemptId)
+			{
+				auto& ctx = app.get_context<AuthorisationMiddleware>(req);
+
+				CROW_LOG_INFO << "User with id: " << ctx.userId << " is trying to delete attempt with id: " << attemptId;
+
+				AttemptInfo attemptInfo = dbManager.getAttemptInfo(attemptId);
+
+				if (!attemptInfo.errors.empty())
+				{
+					std::string log = "Failed to get attempt info for question with id: " + std::to_string(attemptId) + ". Reasons: ";
+
+					for (auto el : attemptInfo.errors)
+					{
+						log += el + " ";
+					}
+
+					CROW_LOG_WARNING << log;
+
+					res = responseJSONManager.createJSONResponse(false, attemptInfo.errors, "attempt-deletion");
+					res.end();
+					return;
+				}
+
+				QuizInfo quizInfo = dbManager.getQuizInfo(attemptInfo.quizId);
+
+				TopicInfo topicInfo = dbManager.getTopicInfo(quizInfo.topicId);
+
+				std::vector<std::string> recordSet = dbManager.canUserAccessCourse(topicInfo.courseId, ctx.userId, true);
+
+				if (recordSet[0] != "1")
+				{
+					std::string log = "Failed to delete attempt with id: " + std::to_string(attemptId) + ". Reason: User is unauthorised";
+					recordSet[0] = "User is unauthorised";
+
+					CROW_LOG_WARNING << log;
+
+					res = responseJSONManager.createJSONResponse(false, recordSet, "attempt-deletion");
+					res.code = 403;
+					res.end();
+					return;
+				}
+
+				recordSet = dbManager.deleteAttempt(attemptId);
+
+				if (recordSet.size() != 0)
+				{
+					std::string log = "Failed to delete attempt. Reason: ";
+
+					for (auto el : recordSet)
+					{
+						log += el + " ";
+					}
+
+					CROW_LOG_WARNING << log;
+
+					res = responseJSONManager.createJSONResponse(false, recordSet, "attempt-deletion");
+					res.end();
+					return;
+				}
+
+				res = responseJSONManager.createJSONResponse(true, recordSet, "question-deletion");
 				res.end();
 				return;
 			});

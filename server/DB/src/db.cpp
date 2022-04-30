@@ -1878,9 +1878,10 @@ std::vector<std::string> DBManager::startAttempt(crow::query_string data, int us
 	}
 
 	// Check for duplicate name
-	if (checkIfValueExistsInField(attemptsJSON, "QuizID", data.get("quizId"), "UserID", std::to_string(userId)))
+	if (checkIfValueExistsInField(attemptsJSON, "QuizID", data.get("quizId"), "UserID", userId))
 	{
-		recordSet.push_back("There is already the same attempt for this quiz");
+		QuizInfo quizInfo = getQuizInfo(std::stoi(data.get("quizId")));
+		recordSet.push_back("Attempt-id: " + std::to_string(quizInfo.id));
 		return recordSet;
 	}
 
@@ -1943,6 +1944,68 @@ AttemptInfo DBManager::getAttemptInfo(int attemptId)
 	returnValue.inProgress = std::stoi(getFieldDataInJSONByCriteria("attempts.json", attemptId, "ID", "inProgress")[0]);
 
 	return returnValue;
+}
+
+int DBManager::getAttemptIdByUserIdAndQuizId(int userId, int quizId)
+{
+	nlohmann::json attemptsJSON;
+
+	// Get the JSON from the file
+	try
+	{
+		attemptsJSON = getJSONFromFile("attempts.json");
+	}
+	catch (std::string ex)
+	{
+		return -1;
+	}
+
+	for (auto it = attemptsJSON.begin(); it != attemptsJSON.end(); ++it)
+	{
+		if (it.value()["QuizID"] == std::to_string(quizId) && it.value()["UserID"] == userId)
+		{
+			return it.value()["ID"];
+		}
+	}
+
+	return -1;
+}
+
+std::vector<std::string> DBManager::deleteAttempt(int attemptId)
+{
+	std::vector<std::string> recordSet;
+	nlohmann::json attemptsJSON;
+
+	// Get the JSON from the file
+	try
+	{
+		attemptsJSON = getJSONFromFile("attempts.json");
+	}
+	catch (std::string ex)
+	{
+		recordSet.push_back("Could'n open attempts.json file");
+		return recordSet;
+	}
+
+	auto it = attemptsJSON.cbegin();
+	for (; it != attemptsJSON.cend();)
+	{
+		if (it.value()["ID"] == attemptId)
+		{
+			it = attemptsJSON.erase(it);
+			if (!setJSONFile(attemptsJSON, "attempts.json"))
+			{
+				recordSet.push_back("Could'n open attempts.json file");
+				return recordSet;
+			}
+		}
+		else
+		{
+			++it;
+		}
+	}
+
+	return recordSet;
 }
 
 std::vector<QuizInfo> DBManager::getAllQuizzesInTopicWithID(int topicId)
@@ -2080,6 +2143,19 @@ bool DBManager::checkIfValueExistsInField(nlohmann::json json, std::string field
 }
 
 bool DBManager::checkIfValueExistsInField(nlohmann::json json, std::string field, std::string fieldData, std::string field2, std::string fieldData2)
+{
+	for (auto it = json.begin(); it != json.end(); ++it)
+	{
+		if (it.value()[field] == fieldData && it.value()[field2] == fieldData2)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+bool DBManager::checkIfValueExistsInField(nlohmann::json json, std::string field, std::string fieldData, std::string field2, int fieldData2)
 {
 	for (auto it = json.begin(); it != json.end(); ++it)
 	{

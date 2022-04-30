@@ -13,6 +13,6 @@ public:
 	crow::json::wvalue createTopicJSONResponse(TopicInfo data);
 	crow::json::wvalue createLessonJSONResponse(LessonInfo data);
 	crow::json::wvalue createQuizJSONResponse(QuizInfo data);
-	crow::json::wvalue createQuestionJSONResponse(QuestionInfo data);
+	crow::json::wvalue createQuestionJSONResponse(QuestionInfo data, bool shareAnswer = true);
 	crow::json::wvalue createAttemptJSONResponse(AttemptInfo data);
 };
