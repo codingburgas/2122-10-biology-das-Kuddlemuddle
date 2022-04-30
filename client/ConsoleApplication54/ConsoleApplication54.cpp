@@ -20,7 +20,7 @@ void gotoxy(int x, int y)  //Get the coordinates inside the console
 void drawButton(int posy, string text, int size, int posx, int col, string input = "")
 {
 	color(col);
-	gotoxy(posx, posy); cout << char(201);
+	gotoxy(posx, posy);gotoxy(posx, 2); cout << char(201);
 
 	for (int i = 0; i < 14; i++)
 	{
@@ -325,78 +325,143 @@ void printOrganisation(string acc[], int orgSize)
 	}
 }
 
-void displayNumber(int num, int posx)
+void displayNumber(int num, int posx, int posy)
 {
 	if (num == 1)
 	{
-		gotoxy(posx, 2); cout << " __  ";
-		gotoxy(posx, 3); cout << "/_ | ";
-		gotoxy(posx, 4); cout << " | |";
-		gotoxy(posx, 5); cout << " | |";
-		gotoxy(posx, 6); cout << " | |";
-		gotoxy(posx, 7); cout << " |_| ";
+		gotoxy(posx, posy + 2); cout << " __  ";
+		gotoxy(posx, posy + 3); cout << "/_ | ";
+		gotoxy(posx, posy + 4); cout << " | |";
+		gotoxy(posx, posy + 5); cout << " | |";
+		gotoxy(posx, posy + 6); cout << " | |";
+		gotoxy(posx, posy +7); cout << " |_| ";
 	}
 	if (num == 2)
 	{
-		gotoxy(posx, 2); cout << " ___  ";
-		gotoxy(posx, 3); cout << "|__  \\  ";
-		gotoxy(posx, 4); cout << "   ) | ";
-		gotoxy(posx, 5); cout << "  / /  ";
-		gotoxy(posx, 6); cout << " / /_  ";
-		gotoxy(posx, 7); cout << "|____| ";
+		gotoxy(posx, posy + 2); cout << " ___  ";
+		gotoxy(posx, posy + 3); cout << "|__  \\  ";
+		gotoxy(posx, posy + 4); cout << "   ) | ";
+		gotoxy(posx, posy + 5); cout << "  / /  ";
+		gotoxy(posx, posy + 6); cout << " / /_  ";
+		gotoxy(posx, posy + 7); cout << "|____| ";
 	}
 	if (num == 3)
 	{
-		gotoxy(posx, 2); cout << " ____";
-		gotoxy(posx, 3); cout << "|___ \ ";
-		gotoxy(posx, 4); cout << "  __) | ";
-		gotoxy(posx, 5); cout << " |__ <  ";
-		gotoxy(posx, 6); cout << " ___) | ";
-		gotoxy(posx, 7); cout << "|____/  ";
+		gotoxy(posx, posy + 2); cout << " ____";
+		gotoxy(posx, posy + 3); cout << "|___ \\ ";
+		gotoxy(posx, posy + 4); cout << "  __) | ";
+		gotoxy(posx, posy + 5); cout << " |__ <  ";
+		gotoxy(posx, posy + 6); cout << " ___) | ";
+		gotoxy(posx, posy + 7); cout << "|____/  ";
 	}
 	if (num == 4)
 	{
-		gotoxy(posx, 2); cout << " _  _   ";
-		gotoxy(posx, 3); cout << "| || |   ";
-		gotoxy(posx, 4); cout << "| || |_  ";
-		gotoxy(posx, 5); cout << "|__   _| ";
-		gotoxy(posx, 6); cout << "   | |   ";
-		gotoxy(posx, 7); cout << "   |_|   ";
+		gotoxy(posx, posy + 2); cout << " _  _   ";
+		gotoxy(posx, posy + 3); cout << "| || |   ";
+		gotoxy(posx, posy + 4); cout << "| || |_  ";
+		gotoxy(posx, posy + 5); cout << "|__   _| ";
+		gotoxy(posx, posy + 6); cout << "   | |   ";
+		gotoxy(posx, posy + 7); cout << "   |_|   ";
 	}
 	if (num == 5)
 	{
-		gotoxy(posx, 2); cout << " _____  ";
-		gotoxy(posx, 2); cout << "| ____| ";
-		gotoxy(posx, 2); cout << "| |__   ";
-		gotoxy(posx, 2); cout << "|___ \  ";
-		gotoxy(posx, 2); cout << " ___) | ";
-		gotoxy(posx, 2); cout << "|____/  ";
-	}
-	if (num == 5) {
-
+		gotoxy(posx, posy + 2); cout << " _____  ";
+		gotoxy(posx, posy + 3); cout << "| ____| ";
+		gotoxy(posx, posy + 4); cout << "| |__   ";
+		gotoxy(posx, posy + 5); cout << "|___ \\  ";
+		gotoxy(posx, posy + 6); cout << " ___) | ";
+		gotoxy(posx, posy + 7); cout << "|____/  ";
 	}
 	if (num == 6) {
-
+		gotoxy(posx, posy + 2); cout << "   __   ";
+		gotoxy(posx, posy + 3); cout << "  / /   ";
+		gotoxy(posx, posy + 4); cout << " / /_   ";
+		gotoxy(posx, posy + 5); cout << "| '_ \\  ";
+		gotoxy(posx, posy + 6); cout << "| (_) | ";
+		gotoxy(posx, posy + 7); cout << " \\___/  ";
 	}
 	if (num == 7) {
+		gotoxy(posx, posy + 2); cout << " ______  ";
+		gotoxy(posx, posy + 3); cout << "|____  | ";
+		gotoxy(posx, posy + 4); cout << "    / /  ";
+		gotoxy(posx, posy + 5); cout << "   / /   ";
+		gotoxy(posx, posy + 6); cout << "  / /    ";
+		gotoxy(posx, posy + 7); cout << " /_/ ";
+	}
+	if (num == 8) 
+	{
+		gotoxy(posx, posy + 2); cout << "  ___   ";
+		gotoxy(posx, posy + 3); cout << " / _ \\  ";
+		gotoxy(posx, posy + 4); cout << "| (_) | ";
+		gotoxy(posx, posy + 5); cout << " > _ <  ";
+		gotoxy(posx, posy + 6); cout << "| (_) | ";
+		gotoxy(posx, posy + 7); cout << " \\___/ ";
 
 	}
-	if (num == 8) {
 
-	}
-	if (num == 9) {
-
+	if (num == 9) 
+	{
+		gotoxy(posx, posy + 2); cout << "  ___  ";
+		gotoxy(posx, posy + 3); cout << " / _ \\ ";
+		gotoxy(posx, posy + 4); cout << "| (_) | ";
+		gotoxy(posx, posy + 5); cout << " \\__, | ";
+		gotoxy(posx, posy + 6); cout << "   / /  ";
+		gotoxy(posx, posy + 7); cout << "  /_/  ";
 	}
 
 	if (num == 0) {
-
+		gotoxy(posx, posy + 2); cout << "  ___   ";
+		gotoxy(posx, posy + 3); cout << " / _ \\  ";
+		gotoxy(posx, posy + 4); cout << "| | | | ";
+		gotoxy(posx, posy + 5); cout << "| | | | ";
+		gotoxy(posx, posy + 6); cout << "| |_| | ";
+		gotoxy(posx, posy + 7); cout << " \\___/  ";
 	}
 }
 
-void displayGrade(int points) {
-	int decs = points / 10;
-	int ones = points % 10;
-	displayNumber(1, 20); displayNumber(2, 26);
+void displayGrade(int points) 
+{
+	gotoxy(40, 2); cout << char(218);
+	for (int i = 0; i < 50; i++) {
+		cout << char(196);
+	}
+	gotoxy(91, 2); cout << char(191);
+
+	gotoxy(54, 5);  cout << "Y O U R   S C O R E   I S";
+
+	for (int i = 0; i < 25; i++) 
+	{
+		gotoxy(40, 3+i);  cout << char(179);
+		gotoxy(91, 3 + i);  cout << char(179);
+	}
+	
+	color(3); displayNumber(points / 10, 58,4);
+	displayNumber(points % 10, 67,4); color(7);
+    gotoxy(62, 13);  cout << "O U T  O F";
+	
+
+	color(8); displayNumber(1, 55, 12);
+	displayNumber(0, 62, 12);
+	displayNumber(0, 71, 12); color(7);
+
+	gotoxy(54, 21);  cout << "Y O U R "; color(3); cout << " S T A T U S "; color(7); cout << " I S";
+	if (points < 40) {
+		gotoxy(65, 23); color(4); cout << "B A D";
+	}
+	else if (points <= 70) {
+		gotoxy(61, 23); color(6); cout << "A V E R A G E";
+	}
+	else if (points <= 100) {
+		gotoxy(59, 23); color(2); cout << "E X C E L E N T";
+	}
+	color(7);
+	gotoxy(40, 26); cout << char(192);
+	for (int i = 0; i < 50; i++) 
+	{
+		cout << char(196);
+	}
+	gotoxy(91, 26); cout << char(217);
+
 }
 
 int main()
@@ -408,5 +473,5 @@ int main()
 		"Kethering und scisorss", "Code block for Specialists", "Cooking restaurnat um France"};
 
 	printOrganisation(acc, 5);*/
-	displayGrade(77);
+	displayGrade(88);
 }
