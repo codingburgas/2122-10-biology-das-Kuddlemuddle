@@ -229,7 +229,7 @@ void accountPage(RegisterData acc)
 	{
 		// Button for history notebook section
 		
-		gotoxy(46, 15); color(SetColor[0]); cout << "E D I T";
+		gotoxy(46, 15); color(SetColor[0]); cout << "U P D A T E";
 		if (counter == 0) {
 			gotoxy(54, 15); color(7); cout << "<--";
 		}
@@ -282,11 +282,16 @@ void printOrganisation(string acc[], int orgSize)
 			if (i == counter) {
 				color(6); gotoxy(9, posy); cout << acc[i];
 				gotoxy(60, posy); 
-				
+				if (counter2 == 0) {
+					color(2); cout << "Update"; color(7); cout << " | Delete";
+				}
+				else {
+					color(7); cout << "Update | "; color(4); cout << "Delete";
+				}
 			}
 			else {
 				gotoxy(9, posy); cout << acc[i];
-				
+				gotoxy(60, posy); color(8); cout << "Update | Delete";
 			}
 			
 			
