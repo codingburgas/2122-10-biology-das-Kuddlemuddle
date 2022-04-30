@@ -132,14 +132,14 @@ RegisterData menuRegister() //Main menu with three options
 	} while (key != '\r' && iPut <= 4);
 
 	RegisterData accaunt = { info[0], info[1], info[2], info[3], info[4] };
-	
+
 	APIHandler newprof;
 	newprof.registerHandler(accaunt);
 	return accaunt;
 }
 
 
-void menuLogin() 
+void menuLogin()
 {
 	system("cls");
 	char key = ' ';
@@ -201,11 +201,11 @@ void menuLogin()
 
 	} while (key != '\r' && iPut <= 1);
 
-	LoginData accaunt = { info[0], info[1]};
+	LoginData accaunt = { info[0], info[1] };
 }
 
 
-void accountPage(RegisterData acc) 
+void accountPage(RegisterData acc)
 {
 	system("cls");
 	gotoxy(40, 3); color(6); cout << "A C C O U N T     S E T T I N G S"; color(7);
@@ -228,7 +228,7 @@ void accountPage(RegisterData acc)
 	while (true)
 	{
 		// Button for history notebook section
-		
+
 		gotoxy(46, 15); color(SetColor[0]); cout << "U P D A T E";
 		if (counter == 0) {
 			gotoxy(54, 15); color(7); cout << "<--";
@@ -254,21 +254,21 @@ void accountPage(RegisterData acc)
 
 		if (counter == 0) { SetColor[0] = 2; }
 		if (counter == 1) { SetColor[1] = 4; }
-		
+
 
 	}
 
 }
 
-void printOrganisation(string acc[], int orgSize) 
+void printOrganisation(string acc[], int orgSize)
 {
 	/*APIHandler apiHandler;
 	apiHandler.getAllOrgs("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJleHAiOjE2NTEzOTQ4MTMsImlhdCI6MTY1MTMwODQxMywiaXNBZG1pbiI6MCwic3ViIjoiMSJ9.lFWn7AUKArrNMiqggBmnkOEHMt7sJFdshvN2JeCCtjw"); */
 	system("cls");
-	
+
 
 	char key; // Key to be entered
-	
+
 	int counter = 0, counter2 = 0;
 	int ckey = 0;
 
@@ -281,7 +281,7 @@ void printOrganisation(string acc[], int orgSize)
 			gotoxy(4, posy); cout << "-->";
 			if (i == counter) {
 				color(6); gotoxy(9, posy); cout << acc[i];
-				gotoxy(60, posy); 
+				gotoxy(60, posy);
 				if (counter2 == 0) {
 					color(2); cout << "Update"; color(7); cout << " | Delete";
 				}
@@ -293,8 +293,8 @@ void printOrganisation(string acc[], int orgSize)
 				gotoxy(9, posy); cout << acc[i];
 				gotoxy(60, posy); color(8); cout << "Update | Delete";
 			}
-			
-			
+
+
 			posy += 2;
 			color(7);
 		}
@@ -310,8 +310,8 @@ void printOrganisation(string acc[], int orgSize)
 		{
 			counter++;
 		}
-		
-		if (key == 75 && (counter2 == 1 )) // 72/75 is the ASCII code for the up arrow
+
+		if (key == 75 && (counter2 == 1)) // 72/75 is the ASCII code for the up arrow
 		{
 			counter2--;
 		}
@@ -325,14 +325,88 @@ void printOrganisation(string acc[], int orgSize)
 	}
 }
 
+void displayNumber(int num, int posx)
+{
+	if (num == 1)
+	{
+		gotoxy(posx, 2); cout << " __  ";
+		gotoxy(posx, 3); cout << "/_ | ";
+		gotoxy(posx, 4); cout << " | |";
+		gotoxy(posx, 5); cout << " | |";
+		gotoxy(posx, 6); cout << " | |";
+		gotoxy(posx, 7); cout << " |_| ";
+	}
+	if (num == 2)
+	{
+		gotoxy(posx, 2); cout << " ___  ";
+		gotoxy(posx, 3); cout << "|__  \\  ";
+		gotoxy(posx, 4); cout << "   ) | ";
+		gotoxy(posx, 5); cout << "  / /  ";
+		gotoxy(posx, 6); cout << " / /_  ";
+		gotoxy(posx, 7); cout << "|____| ";
+	}
+	if (num == 3)
+	{
+		gotoxy(posx, 2); cout << " ____";
+		gotoxy(posx, 3); cout << "|___ \ ";
+		gotoxy(posx, 4); cout << "  __) | ";
+		gotoxy(posx, 5); cout << " |__ <  ";
+		gotoxy(posx, 6); cout << " ___) | ";
+		gotoxy(posx, 7); cout << "|____/  ";
+	}
+	if (num == 4)
+	{
+		gotoxy(posx, 2); cout << " _  _   ";
+		gotoxy(posx, 3); cout << "| || |   ";
+		gotoxy(posx, 4); cout << "| || |_  ";
+		gotoxy(posx, 5); cout << "|__   _| ";
+		gotoxy(posx, 6); cout << "   | |   ";
+		gotoxy(posx, 7); cout << "   |_|   ";
+	}
+	if (num == 5)
+	{
+		gotoxy(posx, 2); cout << " _____  ";
+		gotoxy(posx, 2); cout << "| ____| ";
+		gotoxy(posx, 2); cout << "| |__   ";
+		gotoxy(posx, 2); cout << "|___ \  ";
+		gotoxy(posx, 2); cout << " ___) | ";
+		gotoxy(posx, 2); cout << "|____/  ";
+	}
+	if (num == 5) {
+
+	}
+	if (num == 6) {
+
+	}
+	if (num == 7) {
+
+	}
+	if (num == 8) {
+
+	}
+	if (num == 9) {
+
+	}
+
+	if (num == 0) {
+
+	}
+}
+
+void displayGrade(int points) {
+	int decs = points / 10;
+	int ones = points % 10;
+	displayNumber(1, 20); displayNumber(2, 26);
+}
+
 int main()
 {
 	/*RegisterData acc = menuRegister();
 	menuLogin();
 	accountPage(acc);*/
-	string acc[5] = { "Vocational school of Programing", "United states of America",
+	/*string acc[5] = { "Vocational school of Programing", "United states of America",
 		"Kethering und scisorss", "Code block for Specialists", "Cooking restaurnat um France"};
-	//accountPage(acc);
-	printOrganisation(acc, 5);
+
+	printOrganisation(acc, 5);*/
+	displayGrade(77);
 }
-	
