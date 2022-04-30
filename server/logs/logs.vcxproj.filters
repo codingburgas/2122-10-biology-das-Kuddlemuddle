@@ -18,15 +18,9 @@
     <ClInclude Include="include\loggerHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\framework.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\loggerHandler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\pch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

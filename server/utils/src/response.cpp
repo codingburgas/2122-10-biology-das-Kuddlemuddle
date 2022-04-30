@@ -140,7 +140,7 @@ crow::json::wvalue ResponseJSONManager::createLessonJSONResponse(LessonInfo data
 	return resBody;
 }
 
-crow::json::wvalue ResponseJSONManager::createQuizJSONResponse(QuizInfo data)
+crow::json::wvalue ResponseJSONManager::createQuizJSONResponse(QuizInfo data, bool shareData)
 {
 	crow::json::wvalue resBody;
 
@@ -149,9 +149,17 @@ crow::json::wvalue ResponseJSONManager::createQuizJSONResponse(QuizInfo data)
 	resBody["quiz-name"] = data.name;
 	resBody["topic-id"] = data.topicId;
 	
-	for (size_t i = 0; i < data.questions.size(); i++)
+	if (shareData)
 	{
-		resBody["quiz-questions"][i] = { {"question-id:", data.questions[i].id} };
+		for (size_t i = 0; i < data.questions.size(); i++)
+		{
+			resBody["quiz-questions"][i] = { {"question-id:", data.questions[i].id} };
+		}
+
+		for (size_t i = 0; i < data.attempts.size(); i++)
+		{
+			resBody["quiz-attempts"][i] = { {"attempt-id:", data.attempts[i].id} };
+		}
 	}
 
 	return resBody;
@@ -175,11 +183,11 @@ crow::json::wvalue ResponseJSONManager::createQuestionJSONResponse(QuestionInfo 
 	return resBody;
 }
 
-crow::json::wvalue ResponseJSONManager::createAttemptJSONResponse(AttemptInfo data)
+crow::json::wvalue ResponseJSONManager::createAttemptJSONResponse(AttemptInfo data, std::string type)
 {
 	crow::json::wvalue resBody;
 
-	resBody["type"] = "start-attempt-success";
+	resBody["type"] = type + "-success";
 	resBody["is-in-progress"] = data.inProgress;
 	resBody["attempt-id"] = data.id;
 	resBody["attempt-quiz-id"] = data.quizId;

@@ -361,6 +361,7 @@ lessons.json
 quizzes.json
 questions.json
 attempts.json
+answers.json
 
 # Static folder
 static

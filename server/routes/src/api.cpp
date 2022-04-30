@@ -1928,7 +1928,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware> &a
 					return;
 				}
 
-				res = responseJSONManager.createQuizJSONResponse(quizInfo);
+				res = responseJSONManager.createQuizJSONResponse(quizInfo, dbManager.isUserInCourseAndGetRole(ctx.userId, topicInfo.courseId)[1] != "0");
 				res.end();
 				return;
 			});
@@ -2447,7 +2447,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware> &a
 				CROW_LOG_INFO << "Attempt for quiz with id: " + std::string(reqData.get("quizId")) + " is successfully saved into the database.";
 
 				// Create and send request
-				res = responseJSONManager.createAttemptJSONResponse(attemptInfo);
+				res = responseJSONManager.createAttemptJSONResponse(attemptInfo, "attempt-start");
 				res.end();
 				return;
 			});
@@ -2499,7 +2499,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware> &a
 					return;
 				}
 
-				res = responseJSONManager.createAttemptJSONResponse(attemptInfo);
+				res = responseJSONManager.createAttemptJSONResponse(attemptInfo, "get-attempt");
 				res.end();
 				return;
 			});
@@ -2569,6 +2569,165 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware> &a
 				}
 
 				res = responseJSONManager.createJSONResponse(true, recordSet, "question-deletion");
+				res.end();
+				return;
+			});
+
+	CROW_BP_ROUTE(api, "/answer")
+		.methods(crow::HTTPMethod::Post)
+		.middlewares<crow::App<crow::CORSHandler, AuthorisationMiddleware>, AuthorisationMiddleware>()
+		//CROW_MIDDLEWARES(app, AuthorisationMiddleware)
+		([&](const crow::request& req, crow::response& res)
+			{
+				auto reqData = crow::query_string("?" + req.body);
+				auto& ctx = app.get_context<AuthorisationMiddleware>(req);
+
+				CROW_LOG_INFO << "User with id: " << ctx.userId << " is trying to answer question with id: " << reqData.get("questionId");
+
+				QuestionInfo questionInfo = dbManager.getQuestionInfo(std::stoi(reqData.get("questionId")));
+
+				if (!questionInfo.errors.empty())
+				{
+					std::string log = "Failed to get question info for question with id: " + std::string(reqData.get("questionId")) + ". Reasons: ";
+
+					for (auto el : questionInfo.errors)
+					{
+						log += el + " ";
+					}
+
+					CROW_LOG_WARNING << log;
+
+					res = responseJSONManager.createJSONResponse(false, questionInfo.errors, "answer");
+					res.end();
+					return;
+				}
+
+				QuizInfo quizInfo = dbManager.getQuizInfo(questionInfo.quizId);
+
+				if (!quizInfo.errors.empty())
+				{
+					std::string log = "Failed to get quiz info for quiz with id: " + std::to_string(questionInfo.quizId) + ". Reasons: ";
+
+					for (auto el : quizInfo.errors)
+					{
+						log += el + " ";
+					}
+
+					CROW_LOG_WARNING << log;
+
+					res = responseJSONManager.createJSONResponse(false, quizInfo.errors, "answer");
+					res.end();
+					return;
+				}
+
+				AttemptInfo attemptInfo = dbManager.getAttemptInfo(std::stoi(reqData.get("attemptId")));
+
+				if (!attemptInfo.errors.empty())
+				{
+					std::string log = "Failed to get attempt info for attempt with id: " + std::string(reqData.get("attemptId")) + ". Reasons: ";
+
+					for (auto el : attemptInfo.errors)
+					{
+						log += el + " ";
+					}
+
+					CROW_LOG_WARNING << log;
+
+					res = responseJSONManager.createJSONResponse(false, attemptInfo.errors, "answer");
+					res.end();
+					return;
+				}
+
+				TopicInfo topicInfo = dbManager.getTopicInfo(quizInfo.topicId);
+
+				if (!topicInfo.errors.empty())
+				{
+					std::string log = "Failed to get topic info for topic with id: " + std::to_string(quizInfo.topicId) + ". Reasons: ";
+
+					for (auto el : topicInfo.errors)
+					{
+						log += el + " ";
+					}
+
+					CROW_LOG_WARNING << log;
+
+					res = responseJSONManager.createJSONResponse(false, topicInfo.errors, "answer");
+					res.end();
+					return;
+				}
+
+				std::vector<std::string> recordSet = dbManager.canUserAccessCourse(topicInfo.courseId, ctx.userId);
+
+				if (recordSet[0] != "1")
+				{
+					std::string log = "Failed to answer a question with id: " + std::string(reqData.get("question")) + ". Reason: User is unauthorised";
+					recordSet[0] = "User is unauthorised";
+
+					CROW_LOG_WARNING << log;
+
+					res = responseJSONManager.createJSONResponse(false, recordSet, "answer");
+					res.code = 403;
+					res.end();
+					return;
+				}
+
+				if (attemptInfo.currentQuestionId != questionInfo.id && attemptInfo.userId == ctx.userId)
+				{
+					std::string log = "Failed to answer a question with id: " + std::string(reqData.get("question")) + ". Reason: User is unauthorised";
+					recordSet[0] = "User is unauthorised";
+
+					CROW_LOG_WARNING << log;
+
+					res = responseJSONManager.createJSONResponse(false, recordSet, "answer");
+					res.code = 403;
+					res.end();
+					return;
+				}
+
+				recordSet = dbManager.answerQuestion(reqData);
+
+				// If saving to database fails
+				if (recordSet.size() != 0)
+				{
+					std::string log = "Failed to save answer for attempt with id: " + std::string(reqData.get("attemptId")) + " to the database. Reason/s: ";
+
+					for (auto el : recordSet)
+					{
+						log += el + " ";
+					}
+
+					CROW_LOG_WARNING << log;
+
+					res = responseJSONManager.createJSONResponse(false, recordSet, "answer");
+					res.end();
+					return;
+				}
+
+				recordSet = dbManager.goToNextQuestionInAttempt(attemptInfo, quizInfo);
+
+				if (recordSet.size() != 0)
+				{
+					std::string log = "Failed to update attempt with id: " + std::to_string(attemptInfo.id) + " to the database. Reason/s: ";
+
+					for (auto el : recordSet)
+					{
+						log += el + " ";
+					}
+
+					CROW_LOG_WARNING << log;
+
+					res = responseJSONManager.createJSONResponse(false, recordSet, "answer");
+					res.end();
+					return;
+				}
+
+				//Update attempt info to get the new id of the nexy question
+				attemptInfo = dbManager.getAttemptInfo(attemptInfo.id);
+
+				CROW_LOG_INFO << "Answer for attempt with id: " + std::string(reqData.get("attemptId")) + " is successfully saved into the database.";
+
+				// Create and send request
+				res = responseJSONManager.createAttemptJSONResponse(attemptInfo, "answer");
 				res.end();
 				return;
 			});

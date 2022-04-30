@@ -1,6 +1,8 @@
-#include "../include/pch.h"
 #include <env.h>
 #include <loggerHandler.h>
+#include <graylog_logger/Log.hpp>
+#include <graylog_logger/FileInterface.hpp>
+#include <graylog_logger/GraylogInterface.hpp>
 
 void LoggerHandler::initLogs()
 {

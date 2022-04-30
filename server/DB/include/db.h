@@ -139,6 +139,8 @@ public:
 	AttemptInfo getAttemptInfo(int attemptId);
 	int getAttemptIdByUserIdAndQuizId(int userId, int quizId);
 	std::vector<std::string> deleteAttempt(int attemptId);
+	std::vector<std::string> answerQuestion(crow::query_string data);
+	std::vector<std::string> goToNextQuestionInAttempt(AttemptInfo attemptInfo, QuizInfo quizInfo);
 private:
 	nlohmann::json getJSONFromFile(std::string filename);
 	bool setJSONFile(nlohmann::json json, std::string filename);
@@ -153,5 +155,8 @@ private:
 	std::vector<TopicInfo> getAllTopicsInCourseWithID(int courseId);
 	std::vector<OrgUser> getCourseUsersByCourseId(int courseId);
 	std::vector<CourseInfo> getAllCoursesInOrgWithID(int orgId);
-	std::vector<QuestionInfo> getAllQuestionsInQuizWithID(int quizId);
+	std::vector<QuestionInfo> getAllQuestionsInQuizWithId(int quizId);
+	std::vector<AttemptInfo> getAllAttemptsInQuizWithId(int quizId);
+	int calculateScoreForAttempt(int attemptId);
+	std::vector<std::string> deleteAnswer(int answerId);
 };

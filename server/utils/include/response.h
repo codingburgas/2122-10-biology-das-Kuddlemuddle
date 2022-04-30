@@ -12,7 +12,7 @@ public:
 	crow::json::wvalue createCourseJSONResponse(CourseInfo data);
 	crow::json::wvalue createTopicJSONResponse(TopicInfo data);
 	crow::json::wvalue createLessonJSONResponse(LessonInfo data);
-	crow::json::wvalue createQuizJSONResponse(QuizInfo data);
+	crow::json::wvalue createQuizJSONResponse(QuizInfo data, bool shareData);
 	crow::json::wvalue createQuestionJSONResponse(QuestionInfo data, bool shareAnswer = true);
-	crow::json::wvalue createAttemptJSONResponse(AttemptInfo data);
+	crow::json::wvalue createAttemptJSONResponse(AttemptInfo data, std::string type);
 };
