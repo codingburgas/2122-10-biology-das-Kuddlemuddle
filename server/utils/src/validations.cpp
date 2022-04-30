@@ -131,6 +131,35 @@ std::vector<std::string> ValidationManager::isCourseDataValid(crow::query_string
 	return incorrectValidation;
 }
 
+std::vector<std::string> ValidationManager::isPunnettSquareDataValid(crow::query_string data, bool allowNulls)
+{
+	std::vector<std::string> incorrectValidation;
+
+	std::vector<std::string> fields =
+	{
+		"P1",
+		"P2"
+	};
+
+	for (auto field : fields)
+	{
+		if (allowNulls)
+		{
+			if (std::string(data.get(field)) == "")
+			{
+				continue;
+			}
+		}
+
+		if (!(getValidationHandler(field)(data.get(field))))
+		{
+			incorrectValidation.push_back(field);
+		}
+	}
+
+	return incorrectValidation;
+}
+
 ValidationHandler ValidationManager::getValidationHandler(std::string field)
 {
 	// Sorry, you cannot have string in switch statements :(
@@ -207,6 +236,38 @@ ValidationHandler ValidationManager::getValidationHandler(std::string field)
 				const std::regex valRegex("^[A-Z][A-Za-z0-9_-]{2,19}$");
 
 				return std::regex_match(data, valRegex);
+			}
+		);
+	}
+	else if (field == "P1" || field == "P2")
+	{
+		return (
+			[](std::string data) -> bool
+			{
+				if (data.size() != 4)
+				{
+					return false;
+				}
+
+				for (size_t i = 0; i < data.size(); i++)
+				{
+					if (i == 0 || i == 1)
+					{
+						if (data[i] != 'a' && data[i] != 'A')
+						{
+							return false;
+						}
+					}
+					else
+					{
+						if (data[i] != 'b' && data[i] != 'B')
+						{
+							return false;
+						}
+					}
+				}
+
+				return true;
 			}
 		);
 	}

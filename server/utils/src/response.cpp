@@ -172,10 +172,11 @@ crow::json::wvalue ResponseJSONManager::createQuestionJSONResponse(QuestionInfo 
 	resBody["type"] = "get-question-success";
 	resBody["question-id"] = data.id;
 	resBody["question-question"] = data.question;
+	resBody["question-type"] = data.type;
 	
 	if (shareAnswer)
 	{
-		resBody["question-answer"] = data.answer;
+		data.type == "2" ? resBody["question-answer"] = data.punnettAnswer : resBody["question-answer"] = data.answer;
 	}
 
 	resBody["quiz-id"] = data.quizId;
@@ -202,6 +203,40 @@ crow::json::wvalue ResponseJSONManager::createAttemptJSONResponse(AttemptInfo da
 		resBody["score"] = data.score;
 		resBody["attempt-start"] = data.timeStart;
 		resBody["attempt-end"] = data.timeEnd;
+		
+		for (size_t i = 0; i < data.answers.size(); i++)
+		{
+			resBody["attempt-answers"][i] = { {"answer-id:", data.answers[i].id} };
+		}
+	}
+
+	return resBody;
+}
+
+crow::json::wvalue ResponseJSONManager::createAnswerJSONResponse(AnswerInfo data)
+{
+	crow::json::wvalue resBody;
+
+
+	if (data.type == "2")
+	{
+		resBody["type"] = "get-answer-success";
+		resBody["answer-id"] = data.id;
+		resBody["answer-score"] = data.score;
+		resBody["answer-attempt-id"] = data.attemptId;
+		resBody["answer-question-id"] = data.questionId;
+		resBody["answer-type"] = data.type;
+		resBody["answer-punnett-answers"] = data.punnettAnswer;
+	}
+	else
+	{
+		resBody["type"] = "get-answer-success";
+		resBody["answer-id"] = data.id;
+		resBody["answer-attempt-id"] = data.attemptId;
+		resBody["answer-is-correct"] = data.isCorrect;
+		resBody["answer-question-id"] = data.questionId;
+		resBody["answer-answer"] = data.answer;
+		resBody["answer-type"] = data.type;
 	}
 
 	return resBody;

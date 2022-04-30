@@ -15,4 +15,5 @@ public:
 	crow::json::wvalue createQuizJSONResponse(QuizInfo data, bool shareData);
 	crow::json::wvalue createQuestionJSONResponse(QuestionInfo data, bool shareAnswer = true);
 	crow::json::wvalue createAttemptJSONResponse(AttemptInfo data, std::string type);
+	crow::json::wvalue createAnswerJSONResponse(AnswerInfo data);
 };

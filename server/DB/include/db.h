@@ -21,17 +21,30 @@ struct OrgUser
 	int role;
 };
 
+struct AnswerInfo
+{
+	int id;
+	float score;
+	int attemptId;
+	bool isCorrect;
+	int questionId;
+	std::string answer;
+	std::string type;
+	std::vector<std::string> punnettAnswer;
+	std::vector<std::string> errors;
+};
+
 struct AttemptInfo
 {
 	int id;
 	int quizId;
 	int userId;
 	int currentQuestionId;
-	int score;
+	float score;
 	time_t timeStart;
 	time_t timeEnd;
 	bool inProgress;
-	// Add answers
+	std::vector<AnswerInfo> answers;
 	std::vector<std::string> errors;
 };
 
@@ -39,8 +52,10 @@ struct QuestionInfo
 {
 	int id;
 	int quizId;
+	std::string type;
 	std::string question;
 	std::string answer;
+	std::vector<std::string> punnettAnswer;
 	std::vector<std::string> errors;
 };
 
@@ -69,7 +84,6 @@ struct TopicInfo
 	int courseId;
 	std::string name;
 	std::vector<LessonInfo> lessons;
-	//Add tests
 	std::vector<QuizInfo> quizzes;
 	std::vector<std::string> errors;
 };
@@ -141,6 +155,8 @@ public:
 	std::vector<std::string> deleteAttempt(int attemptId);
 	std::vector<std::string> answerQuestion(crow::query_string data);
 	std::vector<std::string> goToNextQuestionInAttempt(AttemptInfo attemptInfo, QuizInfo quizInfo);
+	std::vector<AnswerInfo> getAllAnswersInAttemptWithId(int attemptId);
+	AnswerInfo getAnswersInfo(int answerId);
 private:
 	nlohmann::json getJSONFromFile(std::string filename);
 	bool setJSONFile(nlohmann::json json, std::string filename);
@@ -157,6 +173,8 @@ private:
 	std::vector<CourseInfo> getAllCoursesInOrgWithID(int orgId);
 	std::vector<QuestionInfo> getAllQuestionsInQuizWithId(int quizId);
 	std::vector<AttemptInfo> getAllAttemptsInQuizWithId(int quizId);
-	int calculateScoreForAttempt(int attemptId);
+	float calculateScoreForAttempt(int attemptId);
+	float calculateScoreForPunnetSquare(std::vector<std::string> userAnswers, int questionId);
 	std::vector<std::string> deleteAnswer(int answerId);
+	std::vector<std::string> getPunnetSquareAnswer(int questionId);
 };

@@ -1196,9 +1196,9 @@ std::vector<AttemptInfo> DBManager::getAllAttemptsInQuizWithId(int quizId)
 	return recordSet;
 }
 
-int DBManager::calculateScoreForAttempt(int attemptId)
+float DBManager::calculateScoreForAttempt(int attemptId)
 {
-	int score = 0;
+	float score = 0;
 	nlohmann::json answersJSON;
 
 	// Get the JSON from the file
@@ -1213,9 +1213,20 @@ int DBManager::calculateScoreForAttempt(int attemptId)
 
 	for (auto it = answersJSON.begin(); it != answersJSON.end(); ++it)
 	{
-		if (it.value()["AttemptID"] == std::to_string(attemptId) && it.value()["IsCorrect"])
+		std::string type = it.value()["Type"];
+		if (type == "2")
 		{
-			score += 1;
+			if (it.value()["AttemptID"] == std::to_string(attemptId))
+			{
+				score += it.value()["Score"];
+			}
+		}
+		else
+		{
+			if (it.value()["AttemptID"] == std::to_string(attemptId) && it.value()["IsCorrect"])
+			{
+				score += 1;
+			}
 		}
 	}
 
@@ -1789,9 +1800,22 @@ std::vector<std::string> DBManager::createQuestion(crow::query_string data)
 		recordSet.push_back("Could'n open questions.json file");
 		return recordSet;
 	}
+	
+	std::string question;
+
+	std::string type = data.get("type");
+
+	if (type == "2")
+	{
+		question = "Fill in the punnett square if the parents are " + std::string(data.get("P1")) + " and " + std::string(data.get("P2"));
+	}
+	else
+	{
+		question = data.get("question");
+	}
 
 	// Check for duplicate name
-	if (checkIfValueExistsInField(questionsJSON, "Question", data.get("question"), "QuizID", data.get("quizId")))
+	if (checkIfValueExistsInField(questionsJSON, "Question", question, "QuizID", data.get("quizId")))
 	{
 		recordSet.push_back("There is already the same question in this quiz");
 		return recordSet;
@@ -1806,15 +1830,50 @@ std::vector<std::string> DBManager::createQuestion(crow::query_string data)
 		}
 	}
 
-	// Add the user to the JSON
-	questionsJSON.push_back(
-		{
-		{ "ID", getLastId(questionsJSON) + 1},
-		{ "Question", data.get("question") },
-		{ "Answer", data.get("answer") },
-		{ "QuizID", data.get("quizId") }
-		}
-	);
+	if (type == "2")
+	{
+		std::vector<std::string> answers = convertP1andP2toAnswers(data.get("P1"), data.get("P2"));
+
+		// Add the user to the JSON
+		questionsJSON.push_back(
+			{
+			{ "ID", getLastId(questionsJSON) + 1},
+			{ "Type", type },
+			{ "QuizID", data.get("quizId") },
+			{ "Question", question },
+			{ "Cell0x0", answers[0] },
+			{ "Cell0x1", answers[1] },
+			{ "Cell0x2", answers[2] },
+			{ "Cell0x3", answers[3] },
+			{ "Cell1x0", answers[4] },
+			{ "Cell1x1", answers[5] },
+			{ "Cell1x2", answers[6] },
+			{ "Cell1x3", answers[7] },
+			{ "Cell2x0", answers[8] },
+			{ "Cell2x1", answers[9] },
+			{ "Cell2x2", answers[10] },
+			{ "Cell2x3", answers[11] },
+			{ "Cell3x0", answers[12] },
+			{ "Cell3x1", answers[13] },
+			{ "Cell3x2", answers[14] },
+			{ "Cell3x3", answers[15] },
+			}
+		);
+	}
+	else
+	{
+		// Add the user to the JSON
+		questionsJSON.push_back(
+			{
+			{ "ID", getLastId(questionsJSON) + 1},
+			{ "Type", data.get("type")},
+			{ "Question", question },
+			{ "Answer", data.get("answer") },
+			{ "QuizID", data.get("quizId") }
+			}
+		);
+	}
+
 
 	// Delete the attempts before these change
 	for (auto it = attemptsJSON.begin(); it != attemptsJSON.end(); ++it)
@@ -1848,7 +1907,17 @@ QuestionInfo DBManager::getQuestionInfo(int questionId)
 	}
 
 	returnValue.question = getFieldDataInJSONByCriteria("questions.json", questionId, "ID", "Question")[0];
-	returnValue.answer = getFieldDataInJSONByCriteria("questions.json", questionId, "ID", "Answer")[0];
+	returnValue.type = getFieldDataInJSONByCriteria("questions.json", questionId, "ID", "Type")[0];
+
+	if (returnValue.type == "2")
+	{
+		returnValue.punnettAnswer = getPunnetSquareAnswer(questionId);
+	}
+	else
+	{
+		returnValue.answer = getFieldDataInJSONByCriteria("questions.json", questionId, "ID", "Answer")[0];
+	}
+	
 	returnValue.quizId = std::stoi(getFieldDataInJSONByCriteria("questions.json", questionId, "ID", "QuizID")[0]);
 
 	return returnValue;
@@ -1939,9 +2008,38 @@ std::vector<std::string> DBManager::updateQuestion(int questionId, crow::query_s
 					deleteAttempt(itAttempt.value()["ID"]);
 				}
 			}
+			std::string type = it.value()["Type"];
 
-			it.value()["Question"] = std::string(data.get("question")).empty() ? it.value()["Question"] : data.get("question");
-			it.value()["Answer"] = std::string(data.get("answer")).empty() ? it.value()["Answer"] : data.get("answer");
+			if (type == "2")
+			{
+				std::vector<std::string> answers = convertP1andP2toAnswers(
+					std::string(data.get("P1")).empty() ? it.value()["P1"] : data.get("P1"),
+					std::string(data.get("P2")).empty() ? it.value()["P2"] : data.get("P2")
+				);
+
+				it.value()["Question"] = "Fill in the punnett square if the parents are " + std::string(data.get("P1")) + " and " + std::string(data.get("P2"));
+				it.value()["Cell0x0"] = answers[0];
+				it.value()["Cell0x1"] = answers[1];
+				it.value()["Cell0x2"] = answers[2];
+				it.value()["Cell0x3"] = answers[3];
+				it.value()["Cell1x0"] = answers[4];
+				it.value()["Cell1x1"] = answers[5];
+				it.value()["Cell1x2"] = answers[6];
+				it.value()["Cell1x3"] = answers[7];
+				it.value()["Cell2x0"] = answers[8];
+				it.value()["Cell2x1"] = answers[9];
+				it.value()["Cell2x2"] = answers[10];
+				it.value()["Cell2x3"] = answers[11];
+				it.value()["Cell3x0"] = answers[12];
+				it.value()["Cell3x1"] = answers[13];
+				it.value()["Cell3x2"] = answers[14];
+				it.value()["Cell3x3"] = answers[15];
+			}
+			else
+			{
+				it.value()["Question"] = std::string(data.get("question")).empty() ? it.value()["Question"] : data.get("question");
+				it.value()["Answer"] = std::string(data.get("answer")).empty() ? it.value()["Answer"] : data.get("answer");
+			}
 
 			if (!setJSONFile(questionsJSON, "questions.json"))
 			{
@@ -1951,8 +2049,6 @@ std::vector<std::string> DBManager::updateQuestion(int questionId, crow::query_s
 			return recordSet;
 		}
 	}
-
-	
 
 	// If the execution goes here, there should be smt very wrong
 	recordSet.push_back("Could not find question with id: " + std::to_string(questionId));
@@ -2036,11 +2132,12 @@ AttemptInfo DBManager::getAttemptInfo(int attemptId)
 
 	returnValue.currentQuestionId = std::stoi(getFieldDataInJSONByCriteria("attempts.json", attemptId, "ID", "CurrentQuestionID")[0]);
 	returnValue.quizId = std::stoi(getFieldDataInJSONByCriteria("attempts.json", attemptId, "ID", "QuizID")[0]);
-	returnValue.score = std::stoi(getFieldDataInJSONByCriteria("attempts.json", attemptId, "ID", "Score")[0]);
+	returnValue.score = std::stof(getFieldDataInJSONByCriteria("attempts.json", attemptId, "ID", "Score")[0]);
 	returnValue.timeStart = std::stoi(getFieldDataInJSONByCriteria("attempts.json", attemptId, "ID", "TimeStart")[0]);
 	returnValue.timeEnd = std::stoi(getFieldDataInJSONByCriteria("attempts.json", attemptId, "ID", "TimeEnd")[0]);
 	returnValue.userId = std::stoi(getFieldDataInJSONByCriteria("attempts.json", attemptId, "ID", "UserID")[0]);
 	returnValue.inProgress = std::stoi(getFieldDataInJSONByCriteria("attempts.json", attemptId, "ID", "inProgress")[0]);
+	returnValue.answers = getAllAnswersInAttemptWithId(attemptId);
 
 	return returnValue;
 }
@@ -2151,16 +2248,71 @@ std::vector<std::string> DBManager::answerQuestion(crow::query_string data)
 
 	QuestionInfo questionInfo = getQuestionInfo(std::stoi(data.get("questionId")));
 
-	// Add the user to the JSON
-	answersJSON.push_back(
+	std::string type = data.get("type");
+
+	if (type == "2")
+	{
+		std::vector<std::string> answers =
 		{
-		{ "ID", getLastId(answersJSON) + 1},
-		{ "QuestionID", data.get("questionId") },
-		{ "AttemptID", data.get("attemptId") },
-		{ "Answer", data.get("answer") },
-		{ "IsCorrect", bool(toLowerCase(questionInfo.answer) == toLowerCase(data.get("answer")))}
-		}
-	);
+			data.get("cell 0x0"),
+			data.get("cell 0x1"),
+			data.get("cell 0x2"),
+			data.get("cell 0x3"),
+			data.get("cell 1x0"),
+			data.get("cell 1x1"),
+			data.get("cell 1x2"),
+			data.get("cell 1x3"),
+			data.get("cell 2x0"),
+			data.get("cell 2x1"),
+			data.get("cell 2x2"),
+			data.get("cell 2x3"),
+			data.get("cell 3x0"),
+			data.get("cell 3x1"),
+			data.get("cell 3x2"),
+			data.get("cell 3x3"),
+		};
+
+		answersJSON.push_back(
+			{
+			{ "ID", getLastId(answersJSON) + 1},
+			{ "Type", type},
+			{ "QuestionID", data.get("questionId") },
+			{ "AttemptID", data.get("attemptId") },
+			{ "Cell0x0", answers[0] },
+			{ "Cell0x1", answers[1] },
+			{ "Cell0x2", answers[2] },
+			{ "Cell0x3", answers[3] },
+			{ "Cell1x0", answers[4] },
+			{ "Cell1x1", answers[5] },
+			{ "Cell1x2", answers[6] },
+			{ "Cell1x3", answers[7] },
+			{ "Cell2x0", answers[8] },
+			{ "Cell2x1", answers[9] },
+			{ "Cell2x2", answers[10] },
+			{ "Cell2x3", answers[11] },
+			{ "Cell3x0", answers[12] },
+			{ "Cell3x1", answers[13] },
+			{ "Cell3x2", answers[14] },
+			{ "Cell3x3", answers[15] },
+			{ "Score", calculateScoreForPunnetSquare(answers, questionInfo.id)}
+			}
+		);
+	}
+	else
+	{
+		// Add the user to the JSON
+		answersJSON.push_back(
+			{
+			{ "ID", getLastId(answersJSON) + 1},
+			{ "Type", type},
+			{ "QuestionID", data.get("questionId") },
+			{ "AttemptID", data.get("attemptId") },
+			{ "Answer", data.get("answer") },
+			{ "IsCorrect", bool(toLowerCase(questionInfo.answer) == toLowerCase(data.get("answer")))}
+			}
+		);
+	}
+
 
 	// Save the json to the file
 	if (!setJSONFile(answersJSON, "answers.json"))
@@ -2256,6 +2408,80 @@ std::vector<QuizInfo> DBManager::getAllQuizzesInTopicWithID(int topicId)
 	}
 
 	return recordSet;
+}
+
+AnswerInfo DBManager::getAnswersInfo(int answerId)
+{
+	nlohmann::json answersJSON;
+
+	// Get the JSON from the file
+	try
+	{
+		answersJSON = getJSONFromFile("answers.json");
+	}
+	catch (std::string ex)
+	{
+		throw "Could'n open answers.json file";
+	}
+
+	for (auto it = answersJSON.begin(); it != answersJSON.end(); ++it)
+	{
+		if (it.value()["ID"] == answerId)
+		{
+			if (it.value()["Type"] == "2")
+			{
+				std::vector<std::string> userAnswers =
+				{
+					it.value()["Cell0x0"],
+					it.value()["Cell0x1"],
+					it.value()["Cell0x2"],
+					it.value()["Cell0x3"],
+					it.value()["Cell1x0"],
+					it.value()["Cell1x1"],
+					it.value()["Cell1x2"],
+					it.value()["Cell1x3"],
+					it.value()["Cell2x0"],
+					it.value()["Cell2x1"],
+					it.value()["Cell2x2"],
+					it.value()["Cell2x3"],
+					it.value()["Cell3x0"],
+					it.value()["Cell3x1"],
+					it.value()["Cell3x2"],
+					it.value()["Cell3x3"]
+				};
+
+				return (
+					AnswerInfo {
+					it.value()["ID"],
+					it.value()["Score"],
+					std::stoi(it.value()["AttemptID"].get<std::string>()),
+					NULL,
+					std::stoi(it.value()["QuestionID"].get<std::string>()),
+					"",
+					it.value()["Type"],
+					userAnswers
+					}
+				);
+			}
+			else
+			{
+				return (
+					AnswerInfo {
+					it.value()["ID"],
+					NULL,
+					std::stoi(it.value()["AttemptID"].get<std::string>()),
+					it.value()["IsCorrect"],
+					std::stoi(it.value()["QuestionID"].get<std::string>()),
+					it.value()["Answer"],
+					it.value()["Type"]
+					}
+				);
+			}
+		}
+	}
+	AnswerInfo answerInfo;
+	answerInfo.errors = { "Cannot find answer with this id" };
+	return answerInfo;
 }
 
 /*
@@ -2513,4 +2739,137 @@ std::vector<std::string> DBManager::deleteAnswer(int answerId)
 	}
 
 	return recordSet;
+}
+
+std::vector<std::string> DBManager::getPunnetSquareAnswer(int questionId)
+{
+	std::vector<std::string> recordSet;
+	nlohmann::json questionsJSON;
+
+	// Get the JSON from the file
+	try
+	{
+		questionsJSON = getJSONFromFile("questions.json");
+	}
+	catch (std::string ex)
+	{
+		recordSet.push_back("Could'n open questions.json file");
+		return recordSet;
+	}
+
+	for (auto it = questionsJSON.begin(); it != questionsJSON.end(); ++it)
+	{
+		if (it.value()["ID"] == questionId)
+		{
+			return
+			{
+				it.value()["Cell0x0"],
+				it.value()["Cell0x1"],
+				it.value()["Cell0x2"],
+				it.value()["Cell0x3"],
+				it.value()["Cell1x0"],
+				it.value()["Cell1x1"],
+				it.value()["Cell1x2"],
+				it.value()["Cell1x3"],
+				it.value()["Cell2x0"],
+				it.value()["Cell2x1"],
+				it.value()["Cell2x2"],
+				it.value()["Cell2x3"],
+				it.value()["Cell3x0"],
+				it.value()["Cell3x1"],
+				it.value()["Cell3x2"],
+				it.value()["Cell3x3"]
+			};
+		}
+	}
+
+	return {};
+}
+
+std::vector<AnswerInfo> DBManager::getAllAnswersInAttemptWithId(int attemptId)
+{
+	std::vector<AnswerInfo> recordSet;
+
+	nlohmann::json answersJSON;
+
+	// Get the JSON from the file
+	try
+	{
+		answersJSON = getJSONFromFile("answers.json");
+	}
+	catch (std::string ex)
+	{
+		throw "Could'n open answers.json file";
+	}
+
+	for (auto it = answersJSON.begin(); it != answersJSON.end(); ++it)
+	{
+		if (it.value()["AttemptID"] == std::to_string(attemptId))
+		{
+			if (it.value()["Type"] == "2")
+			{
+				std::vector<std::string> userAnswers =
+				{
+					it.value()["Cell0x0"],
+					it.value()["Cell0x1"],
+					it.value()["Cell0x2"],
+					it.value()["Cell0x3"],
+					it.value()["Cell1x0"],
+					it.value()["Cell1x1"],
+					it.value()["Cell1x2"],
+					it.value()["Cell1x3"],
+					it.value()["Cell2x0"],
+					it.value()["Cell2x1"],
+					it.value()["Cell2x2"],
+					it.value()["Cell2x3"],
+					it.value()["Cell3x0"],
+					it.value()["Cell3x1"],
+					it.value()["Cell3x2"],
+					it.value()["Cell3x3"]
+				};
+
+				recordSet.push_back({ 
+					it.value()["ID"],
+					it.value()["Score"],
+					std::stoi(it.value()["AttemptID"].get<std::string>()),
+					NULL,
+					std::stoi(it.value()["QuestionID"].get<std::string>()),
+					"",
+					it.value()["Type"],
+					userAnswers
+				});
+			}
+			else
+			{
+				recordSet.push_back({
+					it.value()["ID"],
+					NULL,
+					std::stoi(it.value()["AttemptID"].get<std::string>()),
+					it.value()["IsCorrect"],
+					std::stoi(it.value()["QuestionID"].get<std::string>()),
+					it.value()["Answer"],
+					it.value()["Type"]
+				});
+			}
+		}
+	}
+
+	return recordSet;
+}
+
+float DBManager::calculateScoreForPunnetSquare(std::vector<std::string> userAnswers, int questionId)
+{
+	float score = 0;
+
+	std::vector<std::string> answers = getPunnetSquareAnswer(questionId);
+
+	for (size_t i = 0; i < answers.size(); i++)
+	{
+		if (answers[i] == userAnswers[i])
+		{
+			score += 0.0625;
+		}
+	}
+
+	return score;
 }
