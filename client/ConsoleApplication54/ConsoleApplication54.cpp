@@ -138,7 +138,6 @@ RegisterData menuRegister() //Main menu with three options
 	return accaunt;
 }
 
-
 void menuLogin()
 {
 	system("cls");
@@ -203,7 +202,6 @@ void menuLogin()
 
 	LoginData accaunt = { info[0], info[1] };
 }
-
 
 void accountPage(RegisterData acc)
 {
@@ -464,14 +462,22 @@ void displayGrade(int points)
 
 }
 
+void panetTable() {
+
+}
+
+void navBar() {
+
+}
+
 int main()
 {
 	/*RegisterData acc = menuRegister();
 	menuLogin();
 	accountPage(acc);*/
-	/*string acc[5] = { "Vocational school of Programing", "United states of America",
+	string acc[5] = { "Vocational school of Programing", "United states of America",
 		"Kethering und scisorss", "Code block for Specialists", "Cooking restaurnat um France"};
 
-	printOrganisation(acc, 5);*/
+	printOrganisation(acc, 5);
 	displayGrade(88);
 }
