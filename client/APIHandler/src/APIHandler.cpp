@@ -112,6 +112,37 @@ std::string APIHandler::getUserInfo(std::string userId, LayerContex* ctx, User &
     return "The user wasn't found";
 }
 
+std::vector<OrgInfo> APIHandler::getAllOrgs(std::string JWTToken)
+{
+    cpr::Response r;
+    r = cpr::Get(cpr::Url{ "http://localhost:18080/api/orgs/all" },
+        cpr::Bearer({ JWTToken }));
+
+    nlohmann::json JSONRes;
+
+    try
+    {
+        JSONRes = nlohmann::json::parse(r.text);
+    }
+    catch (nlohmann::json::parse_error& ex)
+    {
+        // Send error
+        return {};
+        // return "There is a problem with the server! Please try again later!";
+    }
+
+    if (JSONRes["type"] == "get-organisation-success")
+    {
+        for (auto it = JSONRes["orgs"].begin(); it != JSONRes["orgs"].end(); ++it)
+        {
+            std::cout << it.value()["org-name"].get<std::string>();
+        }
+    }
+
+    //return All orgs;
+    return {};
+}
+
 void APIHandler::getImage(std::string& url, std::string fileExtension)
 {
     auto ofstream = std::ofstream( "tmp." + fileExtension, std::ofstream::binary);

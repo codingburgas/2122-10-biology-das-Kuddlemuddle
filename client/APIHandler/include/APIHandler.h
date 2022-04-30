@@ -28,6 +28,18 @@ struct LayerContex
     bool isDataFetchOnPage = false;
 };
 
+struct OrgInfo
+{
+    int id;
+    std::string name;
+    /*
+    std::vector<OrgUser> users;
+    std::vector<CourseInfo> courses;
+    */
+};
+
+
+
 struct RegisterData
 {
     std::string fname;
@@ -43,6 +55,7 @@ struct LoginData
     std::string pass;
 };
 
+
 class APIHandler
 {
 public:
@@ -50,6 +63,7 @@ public:
 	std::string loginHandler(LoginData logData, LayerContex* ctx);
 	std::string getUserInfo(std::string userId, LayerContex* ctx, User& user);
 	void getImage(std::string &url, std::string fileExtension);
+    std::vector<OrgInfo> getAllOrgs(std::string JWTToken);
 private:
 
 };

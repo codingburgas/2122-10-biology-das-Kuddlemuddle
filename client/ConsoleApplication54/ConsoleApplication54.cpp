@@ -205,8 +205,10 @@ void menuLogin()
 }
 
 
-void accountPage(RegisterData acc) {
-	gotoxy(40, 3); color(6); cout << "A C C A U N T     S E T T I N G S"; color(7);
+void accountPage(RegisterData acc) 
+{
+	system("cls");
+	gotoxy(40, 3); color(6); cout << "A C C O U N T     S E T T I N G S"; color(7);
 	gotoxy(43, 5); cout << "First name  ";
 	gotoxy(58, 5); cout << acc.fname;
 	gotoxy(44, 7); cout << "Last name  ";
@@ -258,11 +260,74 @@ void accountPage(RegisterData acc) {
 
 }
 
+void printOrganisation(string acc[], int orgSize) 
+{
+	/*APIHandler apiHandler;
+	apiHandler.getAllOrgs("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJleHAiOjE2NTEzOTQ4MTMsImlhdCI6MTY1MTMwODQxMywiaXNBZG1pbiI6MCwic3ViIjoiMSJ9.lFWn7AUKArrNMiqggBmnkOEHMt7sJFdshvN2JeCCtjw"); */
+	system("cls");
+	
+
+	char key; // Key to be entered
+	
+	int counter = 0, counter2 = 0;
+	int ckey = 0;
+
+	while (true)
+	{
+		// Button for history notebook section
+		int posy = 5;
+		gotoxy(2, 3); color(6); cout << "O R G A N I S A T I O N S"; color(7);
+		for (int i = 0; i < orgSize; i++) {
+			gotoxy(4, posy); cout << "-->";
+			if (i == counter) {
+				color(6); gotoxy(9, posy); cout << acc[i];
+				gotoxy(60, posy); 
+				
+			}
+			else {
+				gotoxy(9, posy); cout << acc[i];
+				
+			}
+			
+			
+			posy += 2;
+			color(7);
+		}
+
+		key = _getch();
+
+		if (key == 72 && (counter >= 1 && counter <= orgSize)) // 72/75 is the ASCII code for the up arrow
+		{
+			counter--;
+		}
+
+		if (key == 80 && (counter >= 0 && counter < orgSize - 1)) // 80/77 is the ASCII code for the up arrow
+		{
+			counter++;
+		}
+		
+		if (key == 75 && (counter2 == 1 )) // 72/75 is the ASCII code for the up arrow
+		{
+			counter2--;
+		}
+
+		if (key == 77 && (counter2 == 0)) // 80/77 is the ASCII code for the up arrow
+		{
+			counter2++;
+		}
+
+
+	}
+}
+
 int main()
 {
 	/*RegisterData acc = menuRegister();
 	menuLogin();
 	accountPage(acc);*/
-	RegisterData acc = { "Veselin", "Stoyanov", "Vesaka777", "VNStoyanov@code.bg", "Xyz89231"};
-	accountPage(acc);
+	string acc[5] = { "Vocational school of Programing", "United states of America",
+		"Kethering und scisorss", "Code block for Specialists", "Cooking restaurnat um France"};
+	//accountPage(acc);
+	printOrganisation(acc, 5);
 }
+	
