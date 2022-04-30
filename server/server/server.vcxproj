@@ -143,7 +143,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\StoyanJR\boost_1_78_0\boost_1_78_0;D:\lib\boost_1_77_0;$(ProjectDir)include;$(SolutionDir)logs\include;$(SolutionDir)routes\include;$(SolutionDir)utils\include;$(SolutionDir)DB\include;$(SolutionDir)middlewares\include;C:\boost_1_79_0\boost_1_79_0;$(SolutionDir)types\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;$(SolutionDir)logs\include;$(SolutionDir)routes\include;$(SolutionDir)utils\include;$(SolutionDir)DB\include;$(SolutionDir)middlewares\include;$(SolutionDir)types\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
     </ClCompile>
