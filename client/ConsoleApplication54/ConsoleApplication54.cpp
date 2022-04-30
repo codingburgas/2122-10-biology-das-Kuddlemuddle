@@ -20,7 +20,7 @@ void gotoxy(int x, int y)  //Get the coordinates inside the console
 void drawBox(int posy, string text, int size, int posx, int col, string input = "")
 {
 	color(col);
-	gotoxy(posx, posy);gotoxy(posx, 2); cout << char(201);
+	gotoxy(posx, posy); cout << char(201);
 
 	for (int i = 0; i < 14; i++)
 	{
@@ -322,6 +322,30 @@ void printOrganisationAdmin(string acc[], int orgSize)
 	}
 }
 
+void drawButton(int posy, string text, int size, int posx, int col)
+{
+	color(col); gotoxy(posx, posy); cout << char(201);
+
+	for (int i = 0; i < size; i++)
+	{
+		cout << char(205);
+	}
+
+	cout << char(187);
+	gotoxy(posx, posy + 1); cout << char(186); color(7); cout << text; color(col); cout << char(186) << endl;
+	gotoxy(posx, posy + 2); cout << char(200);
+
+	for (int i = 0; i < size; i++)
+	{
+		cout << char(205);
+	}
+
+	cout << char(188); color(7);
+
+}
+
+
+
 void printOrganisationUser(string acc[], int orgSize)
 {
 	/*APIHandler apiHandler;
@@ -377,7 +401,7 @@ void displayNumber(int num, int posx, int posy)
 		gotoxy(posx, posy + 4); cout << " | |";
 		gotoxy(posx, posy + 5); cout << " | |";
 		gotoxy(posx, posy + 6); cout << " | |";
-		gotoxy(posx, posy +7); cout << " |_| ";
+		gotoxy(posx, posy + 7); cout << " |_| ";
 	}
 	if (num == 2)
 	{
@@ -431,7 +455,7 @@ void displayNumber(int num, int posx, int posy)
 		gotoxy(posx, posy + 6); cout << "  / /    ";
 		gotoxy(posx, posy + 7); cout << " /_/ ";
 	}
-	if (num == 8) 
+	if (num == 8)
 	{
 		gotoxy(posx, posy + 2); cout << "  ___   ";
 		gotoxy(posx, posy + 3); cout << " / _ \\  ";
@@ -442,7 +466,7 @@ void displayNumber(int num, int posx, int posy)
 
 	}
 
-	if (num == 9) 
+	if (num == 9)
 	{
 		gotoxy(posx, posy + 2); cout << "  ___  ";
 		gotoxy(posx, posy + 3); cout << " / _ \\ ";
@@ -462,7 +486,7 @@ void displayNumber(int num, int posx, int posy)
 	}
 }
 
-void displayGrade(int points) 
+void displayGrade(int points)
 {
 	gotoxy(40, 2); cout << char(218);
 	for (int i = 0; i < 50; i++) {
@@ -472,16 +496,16 @@ void displayGrade(int points)
 
 	gotoxy(54, 5);  cout << "Y O U R   S C O R E   I S";
 
-	for (int i = 0; i < 25; i++) 
+	for (int i = 0; i < 25; i++)
 	{
-		gotoxy(40, 3+i);  cout << char(179);
+		gotoxy(40, 3 + i);  cout << char(179);
 		gotoxy(91, 3 + i);  cout << char(179);
 	}
-	
-	color(3); displayNumber(points / 10, 58,4);
-	displayNumber(points % 10, 67,4); color(7);
-    gotoxy(62, 13);  cout << "O U T  O F";
-	
+
+	color(3); displayNumber(points / 10, 58, 4);
+	displayNumber(points % 10, 67, 4); color(7);
+	gotoxy(62, 13);  cout << "O U T  O F";
+
 
 	color(8); displayNumber(1, 55, 12);
 	displayNumber(0, 62, 12);
@@ -499,7 +523,7 @@ void displayGrade(int points)
 	}
 	color(7);
 	gotoxy(40, 26); cout << char(192);
-	for (int i = 0; i < 50; i++) 
+	for (int i = 0; i < 50; i++)
 	{
 		cout << char(196);
 	}
@@ -509,28 +533,6 @@ void displayGrade(int points)
 
 void panetTable() {
 
-}
-
-
-void drawButton(int posy, string text, int size, int posx, int col)
-{
-	gotoxy(posx, posy); cout << char(201);
-
-	for (int i = 0; i < size; i++)
-	{
-		cout << char(205);
-	}
-
-	cout << char(187);
-	gotoxy(posx, posy + 1); cout << char(186); color(7); cout << text; color(col); cout << char(186) << endl;
-	gotoxy(posx, posy + 2); cout << char(200);
-
-	for (int i = 0; i < size; i++)
-	{
-		cout << char(205);
-	}
-
-	cout << char(188);
 }
 
 void tr(string st)
@@ -591,7 +593,9 @@ int Menu() //Main menu with three options
 			if (counter == 2)
 			{
 				system("CLS");
-				tr("BioSphere");
+				string acc[5] = { "Vocational school of Programing", "United states of America",
+		"Kethering und scisorss", "Code block for Specialists", "Cooking restaurnat um France" };
+				printOrganisationAdmin(acc, 5);
 			}
 
 			if (counter == 3)
@@ -629,7 +633,6 @@ int Menu() //Main menu with three options
 	return 0;
 }
 
-
 int main()
 {
 	/*RegisterData acc = menuRegister();
@@ -638,6 +641,8 @@ int main()
 	/*string acc[5] = { "Vocational school of Programing", "United states of America",
 		"Kethering und scisorss", "Code block for Specialists", "Cooking restaurnat um France"};*/
 
-	
-	Menu();
+	/*Menu();*/
+	//displayQuestion();
+	//displayGrade(34);
+
 }
