@@ -1,6 +1,7 @@
 #include <db.h>
+#include <bcrypt-lib.h>
 
-std::vector<std::string> DBManager::registerUser(crow::query_string data)
+std::vector<std::string> DBManager::registerUser(crow::query_string data, char* hash, char* salt, int role)
 {
 	std::vector<std::string> recordSet;
 
@@ -48,9 +49,9 @@ std::vector<std::string> DBManager::registerUser(crow::query_string data)
 		{ "LastName", data.get("lastName") },
 		{ "Username", data.get("username") },
 		{ "Email", data.get("email") },
-		{ "Password", data.get("password") },
-		// TODO: Add salt
-		{ "RoleID", 0 },
+		{ "Password", hash },
+		{ "Salt", salt },
+		{ "RoleID", role },
 		{ "AvatarURL", std::string("https://avatars.dicebear.com/api/identicon/" + std::to_string(time(0)) + ".svg") }
 		}
 	);
@@ -88,7 +89,7 @@ std::vector<std::string> DBManager::loginUser(crow::query_string data)
 		for (auto it = userJSON.begin(); it != userJSON.end(); ++it)
 		{
 			// Authtenticate user
-			if (it.value()["Email"] == data.get("loginCredential") && it.value()["Password"] == data.get("password"))
+			if (it.value()["Email"] == data.get("loginCredential") && bcrypt_checkpw(data.get("password"), std::string(it.value()["Password"]).c_str()) == 0)
 			{
 				// Authorise user
 				auto token = jwt::create<jwt::traits::nlohmann_json>()
@@ -113,7 +114,7 @@ std::vector<std::string> DBManager::loginUser(crow::query_string data)
 		for (auto it = userJSON.begin(); it != userJSON.end(); ++it)
 		{
 			// Authtenticate user
-			if (toLowerCase(it.value()["Username"]) == toLowerCase(data.get("loginCredential")) && it.value()["Password"] == data.get("password"))
+			if (toLowerCase(it.value()["Username"]) == toLowerCase(data.get("loginCredential")) && bcrypt_checkpw(data.get("password"), std::string(it.value()["Password"]).c_str()) == 0)
 			{
 				// Authorise user
 				auto token = jwt::create<jwt::traits::nlohmann_json>()
@@ -341,7 +342,7 @@ std::vector<std::string> DBManager::updateUserAvatar(int userId, std::string ima
 	return recordSet;
 }
 
-std::vector<std::string> DBManager::createOrg(int userId, crow::query_string data)
+std::vector<std::string> DBManager::createOrg(int userId, crow::query_string data, char* hash, char* salt)
 {
 	std::vector<std::string> recordSet;
 
@@ -379,8 +380,8 @@ std::vector<std::string> DBManager::createOrg(int userId, crow::query_string dat
 		{
 		{ "ID", getLastId(orgsJSON) + 1},
 		{ "Name", data.get("orgName") },
-		{ "Password", data.get("password") }
-		// TODO: Add Salt
+		{ "Password", hash },
+		{ "Salt", salt }
 		}
 	);
 
@@ -512,7 +513,7 @@ std::vector<std::string> DBManager::doesPasswordMatchOrg(std::string password, i
 	{
 		if (it.value()["ID"] == orgId)
 		{
-			recordSet.push_back(std::to_string(it.value()["Password"] == password));
+			recordSet.push_back(std::to_string(bcrypt_checkpw(password.c_str(), std::string(it.value()["Password"]).c_str()) == 0));
 			return recordSet;
 		}
 	}
@@ -703,7 +704,7 @@ std::vector<OrgInfo> DBManager::getAllOrgsInfo()
 	return recordSet;
 }
 
-std::vector<std::string> DBManager::createCourse(crow::query_string data)
+std::vector<std::string> DBManager::createCourse(crow::query_string data, char* hash, char* salt)
 {
 	std::vector<std::string> recordSet;
 
@@ -749,9 +750,9 @@ std::vector<std::string> DBManager::createCourse(crow::query_string data)
 		{
 		{ "ID", getLastId(coursesJSON) + 1},
 		{ "Name", data.get("courseName") },
-		{ "Password", data.get("password") },
-		{ "OrgID", data.get("orgId") }
-		// TODO: Add Salt
+		{ "Password", hash },
+		{ "OrgID", data.get("orgId") },
+		{ "Salt", salt }
 		}
 	);
 
@@ -786,7 +787,7 @@ std::vector<std::string> DBManager::doesPasswordMatchCourse(std::string password
 	{
 		if (it.value()["ID"] == courseId)
 		{
-			recordSet.push_back(std::to_string(it.value()["Password"] == password));
+			recordSet.push_back(std::to_string(bcrypt_checkpw(password.c_str(), std::string(it.value()["Password"]).c_str()) == 0));
 			return recordSet;
 		}
 	}

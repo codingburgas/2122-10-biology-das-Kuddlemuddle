@@ -1,5 +1,6 @@
 #include <api.h>
 #include <filesystem>
+#include <types.h>
 
 crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& app)
 {
@@ -35,9 +36,33 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					return;
 				}
 
-				// TODO: Hash password
+				char salt[BCRYPT_HASHSIZE];
+				char hash[BCRYPT_HASHSIZE];
+				int ret;
+				
+				ret = bcrypt_gensalt(12, salt);
 
-				recordSet = dbManager.registerUser(registerData);
+				if (ret != 0)
+				{
+					std::string log = "Failed to generate salt";
+
+					res = responseJSONManager.createJSONResponse(false, { log }, "register");
+					res.end();
+					return;
+				}
+
+				ret = bcrypt_hashpw(registerData.get("password"), salt, hash);
+
+				if (ret != 0)
+				{
+					std::string log = "Failed to generate hash";
+
+					res = responseJSONManager.createJSONResponse(false, { log }, "register");
+					res.end();
+					return;
+				}
+
+				recordSet = dbManager.registerUser(registerData, hash, salt);
 
 				// If saving to database fails
 				if (recordSet.size() != 0)
@@ -90,8 +115,6 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					res.end();
 					return;
 				}
-
-				// TODO: Hash password
 
 				recordSet = dbManager.loginUser(loginData);
 
@@ -371,9 +394,33 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					return;
 				}
 
-				// TODO: Hash password
+				char salt[BCRYPT_HASHSIZE];
+				char hash[BCRYPT_HASHSIZE];
+				int ret;
 
-				recordSet = dbManager.createOrg(ctx.userId, reqData);
+				ret = bcrypt_gensalt(12, salt);
+
+				if (ret != 0)
+				{
+					std::string log = "Failed to generate salt";
+
+					res = responseJSONManager.createJSONResponse(false, { log }, "organisation-register");
+					res.end();
+					return;
+				}
+
+				ret = bcrypt_hashpw(reqData.get("password"), salt, hash);
+
+				if (ret != 0)
+				{
+					std::string log = "Failed to generate hash";
+
+					res = responseJSONManager.createJSONResponse(false, { log }, "organisation-register");
+					res.end();
+					return;
+				}
+
+				recordSet = dbManager.createOrg(ctx.userId, reqData, hash, salt);
 
 				// If saving to database fails
 				if (recordSet.size() != 0)
@@ -467,8 +514,6 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					res.end();
 					return;
 				}
-
-				// TODO: Hash password
 
 				recordSet = dbManager.doesPasswordMatchOrg(reqData.get("password"), std::stoi(reqData.get("orgId")));
 
@@ -895,9 +940,33 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					return;
 				}
 
-				// TODO: Hash password
+				char salt[BCRYPT_HASHSIZE];
+				char hash[BCRYPT_HASHSIZE];
+				int ret;
 
-				recordSet = dbManager.createCourse(reqData);
+				ret = bcrypt_gensalt(12, salt);
+
+				if (ret != 0)
+				{
+					std::string log = "Failed to generate salt";
+
+					res = responseJSONManager.createJSONResponse(false, { log }, "course-register");
+					res.end();
+					return;
+				}
+
+				ret = bcrypt_hashpw(reqData.get("password"), salt, hash);
+
+				if (ret != 0)
+				{
+					std::string log = "Failed to generate hash";
+
+					res = responseJSONManager.createJSONResponse(false, { log }, "course-register");
+					res.end();
+					return;
+				}
+
+				recordSet = dbManager.createCourse(reqData, hash, salt);
 
 				// If saving to database fails
 				if (recordSet.size() != 0)
@@ -987,8 +1056,6 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					res.end();
 					return;
 				}
-
-				// TODO: Hash password
 
 				recordSet = dbManager.doesPasswordMatchCourse(reqData.get("password"), std::stoi(reqData.get("courseId")));
 

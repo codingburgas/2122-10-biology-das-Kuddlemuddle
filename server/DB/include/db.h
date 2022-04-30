@@ -3,120 +3,21 @@
 #include <crow.h>
 #include <misc.h>
 #include <time.h>
+#include <types.h>
 #include <jwt-cpp/jwt.h>
 #include <nlohmann/json.hpp>
 #include <jwt-cpp/traits/nlohmann-json/traits.h>
 
-// This should go in seperate .lib
-enum class UserRolesInOrgs
-{
-	USER = 0,
-	TEACHER = 1,
-	ADMIN = 2
-};
-
-struct OrgUser
-{
-	int id;
-	int role;
-};
-
-struct AnswerInfo
-{
-	int id;
-	float score;
-	int attemptId;
-	bool isCorrect;
-	int questionId;
-	std::string answer;
-	std::string type;
-	std::vector<std::string> punnettAnswer;
-	std::vector<std::string> errors;
-};
-
-struct AttemptInfo
-{
-	int id;
-	int quizId;
-	int userId;
-	int currentQuestionId;
-	float score;
-	time_t timeStart;
-	time_t timeEnd;
-	bool inProgress;
-	std::vector<AnswerInfo> answers;
-	std::vector<std::string> errors;
-};
-
-struct QuestionInfo
-{
-	int id;
-	int quizId;
-	std::string type;
-	std::string question;
-	std::string answer;
-	std::vector<std::string> punnettAnswer;
-	std::vector<std::string> errors;
-};
-
-struct QuizInfo
-{
-	int id;
-	int topicId;
-	std::string name;
-	std::vector<AttemptInfo> attempts;
-	std::vector<QuestionInfo> questions;
-	std::vector<std::string> errors;
-};
-
-struct LessonInfo
-{
-	int id;
-	int topicId;
-	std::string name;
-	std::string data;
-	std::vector<std::string> errors;
-};
-
-struct TopicInfo
-{
-	int id;
-	int courseId;
-	std::string name;
-	std::vector<LessonInfo> lessons;
-	std::vector<QuizInfo> quizzes;
-	std::vector<std::string> errors;
-};
-
-struct CourseInfo
-{
-	int id;
-	int orgId;
-	std::string name;
-	std::vector<OrgUser> users;
-	std::vector<TopicInfo> topics;
-	std::vector<std::string> errors;
-};
-
-struct OrgInfo
-{
-	int id;
-	std::string name;
-	std::vector<OrgUser> users;
-	std::vector<CourseInfo> courses;
-	std::vector<std::string> errors;
-};
-
 class DBManager
 {
 public:
-	std::vector<std::string> registerUser(crow::query_string data);
+	std::vector<std::string> registerUser(crow::query_string data, char* hash, char* salt, int role = 0);
 	std::vector<std::string> loginUser(crow::query_string data);
 	std::vector<std::string> getUserInfo(std::string username, int userId = NULL);
 	std::vector<std::string> deleteUser(std::string username, int userId = NULL);
 	std::vector<std::string> updateUser(int userId, crow::query_string data);
 	std::vector<std::string> updateUserAvatar(int userId, std::string imageName);
-	std::vector<std::string> createOrg(int userId, crow::query_string data);
+	std::vector<std::string> createOrg(int userId, crow::query_string data, char* hash, char* salt);
 	std::vector<std::string> addUserToOrganisation(int userId, int orgId, UserRolesInOrgs userRolesInOrgs, bool createNewEntry = true);
 	std::vector<std::string> getOrgIdByName(std::string orgName);
 	std::vector<std::string> doesPasswordMatchOrg(std::string password, int orgId);
@@ -125,7 +26,7 @@ public:
 	std::vector<std::string> updateOrg(int orgId, crow::query_string data);
 	OrgInfo getOrgInfo(std::string orgName);
 	std::vector<OrgInfo> getAllOrgsInfo();
-	std::vector<std::string> createCourse(crow::query_string data);
+	std::vector<std::string> createCourse(crow::query_string data, char* hash, char* salt);
 	std::vector<std::string> doesPasswordMatchCourse(std::string password, int courseId);
 	std::vector<std::string> addUserToCourse(int userId, int courseId, UserRolesInOrgs userRolesInOrgs, bool createNewEntry = true);
 	CourseInfo getCourseInfo(int courseId);
