@@ -344,7 +344,28 @@ void drawButton(int posy, string text, int size, int posx, int col)
 
 }
 
+void displayQuestion()
+{
+	string info = "", question = "Who is the person who loves vscpi the most";
+	char key;
 
+	do {
+		drawButton(7, "     QUESTION    ", 17, 6, 6);
+		gotoxy(26, 8); color(7); cout << question;
+		drawBox(10, "  TYPE HERE ", 40, 6, 7, info);
+
+		drawButton(13, "      SUBMIT     ", 17, 6, 2);
+		key = _getch();
+
+		if (key == '\b') {
+			info = info.substr(0, info.size() - 1);
+		}
+		else {
+			info += key;
+		}
+
+	} while (key != '\r');
+}
 
 void printOrganisationUser(string acc[], int orgSize)
 {
