@@ -59,7 +59,7 @@
 1. How many heterozygote children do we get when we cross (Yy) and (yy)?    //2
 1. Which type of variability is nonhereditary?    //modification
 1. What is a sudden, abrupt change in genetic information that often leads to changes in the phenotype called?    //mutation
-1. How may types of variability ae there?    //2
+1. How may types of variability are there?    //2
 
 ### Biosphere
 
