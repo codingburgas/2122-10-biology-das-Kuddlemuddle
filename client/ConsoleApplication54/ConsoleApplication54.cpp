@@ -413,6 +413,45 @@ void printOrganisationUser(string acc[], int orgSize)
 	}
 }
 
+void drawPunnettSquare()
+{
+	char key;
+	int row = 0;
+	string parents[8] = { "AB", "Ab","aB","ab","AB", "Ab","aB","ab" };
+
+	int counter2 = 0, counter = 0;
+	do {
+		system("cls");
+		row = 0;
+		drawPunnettRows(8, 218, 196, 194, 191);
+		gotoxy(2, 9 + counter); color(6);  cout << char(254); color(7);
+		gotoxy(9 + counter2, 7); color(6);  cout << char(254); color(7);
+
+		for (int i = 0; i < 36; i += 7)
+		{
+			gotoxy(5 + i, 9); cout << char(179) << " ";
+
+		}
+		for (int i = 0; i < 26; i += 7)
+		{
+			gotoxy(15 + i, 9); cout << parents[row];
+			row++;
+		}
+		for (int i = 0; i < 8; i += 2)
+		{
+			gotoxy(8, 11 + i); cout << parents[row];
+			row++;
+		}
+		drawPunnettRows(10, 195, 196, 197, 180);
+
+		for (int i = 0; i < 36; i += 7)
+		{
+			gotoxy(5 + i, 11); cout << char(179);
+		}
+
+		drawPunnettRows(12, 195, 196, 197, 180);
+
+	}
 void createQuestion()
 {
 	string question = "", answer;
