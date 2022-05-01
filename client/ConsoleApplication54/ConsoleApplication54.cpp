@@ -17,7 +17,7 @@ void gotoxy(int x, int y)  //Get the coordinates inside the console
 	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
 }
 
-void drawBox(int posy, string text, int size, int posx, int col, string input = "")
+void drawBox(int posy, string text, int size, int posx, int col, string input = "", int col2 = 7)
 {
 	color(col);
 	gotoxy(posx, posy); cout << char(201);
@@ -33,9 +33,9 @@ void drawBox(int posy, string text, int size, int posx, int col, string input = 
 	}
 	cout << char(187);
 
-	gotoxy(posx, posy + 1); cout << char(186); color(7);
+	gotoxy(posx, posy + 1); cout << char(186); color(col2);
 	cout << text << "  "; color(col); cout << char(186) << " ";
-	color(7);
+	color(col2);
 	size_t inputLength = 0;
 	if (input.size() > 24) {
 		cout << input.substr(input.size() - 24, input.size());
@@ -322,7 +322,7 @@ void printOrganisationAdmin(string acc[], int orgSize)
 	}
 }
 
-void drawButton(int posy, string text, int size, int posx, int col)
+void drawButton(int posy, string text, int size, int posx, int col, int col2 = 7)
 {
 	color(col); gotoxy(posx, posy); cout << char(201);
 
@@ -332,7 +332,7 @@ void drawButton(int posy, string text, int size, int posx, int col)
 	}
 
 	cout << char(187);
-	gotoxy(posx, posy + 1); cout << char(186); color(7); cout << text; color(col); cout << char(186) << endl;
+	gotoxy(posx, posy + 1); cout << char(186); color(col2); cout << text; color(col); cout << char(186) << endl;
 	gotoxy(posx, posy + 2); cout << char(200);
 
 	for (int i = 0; i < size; i++)
@@ -411,101 +411,6 @@ void printOrganisationUser(string acc[], int orgSize)
 
 
 	}
-}
-
-void drawPunnettSquare()
-{
-	char key;
-	int row = 0;
-	string parents[8] = { "AB", "Ab","aB","ab","AB", "Ab","aB","ab" };
-
-	int counter2 = 0, counter = 0;
-	do {
-		system("cls");
-		row = 0;
-		drawPunnettRows(8, 218, 196, 194, 191);
-		gotoxy(2, 9 + counter); color(6);  cout << char(254); color(7);
-		gotoxy(9 + counter2, 7); color(6);  cout << char(254); color(7);
-
-		for (int i = 0; i < 36; i += 7)
-		{
-			gotoxy(5 + i, 9); cout << char(179) << " ";
-
-		}
-		for (int i = 0; i < 26; i += 7)
-		{
-			gotoxy(15 + i, 9); cout << parents[row];
-			row++;
-		}
-		for (int i = 0; i < 8; i += 2)
-		{
-			gotoxy(8, 11 + i); cout << parents[row];
-			row++;
-		}
-		drawPunnettRows(10, 195, 196, 197, 180);
-
-		for (int i = 0; i < 36; i += 7)
-		{
-			gotoxy(5 + i, 11); cout << char(179);
-		}
-
-		drawPunnettRows(12, 195, 196, 197, 180);
-
-	}
-void createQuestion()
-{
-	string question = "", answer;
-	char key;
-	do {
-
-		drawButton(5, "   QUESTION   ", 14, 5, 6);
-		drawBox(8, " TYPE HERE  ", 40, 5, 7, question);
-
-		drawButton(12, "    ANSWER    ", 14, 5, 8, 8);
-		drawBox(15, " TYPE HERE  ", 40, 5, 8, " ", 8);
-		drawButton(19, "    SUBMIT    ", 14, 5, 2);
-		key = _getch();
-
-		if (key == '\b')
-		{
-			question = question.substr(0, question.size() - 1);
-		}
-
-		else if (key == '\r')
-		{
-			break;
-		}
-		else
-		{
-			question += key;
-		}
-
-
-
-	} while (key != '\r');
-
-	int subcol = 7;
-	do {
-		drawButton(5, "   QUESTION   ", 14, 5, 8, 8);
-		drawBox(8, " TYPE HERE  ", 40, 5, 8, question, 8);
-		drawButton(12, "    ANSWER    ", 14, 5, 6);
-		drawBox(15, " TYPE HERE  ", 40, 5, 7, answer);
-		drawButton(19, "    SUBMIT    ", 14, 5, 2, subcol);
-		key = _getch();
-
-		if (key == '\b')
-		{
-			answer = answer.substr(0, answer.size() - 1);
-		}
-
-		else
-		{
-			answer += key;
-		}
-
-		answer.size() > 0 ? subcol = 2 : subcol = 7;
-
-	} while (key != '\r');
 }
 
 void displayNumber(int num, int posx, int posy)
@@ -647,8 +552,157 @@ void displayGrade(int points)
 
 }
 
-void panetTable() {
+void drawPunnettRows(int y, int start, int middSymb, int middSymb2, int end)
+{
+	gotoxy(5, y); cout << char(start);
+	for (int j = 0; j < 5; j++)
+	{
+		for (int i = 0; i < 6; i++)
+		{
+			cout << char(middSymb);
+		}
+		j == 4 ? cout << char(end) : cout << char(middSymb2);
+	}
 
+}
+
+void createQuestion()
+{
+	string question = "", answer;
+	char key;
+	do {
+
+		drawButton(5, "   QUESTION   ", 14, 5, 6);
+		drawBox(8, " TYPE HERE  ", 40, 5, 7, question);
+
+		drawButton(12, "    ANSWER    ", 14, 5, 8, 8);
+		drawBox(15, " TYPE HERE  ", 40, 5, 8, " ", 8);
+		drawButton(19, "    SUBMIT    ", 14, 5, 2);
+		key = _getch();
+
+		if (key == '\b')
+		{
+			question = question.substr(0, question.size() - 1);
+		}
+
+		else if (key == '\r')
+		{
+			break;
+		}
+		else
+		{
+			question += key;
+		}
+
+
+
+	} while (key != '\r');
+
+	int subcol = 7;
+	do {
+		drawButton(5, "   QUESTION   ", 14, 5, 8, 8);
+		drawBox(8, " TYPE HERE  ", 40, 5, 8, question, 8);
+		drawButton(12, "    ANSWER    ", 14, 5, 6);
+		drawBox(15, " TYPE HERE  ", 40, 5, 7, answer);
+		drawButton(19, "    SUBMIT    ", 14, 5, 2, subcol);
+		key = _getch();
+
+		if (key == '\b')
+		{
+			answer = answer.substr(0, answer.size() - 1);
+		}
+
+		else
+		{
+			answer += key;
+		}
+
+		answer.size() > 0 ? subcol = 2 : subcol = 7;
+
+	} while (key != '\r');
+}
+void drawPunnettSquare()
+{
+	char key;
+	int row = 0;
+	string parents[8] = { "AB", "Ab","aB","ab","AB", "Ab","aB","ab" };
+
+	int counter2 = 0, counter = 0;
+	do {
+		system("cls");
+		row = 0;
+		drawPunnettRows(8, 218, 196, 194, 191);
+		gotoxy(2, 9 + counter); color(6);  cout << char(254); color(7);
+		gotoxy(9 + counter2, 7); color(6);  cout << char(254); color(7);
+
+		for (int i = 0; i < 36; i += 7)
+		{
+			gotoxy(5 + i, 9); cout << char(179) << " ";
+
+		}
+		for (int i = 0; i < 26; i += 7)
+		{
+			gotoxy(15 + i, 9); cout << parents[row];
+			row++;
+		}
+		for (int i = 0; i < 8; i += 2)
+		{
+			gotoxy(8, 11 + i); cout << parents[row];
+			row++;
+		}
+		drawPunnettRows(10, 195, 196, 197, 180);
+
+		for (int i = 0; i < 36; i += 7)
+		{
+			gotoxy(5 + i, 11); cout << char(179);
+		}
+
+		drawPunnettRows(12, 195, 196, 197, 180);
+
+		for (int i = 0; i < 36; i += 7)
+		{
+			gotoxy(5 + i, 13); cout << char(179);
+		}
+
+		drawPunnettRows(14, 195, 196, 197, 180);
+
+		for (int i = 0; i < 36; i += 7)
+		{
+			gotoxy(5 + i, 15); cout << char(179);
+		}
+
+		drawPunnettRows(16, 195, 196, 197, 180);
+
+		for (int i = 0; i < 36; i += 7)
+		{
+			gotoxy(5 + i, 17); cout << char(179);
+		}
+
+		drawPunnettRows(18, 192, 196, 193, 217);
+
+		key = _getch();
+
+		if (key == 72 && (counter >= 1 && counter <= 8)) // 72/75 is the ASCII code for the up arrow
+		{
+			counter -= 2;
+		}
+
+		if (key == 80 && (counter >= 0 && counter < 7)) // 80/77 is the ASCII code for the up arrow
+		{
+			counter += 2;
+		}
+
+		if (key == 75 && (counter2 >= 1 && counter2 <= 28)) // 72/75 is the ASCII code for the up arrow
+		{
+			counter2 -= 7;
+		}
+
+		if (key == 77 && (counter2 >= 0 && counter2 < 26)) // 80/77 is the ASCII code for the up arrow
+		{
+			counter2 += 7;
+		}
+
+	} while (key != '\r');
 }
 
 void tr(string st)
@@ -751,14 +805,15 @@ int Menu() //Main menu with three options
 
 int main()
 {
-	/*RegisterData acc = menuRegister();
-	menuLogin();
-	accountPage(acc);*/
+	/*drawPunnettSquare();
+	RegisterData acc = menuRegister();*/
+	//menuLogin();
+	//accountPage(acc);
 	/*string acc[5] = { "Vocational school of Programing", "United states of America",
 		"Kethering und scisorss", "Code block for Specialists", "Cooking restaurnat um France"};*/
 
-	/*Menu();*/
-	//displayQuestion();
-	//displayGrade(34);
-
+		/*Menu();*/
+		//displayQuestion();
+		//displayGrade(74);
+	createQuestion();
 }
