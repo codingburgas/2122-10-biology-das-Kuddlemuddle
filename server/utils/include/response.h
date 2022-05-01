@@ -1,10 +1,24 @@
+/*! @file response.h
+*   @brief A header file for the response system.
+*/
+
 #pragma once
 #include <crow.h>
 #include <db.h>
 
+/**
+ * @brief Class for the response system
+*/
 class ResponseJSONManager
 {
 public:
+	/**
+	 * @brief Create JSON response based on data
+	 * @param isSuccess Is the response successful
+	 * @param fields The fileds to be in the JSON response
+	 * @param type Type of the response
+	 * @return JSON to be sent to the client
+	*/
 	crow::json::wvalue createJSONResponse(bool isSuccess, std::vector<std::string> fields, std::string type);
 	crow::json::wvalue createProfileJSONResponse(std::vector<std::string> fields);
 	crow::json::wvalue createOrgJSONResponse(OrgInfo data);

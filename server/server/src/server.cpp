@@ -1,3 +1,8 @@
+/*! @file server.cpp
+*   @brief A source file for the http server.
+*/
+
+
 #include <api.h>
 #include <crow.h>
 #include <loggerHandler.h>
@@ -5,7 +10,10 @@
 #include <authorisationMiddleware.h>
 
 /**
- * @brief The entry point for our http server.
+ * @brief The entry point for our http server
+ * @param argc The count of the arguments passed through CLI
+ * @param argv The value of the arguments passed through CLI
+ * @return Status code of the execution of the program
 */
 int main(int argc, char* argv[])
 {
@@ -37,6 +45,8 @@ int main(int argc, char* argv[])
 		DBManager dbManager;
 		ValidationManager validationManager;
 
+		// Transform the register data
+		// to query string
 		auto registerData = crow::query_string(
 			"?" +
 			std::string("firstName=") + firstName +
@@ -98,7 +108,8 @@ int main(int argc, char* argv[])
 	}
 
 	// Initialise crow app
-	// and apply the default CORS handler
+	// and apply the default CORS handler middleware
+	// and the custom Authorisation middleware
 	crow::App<crow::CORSHandler, AuthorisationMiddleware> app;
 
 	// Change the default handler to a new one

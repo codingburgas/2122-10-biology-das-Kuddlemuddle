@@ -1,3 +1,7 @@
+/*! @file api.h
+*   @brief A header file for the api blueprint.
+*/
+
 #pragma once
 #include <db.h>
 #include <crow.h>
@@ -7,4 +11,9 @@
 #include <authorisationMiddleware.h>
 #include <bcrypt-lib.h>
 
+/**
+ * @brief Function for initialising 
+ * @param app The crow app
+ * @return Api blueprint
+*/
 crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware> &app);

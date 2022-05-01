@@ -1,3 +1,7 @@
+/*! @file validations.cpp
+*   @brief A sourse file for the validation system.
+*/
+
 #include <validations.h>
 
 std::vector<std::string> ValidationManager::isRegisterDataValid(crow::query_string data, bool allowNulls)
@@ -160,20 +164,11 @@ std::vector<std::string> ValidationManager::isPunnettSquareDataValid(crow::query
 	return incorrectValidation;
 }
 
-bool isValueNumber(std::string str) 
-{
-	for (auto& el : str)
-	{
-		if (!isdigit(el))
-		{
-			return false;
-		}
-	}
-
-	return true;
-}
-
-std::vector<std::string> ValidationManager::checkForNullValues(crow::query_string data, std::vector<std::string> fields, std::vector<std::string> numFields)
+std::vector<std::string> ValidationManager::checkForNullValues(
+	crow::query_string data, 
+	std::vector<std::string> fields, 
+	std::vector<std::string> numFields
+)
 {
 	std::vector<std::string> nullValues;
 
@@ -318,5 +313,20 @@ ValidationHandler ValidationManager::getValidationHandler(std::string field)
 				return false;
 			}
 		);
+	}
+}
+
+bool ValidationManager::isValueNumber(std::string str)
+{
+	{
+		for (auto& el : str)
+		{
+			if (!isdigit(el))
+			{
+				return false;
+			}
+		}
+
+		return true;
 	}
 }

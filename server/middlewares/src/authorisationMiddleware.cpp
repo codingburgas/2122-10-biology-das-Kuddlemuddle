@@ -1,6 +1,10 @@
-#include <authorisationMiddleware.h>
-#include <jwt-cpp/jwt.h>
+/*! @file authorisationMiddleware.cpp
+*   @brief A source file for the authorisation middleware.
+*/
+
 #include <env.h>
+#include <jwt-cpp/jwt.h>
+#include <authorisationMiddleware.h>
 #include <jwt-cpp/traits/nlohmann-json/traits.h>
 
 void AuthorisationMiddleware::before_handle(crow::request& req, crow::response& res, context& ctx)
@@ -16,7 +20,7 @@ void AuthorisationMiddleware::before_handle(crow::request& req, crow::response& 
 	if (myauth == "")
 	{
 		CROW_LOG_WARNING << "Failed to authorise user. Reason: Authorization header is missing!";
-		res = crow::response(401);
+		res = crow::response(crow::status::UNAUTHORIZED);
 		res.end();
 		return;
 	}
@@ -35,7 +39,7 @@ void AuthorisationMiddleware::before_handle(crow::request& req, crow::response& 
 	catch (...)
 	{
 		CROW_LOG_WARNING << "Failed to authorise user. Reason: Token is invalid!";
-		res = crow::response(403);
+		res = crow::response(crow::status::FORBIDDEN);
 		res.end();
 		return;
 	}

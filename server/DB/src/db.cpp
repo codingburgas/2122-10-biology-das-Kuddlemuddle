@@ -1,7 +1,16 @@
-#include <db.h>
-#include <bcrypt-lib.h>
+/*! @file db.cpp
+*   @brief A source file for the database.
+*/
 
-std::vector<std::string> DBManager::registerUser(crow::query_string data, char* hash, char* salt, int role)
+#include <db.h>
+
+
+std::vector<std::string> DBManager::registerUser(
+	crow::query_string data,
+	char* hash,
+	char* salt,
+	int role
+)
 {
 	std::vector<std::string> recordSet;
 
@@ -89,9 +98,14 @@ std::vector<std::string> DBManager::loginUser(crow::query_string data)
 		for (auto it = userJSON.begin(); it != userJSON.end(); ++it)
 		{
 			// Authtenticate user
-			if (it.value()["Email"] == data.get("loginCredential") && bcrypt_checkpw(data.get("password"), std::string(it.value()["Password"]).c_str()) == 0)
+			if (it.value()["Email"] == data.get("loginCredential") &&
+				bcrypt_checkpw(
+					data.get("password"),
+					std::string(it.value()["Password"]).c_str()
+				) == 0
+				)
 			{
-				// Authorise user
+				// Authorise user -> Generate JWT token for this user
 				auto token = jwt::create<jwt::traits::nlohmann_json>()
 					.set_type("JWS")
 					.set_subject(std::to_string(int(it.value()["ID"])))
@@ -106,7 +120,9 @@ std::vector<std::string> DBManager::loginUser(crow::query_string data)
 		}
 
 		// Login failure
-		recordSet.push_back("There is not a user with this email: " + std::string(data.get("loginCredential")) + " or password is invalid.");
+		recordSet.push_back("There is not a user with this email: " +
+			std::string(data.get("loginCredential")) + " or password is invalid.");
+
 		return recordSet;
 	}
 	else
@@ -114,7 +130,11 @@ std::vector<std::string> DBManager::loginUser(crow::query_string data)
 		for (auto it = userJSON.begin(); it != userJSON.end(); ++it)
 		{
 			// Authtenticate user
-			if (toLowerCase(it.value()["Username"]) == toLowerCase(data.get("loginCredential")) && bcrypt_checkpw(data.get("password"), std::string(it.value()["Password"]).c_str()) == 0)
+			if (toLowerCase(it.value()["Username"]) == toLowerCase(data.get("loginCredential"))
+				&& bcrypt_checkpw(
+					data.get("password"), std::string(it.value()["Password"]).c_str()
+				) == 0
+				)
 			{
 				// Authorise user
 				auto token = jwt::create<jwt::traits::nlohmann_json>()
@@ -131,7 +151,8 @@ std::vector<std::string> DBManager::loginUser(crow::query_string data)
 		}
 
 		// Login failure
-		recordSet.push_back("There is not a user with this username: " + std::string(data.get("loginCredential")) + " or password is invalid.");
+		recordSet.push_back("There is not a user with this username: " + 
+			std::string(data.get("loginCredential")) + " or password is invalid.");
 		return recordSet;
 	}
 
@@ -222,7 +243,7 @@ std::vector<std::string> DBManager::deleteUser(std::string username, int userId)
 			if (it.value()["ID"] == userId)
 			{
 				it = userJSON.erase(it);
-				
+
 				if (!setJSONFile(userJSON, "users.json"))
 				{
 					recordSet.push_back("Could'n open user.json file");
@@ -240,7 +261,7 @@ std::vector<std::string> DBManager::deleteUser(std::string username, int userId)
 		recordSet.push_back("Could not find user with id: " + std::to_string(userId));
 		return recordSet;
 	}
-	
+
 	// Authtenticate user
 	auto it = userJSON.cbegin();
 	for (; it != userJSON.cend();)
@@ -286,11 +307,20 @@ std::vector<std::string> DBManager::updateUser(int userId, crow::query_string da
 	{
 		if (it.value()["ID"] == userId)
 		{
-			it.value()["FirstName"] = std::string(data.get("firstName")).empty() ? it.value()["FirstName"] : data.get("firstName");
-			it.value()["LastName"] = std::string(data.get("lastName")).empty() ? it.value()["LastName"] : data.get("lastName");
-			it.value()["Username"] = std::string(data.get("username")).empty() ? it.value()["Username"] : data.get("username");
-			it.value()["Email"] = std::string(data.get("email")).empty() ? it.value()["Email"] : data.get("email");
-			it.value()["Password"] = std::string(data.get("password")).empty() ? it.value()["Password"] : data.get("password");
+			it.value()["FirstName"] = std::string(data.get("firstName")).empty() ? 
+				it.value()["FirstName"] : data.get("firstName");
+
+			it.value()["LastName"] = std::string(data.get("lastName")).empty() ? 
+				it.value()["LastName"] : data.get("lastName");
+
+			it.value()["Username"] = std::string(data.get("username")).empty() ? 
+				it.value()["Username"] : data.get("username");
+
+			it.value()["Email"] = std::string(data.get("email")).empty() ?
+				it.value()["Email"] : data.get("email");
+
+			it.value()["Password"] = std::string(data.get("password")).empty() ?
+				it.value()["Password"] : data.get("password");
 
 			if (!setJSONFile(userJSON, "users.json"))
 			{
@@ -395,7 +425,12 @@ std::vector<std::string> DBManager::createOrg(int userId, crow::query_string dat
 	return recordSet;
 }
 
-std::vector<std::string> DBManager::addUserToOrganisation(int userId, int orgId, UserRolesInOrgs userRolesInOrgs, bool createNewEntry)
+std::vector<std::string> DBManager::addUserToOrganisation(
+	int userId,
+	int orgId,
+	UserRolesInOrgs userRolesInOrgs,
+	bool createNewEntry
+)
 {
 	std::vector<std::string> recordSet;
 
@@ -430,7 +465,8 @@ std::vector<std::string> DBManager::addUserToOrganisation(int userId, int orgId,
 
 	if (!createNewEntry)
 	{
-		recordSet.push_back("Couldn't find user with id: " + std::to_string(userId) + " or organisation with id: " + std::to_string(orgId));
+		recordSet.push_back("Couldn't find user with id: " + std::to_string(userId) +
+			" or organisation with id: " + std::to_string(orgId));
 		return recordSet;
 	}
 
@@ -513,7 +549,10 @@ std::vector<std::string> DBManager::doesPasswordMatchOrg(std::string password, i
 	{
 		if (it.value()["ID"] == orgId)
 		{
-			recordSet.push_back(std::to_string(bcrypt_checkpw(password.c_str(), std::string(it.value()["Password"]).c_str()) == 0));
+			recordSet.push_back(std::to_string(bcrypt_checkpw(
+				password.c_str(), std::string(it.value()["Password"]).c_str()) == 0)
+			);
+
 			return recordSet;
 		}
 	}
@@ -549,7 +588,9 @@ std::vector<std::string> DBManager::isUserInOrgAndGetRole(int userId, int orgId)
 		}
 	}
 
-	recordSet.push_back("Could not find organisation with id: " + std::to_string(orgId) + " or this user is not part of it");
+	recordSet.push_back("Could not find organisation with id: " + std::to_string(orgId) + 
+		" or this user is not part of it");
+	
 	return recordSet;
 }
 
@@ -598,7 +639,7 @@ std::vector<std::string> DBManager::deleteOrg(int orgId)
 		{
 			it = userOrgRoleJSON.erase(it);
 		}
-		else 
+		else
 		{
 			++it;
 		}
@@ -640,8 +681,11 @@ std::vector<std::string> DBManager::updateOrg(int orgId, crow::query_string data
 	{
 		if (it.value()["ID"] == orgId)
 		{
-			it.value()["Name"] = std::string(data.get("orgName")).empty() ? it.value()["Name"] : data.get("orgName");
-			it.value()["Password"] = std::string(data.get("password")).empty() ? it.value()["Password"] : data.get("password");
+			it.value()["Name"] = std::string(data.get("orgName")).empty() ? 
+				it.value()["Name"] : data.get("orgName");
+
+			it.value()["Password"] = std::string(data.get("password")).empty() ? 
+				it.value()["Password"] : data.get("password");
 
 			if (!setJSONFile(orgJSON, "orgs.json"))
 			{
@@ -726,13 +770,15 @@ std::vector<std::string> DBManager::createCourse(crow::query_string data, char* 
 	// Check for duplicate name
 	if (checkIfValueExistsInField(coursesJSON, "Name", data.get("courseName"), "OrgID", data.get("orgId")))
 	{
-		recordSet.push_back("There is already a course with this name: " + std::string(data.get("courseName")));
+		recordSet.push_back("There is already a course with this name: " +
+			std::string(data.get("courseName")));
 		return recordSet;
 	}
 
 	if (checkIfValueExistsInField(orgsJSON, "OrgID", data.get("orgId")))
 	{
-		recordSet.push_back("There is not a organisation with this id: " + std::string(data.get("orgId")));
+		recordSet.push_back("There is not a organisation with this id: " +
+			std::string(data.get("orgId")));
 		return recordSet;
 	}
 
@@ -787,7 +833,11 @@ std::vector<std::string> DBManager::doesPasswordMatchCourse(std::string password
 	{
 		if (it.value()["ID"] == courseId)
 		{
-			recordSet.push_back(std::to_string(bcrypt_checkpw(password.c_str(), std::string(it.value()["Password"]).c_str()) == 0));
+			recordSet.push_back(
+				std::to_string(bcrypt_checkpw(
+					password.c_str(), std::string(it.value()["Password"]).c_str()
+				) == 0)
+			);
 			return recordSet;
 		}
 	}
@@ -796,7 +846,12 @@ std::vector<std::string> DBManager::doesPasswordMatchCourse(std::string password
 	return recordSet;
 }
 
-std::vector<std::string> DBManager::addUserToCourse(int userId, int courseId, UserRolesInOrgs userRolesInOrgs, bool createNewEntry)
+std::vector<std::string> DBManager::addUserToCourse(
+	int userId, 
+	int courseId, 
+	UserRolesInOrgs userRolesInOrgs, 
+	bool createNewEntry
+)
 {
 	std::vector<std::string> recordSet;
 
@@ -831,7 +886,8 @@ std::vector<std::string> DBManager::addUserToCourse(int userId, int courseId, Us
 
 	if (!createNewEntry)
 	{
-		recordSet.push_back("Couldn't find user with id: " + std::to_string(userId) + " or course with id: " + std::to_string(courseId));
+		recordSet.push_back("Couldn't find user with id: " + std::to_string(userId) + 
+			" or course with id: " + std::to_string(courseId));
 		return recordSet;
 	}
 
@@ -877,7 +933,7 @@ CourseInfo DBManager::getCourseInfo(int courseId)
 	returnValue.name = getFieldDataInJSONByCriteria("courses.json", courseId, "ID", "Name")[0];
 	returnValue.orgId = std::stoi(getFieldDataInJSONByCriteria("courses.json", returnValue.id, "ID", "OrgID")[0]);
 	returnValue.topics = getAllTopicsInCourseWithID(courseId);
-	
+
 	try
 	{
 		returnValue.users = getCourseUsersByCourseId(returnValue.id);
@@ -911,8 +967,11 @@ std::vector<std::string> DBManager::updateCourse(int courseId, crow::query_strin
 	{
 		if (it.value()["ID"] == courseId)
 		{
-			it.value()["Name"] = std::string(data.get("courseName")).empty() ? it.value()["Name"] : data.get("courseName");
-			it.value()["Password"] = std::string(data.get("password")).empty() ? it.value()["Password"] : data.get("password");
+			it.value()["Name"] = std::string(data.get("courseName")).empty() ? 
+				it.value()["Name"] : data.get("courseName");
+
+			it.value()["Password"] = std::string(data.get("password")).empty() ? 
+				it.value()["Password"] : data.get("password");
 
 			if (!setJSONFile(coursesJSON, "courses.json"))
 			{
@@ -928,7 +987,11 @@ std::vector<std::string> DBManager::updateCourse(int courseId, crow::query_strin
 	return recordSet;
 }
 
-std::vector<std::string> DBManager::canUserAccessCourse(int courseId, int userId, bool allowOnlyTeachersAndAdmins)
+std::vector<std::string> DBManager::canUserAccessCourse(
+	int courseId, 
+	int userId, 
+	bool allowOnlyTeachersAndAdmins
+)
 {
 	std::vector<std::string> returnVal;
 
@@ -936,7 +999,8 @@ std::vector<std::string> DBManager::canUserAccessCourse(int courseId, int userId
 
 	if (!courseInfo.errors.empty())
 	{
-		std::string log = "Failed to get course info for course with name: " + std::to_string(courseId) + ". Reasons: ";
+		std::string log = "Failed to get course info for course with name: " +
+			std::to_string(courseId) + ". Reasons: ";
 
 		for (auto el : courseInfo.errors)
 		{
@@ -954,7 +1018,8 @@ std::vector<std::string> DBManager::canUserAccessCourse(int courseId, int userId
 	{
 		if (recordSet[0] != "1" || recordSet[1] == "0")
 		{
-			std::string log = "Failed to get course info with id: " + std::to_string(courseId) + ". Reason: User is unauthorised";
+			std::string log = "Failed to get course info with id: " + 
+				std::to_string(courseId) + ". Reason: User is unauthorised";
 			returnVal.push_back("User is unauthorised");
 
 			CROW_LOG_WARNING << log;
@@ -966,7 +1031,8 @@ std::vector<std::string> DBManager::canUserAccessCourse(int courseId, int userId
 	{
 		if (recordSet[0] != "1")
 		{
-			std::string log = "Failed to get course info with id: " + std::to_string(courseId) + ". Reason: User is unauthorised";
+			std::string log = "Failed to get course info with id: " + 
+				std::to_string(courseId) + ". Reason: User is unauthorised";
 			returnVal.push_back("User is unauthorised");
 
 			CROW_LOG_WARNING << log;
@@ -1064,7 +1130,7 @@ TopicInfo DBManager::getTopicInfo(int topicId)
 	TopicInfo returnValue;
 
 	returnValue.id = topicId;
-	
+
 	if (getFieldDataInJSONByCriteria("topics.json", topicId, "ID", "Name").empty())
 	{
 		returnValue.errors.push_back("Can not find topic with id: " + std::to_string(topicId));
@@ -1163,7 +1229,7 @@ std::vector<CourseInfo> DBManager::getAllCoursesInOrgWithID(int orgId)
 	{
 		if (it.value()["OrgID"] == std::to_string(orgId))
 		{
-			recordSet.push_back({it.value()["ID"], orgId,  it.value()["Name"]});
+			recordSet.push_back({ it.value()["ID"], orgId,  it.value()["Name"] });
 		}
 	}
 
@@ -1433,8 +1499,9 @@ std::vector<std::string> DBManager::updateTopic(int topicId, crow::query_string 
 	{
 		if (it.value()["ID"] == topicId)
 		{
-			it.value()["Name"] = std::string(data.get("topicName")).empty() ? it.value()["Name"] : data.get("topicName");
-			
+			it.value()["Name"] = std::string(data.get("topicName")).empty() ? 
+				it.value()["Name"] : data.get("topicName");
+
 			if (!setJSONFile(topicsJSON, "topics.json"))
 			{
 				recordSet.push_back("Could'n open topics.json file");
@@ -1513,7 +1580,7 @@ LessonInfo DBManager::getLessonInfo(int lessonId)
 		returnValue.errors.push_back("Can not find lesson with id: " + std::to_string(lessonId));
 		return returnValue;
 	}
-	
+
 	returnValue.name = getFieldDataInJSONByCriteria("lessons.json", lessonId, "ID", "Name")[0];
 	returnValue.topicId = std::stoi(getFieldDataInJSONByCriteria("lessons.json", lessonId, "ID", "TopicID")[0]);
 	returnValue.data = getFieldDataInJSONByCriteria("lessons.json", lessonId, "ID", "Data")[0];
@@ -1608,8 +1675,11 @@ std::vector<std::string> DBManager::updateLesson(int lessonId, crow::query_strin
 	{
 		if (it.value()["ID"] == lessonId)
 		{
-			it.value()["Name"] = std::string(data.get("lessonName")).empty() ? it.value()["Name"] : data.get("lessonName");
-			it.value()["Data"] = std::string(data.get("lessonData")).empty() ? it.value()["Data"] : data.get("lessonData");
+			it.value()["Name"] = std::string(data.get("lessonName")).empty() ? 
+				it.value()["Name"] : data.get("lessonName");
+
+			it.value()["Data"] = std::string(data.get("lessonData")).empty() ? 
+				it.value()["Data"] : data.get("lessonData");
 
 			if (!setJSONFile(lessonsJSON, "lessons.json"))
 			{
@@ -1702,7 +1772,7 @@ std::vector<std::string> DBManager::deleteQuiz(int quizId)
 	std::vector<std::string> recordSet;
 	nlohmann::json quizzesJSON;
 	nlohmann::json questionsJSON;
-	
+
 
 	// Get the JSON from the file
 	try
@@ -1767,7 +1837,8 @@ std::vector<std::string> DBManager::updateQuiz(int quizId, crow::query_string da
 	{
 		if (it.value()["ID"] == quizId)
 		{
-			it.value()["Name"] = std::string(data.get("quizName")).empty() ? it.value()["Name"] : data.get("quizName");
+			it.value()["Name"] = std::string(data.get("quizName")).empty() ?
+				it.value()["Name"] : data.get("quizName");
 
 			if (!setJSONFile(quizzesJSON, "quizzes.json"))
 			{
@@ -1801,14 +1872,15 @@ std::vector<std::string> DBManager::createQuestion(crow::query_string data)
 		recordSet.push_back("Could'n open questions.json file");
 		return recordSet;
 	}
-	
+
 	std::string question;
 
 	std::string type = data.get("type");
 
 	if (type == "2")
 	{
-		question = "Fill in the punnett square if the parents are " + std::string(data.get("P1")) + " and " + std::string(data.get("P2"));
+		question = "Fill in the punnett square if the parents are " + 
+			std::string(data.get("P1")) + " and " + std::string(data.get("P2"));
 	}
 	else
 	{
@@ -1918,7 +1990,7 @@ QuestionInfo DBManager::getQuestionInfo(int questionId)
 	{
 		returnValue.answer = getFieldDataInJSONByCriteria("questions.json", questionId, "ID", "Answer")[0];
 	}
-	
+
 	returnValue.quizId = std::stoi(getFieldDataInJSONByCriteria("questions.json", questionId, "ID", "QuizID")[0]);
 
 	return returnValue;
@@ -1962,11 +2034,11 @@ std::vector<std::string> DBManager::deleteQuestion(int questionId)
 					++itAttempt;
 				}
 			}
-			
+
 			it = questionsJSON.erase(it);
-			
+
 			if (!setJSONFile(questionsJSON, "questions.json"))
-			{	
+			{
 				recordSet.push_back("Could'n open questions.json file");
 				return recordSet;
 			}
@@ -2018,7 +2090,8 @@ std::vector<std::string> DBManager::updateQuestion(int questionId, crow::query_s
 					std::string(data.get("P2")).empty() ? it.value()["P2"] : data.get("P2")
 				);
 
-				it.value()["Question"] = "Fill in the punnett square if the parents are " + std::string(data.get("P1")) + " and " + std::string(data.get("P2"));
+				it.value()["Question"] = "Fill in the punnett square if the parents are " +
+					std::string(data.get("P1")) + " and " + std::string(data.get("P2"));
 				it.value()["Cell0x0"] = answers[0];
 				it.value()["Cell0x1"] = answers[1];
 				it.value()["Cell0x2"] = answers[2];
@@ -2038,8 +2111,11 @@ std::vector<std::string> DBManager::updateQuestion(int questionId, crow::query_s
 			}
 			else
 			{
-				it.value()["Question"] = std::string(data.get("question")).empty() ? it.value()["Question"] : data.get("question");
-				it.value()["Answer"] = std::string(data.get("answer")).empty() ? it.value()["Answer"] : data.get("answer");
+				it.value()["Question"] = std::string(data.get("question")).empty() ? 
+					it.value()["Question"] : data.get("question");
+
+				it.value()["Answer"] = std::string(data.get("answer")).empty() ?
+					it.value()["Answer"] : data.get("answer");
 			}
 
 			if (!setJSONFile(questionsJSON, "questions.json"))
@@ -2131,13 +2207,34 @@ AttemptInfo DBManager::getAttemptInfo(int attemptId)
 		return returnValue;
 	}
 
-	returnValue.currentQuestionId = std::stoi(getFieldDataInJSONByCriteria("attempts.json", attemptId, "ID", "CurrentQuestionID")[0]);
-	returnValue.quizId = std::stoi(getFieldDataInJSONByCriteria("attempts.json", attemptId, "ID", "QuizID")[0]);
-	returnValue.score = std::stof(getFieldDataInJSONByCriteria("attempts.json", attemptId, "ID", "Score")[0]);
-	returnValue.timeStart = std::stoi(getFieldDataInJSONByCriteria("attempts.json", attemptId, "ID", "TimeStart")[0]);
-	returnValue.timeEnd = std::stoi(getFieldDataInJSONByCriteria("attempts.json", attemptId, "ID", "TimeEnd")[0]);
-	returnValue.userId = std::stoi(getFieldDataInJSONByCriteria("attempts.json", attemptId, "ID", "UserID")[0]);
-	returnValue.inProgress = std::stoi(getFieldDataInJSONByCriteria("attempts.json", attemptId, "ID", "inProgress")[0]);
+	returnValue.currentQuestionId = std::stoi(getFieldDataInJSONByCriteria(
+		"attempts.json", attemptId, "ID", "CurrentQuestionID")[0]
+	);
+
+	returnValue.quizId = std::stoi(getFieldDataInJSONByCriteria(
+		"attempts.json", attemptId, "ID", "QuizID")[0]
+	);
+
+	returnValue.score = std::stof(getFieldDataInJSONByCriteria(
+		"attempts.json", attemptId, "ID", "Score")[0]
+	);
+
+	returnValue.timeStart = std::stoi(getFieldDataInJSONByCriteria(
+		"attempts.json", attemptId, "ID", "TimeStart")[0]
+	);
+
+	returnValue.timeEnd = std::stoi(getFieldDataInJSONByCriteria(
+		"attempts.json", attemptId, "ID", "TimeEnd")[0]
+	);
+
+	returnValue.userId = std::stoi(getFieldDataInJSONByCriteria(
+		"attempts.json", attemptId, "ID", "UserID")[0]
+	);
+	
+	returnValue.inProgress = std::stoi(getFieldDataInJSONByCriteria(
+		"attempts.json", attemptId, "ID", "inProgress")[0]
+	);
+
 	returnValue.answers = getAllAnswersInAttemptWithId(attemptId);
 
 	return returnValue;
@@ -2452,7 +2549,7 @@ AnswerInfo DBManager::getAnswersInfo(int answerId)
 				};
 
 				return (
-					AnswerInfo {
+					AnswerInfo{
 					it.value()["ID"],
 					it.value()["Score"],
 					std::stoi(it.value()["AttemptID"].get<std::string>()),
@@ -2467,7 +2564,7 @@ AnswerInfo DBManager::getAnswersInfo(int answerId)
 			else
 			{
 				return (
-					AnswerInfo {
+					AnswerInfo{
 					it.value()["ID"],
 					NULL,
 					std::stoi(it.value()["AttemptID"].get<std::string>()),
@@ -2591,7 +2688,13 @@ bool DBManager::checkIfValueExistsInField(nlohmann::json json, std::string field
 	return false;
 }
 
-bool DBManager::checkIfValueExistsInField(nlohmann::json json, std::string field, std::string fieldData, std::string field2, std::string fieldData2)
+bool DBManager::checkIfValueExistsInField(
+	nlohmann::json json,
+	std::string field,
+	std::string fieldData,
+	std::string field2,
+	std::string fieldData2
+)
 {
 	for (auto it = json.begin(); it != json.end(); ++it)
 	{
@@ -2604,7 +2707,13 @@ bool DBManager::checkIfValueExistsInField(nlohmann::json json, std::string field
 	return false;
 }
 
-bool DBManager::checkIfValueExistsInField(nlohmann::json json, std::string field, std::string fieldData, std::string field2, int fieldData2)
+bool DBManager::checkIfValueExistsInField(
+	nlohmann::json json,
+	std::string field,
+	std::string fieldData,
+	std::string field2,
+	int fieldData2
+)
 {
 	for (auto it = json.begin(); it != json.end(); ++it)
 	{
@@ -2671,7 +2780,12 @@ std::vector<OrgUser> DBManager::getCourseUsersByCourseId(int courseId)
 	return recordSet;
 }
 
-std::vector<std::string> DBManager::getFieldDataInJSONByCriteria(std::string filename, int criteria, std::string criteriaField, std::string field)
+std::vector<std::string> DBManager::getFieldDataInJSONByCriteria(
+	std::string filename, 
+	int criteria, 
+	std::string criteriaField,
+	std::string field
+)
 {
 	std::vector<std::string> recordSet;
 
@@ -2829,7 +2943,7 @@ std::vector<AnswerInfo> DBManager::getAllAnswersInAttemptWithId(int attemptId)
 					it.value()["Cell3x3"]
 				};
 
-				recordSet.push_back({ 
+				recordSet.push_back({
 					it.value()["ID"],
 					it.value()["Score"],
 					std::stoi(it.value()["AttemptID"].get<std::string>()),
@@ -2838,7 +2952,7 @@ std::vector<AnswerInfo> DBManager::getAllAnswersInAttemptWithId(int attemptId)
 					"",
 					it.value()["Type"],
 					userAnswers
-				});
+					});
 			}
 			else
 			{
@@ -2850,7 +2964,7 @@ std::vector<AnswerInfo> DBManager::getAllAnswersInAttemptWithId(int attemptId)
 					std::stoi(it.value()["QuestionID"].get<std::string>()),
 					it.value()["Answer"],
 					it.value()["Type"]
-				});
+					});
 			}
 		}
 	}

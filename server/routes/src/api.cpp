@@ -1,3 +1,7 @@
+/*! @file api.cpp
+*   @brief A source file for the api blueprint.
+*/
+
 #include <api.h>
 #include <filesystem>
 #include <types.h>
@@ -10,7 +14,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 	ResponseJSONManager responseJSONManager;
 
 	CROW_BP_ROUTE(api, "/register")
-		.methods(crow::HTTPMethod::Post)
+		.methods(crow::HTTPMethod::POST)
 		([&](const crow::request& req, crow::response& res)
 			{
 				auto registerData = crow::query_string("?" + req.body);
@@ -30,19 +34,21 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 				if (recordSet.size() != 0)
 				{
 					res = responseJSONManager.createJSONResponse(false, recordSet, "register");
-					res.code = 400;
+					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;
 				}
 
-				CROW_LOG_INFO << "User with email: " << registerData.get("email") << " is trying to register.";
+				CROW_LOG_INFO << "User with email: " << registerData.get("email") <<
+					" is trying to register.";
 
 				recordSet = validationManager.isRegisterDataValid(registerData);
 
 				// If validation falls
 				if (recordSet.size() != 0)
 				{
-					std::string log = "Failed validation/s at user with email: " + std::string(registerData.get("email")) + " at: ";
+					std::string log = "Failed validation/s at user with email: " +
+						std::string(registerData.get("email")) + " at: ";
 
 					for (auto el : recordSet)
 					{
@@ -52,6 +58,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(false, recordSet, "register");
+					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;
 				}
@@ -67,6 +74,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					std::string log = "Failed to generate salt";
 
 					res = responseJSONManager.createJSONResponse(false, { log }, "register");
+					res.code = crow::status::INTERNAL_SERVER_ERROR;
 					res.end();
 					return;
 				}
@@ -78,6 +86,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					std::string log = "Failed to generate hash";
 
 					res = responseJSONManager.createJSONResponse(false, { log }, "register");
+					res.code = crow::status::INTERNAL_SERVER_ERROR;
 					res.end();
 					return;
 				}
@@ -87,7 +96,8 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 				// If saving to database fails
 				if (recordSet.size() != 0)
 				{
-					std::string log = "Failed to save user with email: " + std::string(registerData.get("email")) + " to the database. Reason/s: ";
+					std::string log = "Failed to save user with email: " +
+						std::string(registerData.get("email")) + " to the database. Reason/s: ";
 
 					for (auto el : recordSet)
 					{
@@ -97,11 +107,13 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(false, recordSet, "register");
+					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;
 				}
 
-				CROW_LOG_INFO << "User with email: " + std::string(registerData.get("email")) + " is successfully register into the database.";
+				CROW_LOG_INFO << "User with email: " + std::string(registerData.get("email")) +
+					" is successfully register into the database.";
 
 				// Create and send request
 				res = responseJSONManager.createJSONResponse(true, recordSet, "register");
@@ -110,7 +122,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 			});
 
 	CROW_BP_ROUTE(api, "/login")
-		.methods(crow::HTTPMethod::Post)
+		.methods(crow::HTTPMethod::POST)
 		([&](const crow::request& req, crow::response& res)
 			{
 				auto loginData = crow::query_string("?" + req.body);
@@ -127,19 +139,21 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 				if (recordSet.size() != 0)
 				{
 					res = responseJSONManager.createJSONResponse(false, recordSet, "login");
-					res.code = 400;
+					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;
 				}
 
-				CROW_LOG_INFO << "User with email: " << loginData.get("loginCredential") << " is trying to register.";
+				CROW_LOG_INFO << "User with email: " <<
+					loginData.get("loginCredential") << " is trying to register.";
 
 				recordSet = validationManager.isLoginDataValid(loginData);
 
 				// If validation falls
 				if (recordSet.size() != 0)
 				{
-					std::string log = "Failed validation/s at user with email: " + std::string(loginData.get("loginCredential")) + " at: ";
+					std::string log = "Failed validation/s at user with email: " +
+						std::string(loginData.get("loginCredential")) + " at: ";
 
 					for (auto el : recordSet)
 					{
@@ -149,6 +163,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(false, recordSet, "login");
+					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;
 				}
@@ -158,7 +173,8 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 				// If login was unsuccessful
 				if (recordSet[0].substr(0, 7) != "Bearer ")
 				{
-					std::string log = "Failed to loggin user with credential: " + std::string(loginData.get("loginCredential")) + ". Reason: ";
+					std::string log = "Failed to loggin user with credential: " +
+						std::string(loginData.get("loginCredential")) + ". Reason: ";
 
 					for (auto el : recordSet)
 					{
@@ -168,11 +184,13 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(false, recordSet, "login");
+					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;
 				}
 
-				CROW_LOG_INFO << "User with credential: " + std::string(loginData.get("loginCredential")) + " is successfully logged in.";
+				CROW_LOG_INFO << "User with credential: " +
+					std::string(loginData.get("loginCredential")) + " is successfully logged in.";
 
 				// Remove the "Bearer "
 				recordSet[0] = recordSet[0].substr(7);
@@ -183,7 +201,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 			});
 
 	CROW_BP_ROUTE(api, "/users/<string>")
-		.methods(crow::HTTPMethod::Get)
+		.methods(crow::HTTPMethod::GET)
 		([&](const crow::request& req, crow::response& res, std::string username)
 			{
 				EnvManager envManager;
@@ -201,15 +219,15 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					// If values is missing
 					if (myauth == "")
 					{
-						res = crow::response(401);
+						res = crow::response(crow::status::UNAUTHORIZED);
 						res.end();
 						return;
 					}
 
-					// Decode the token
+					// Remove "Bearer "
 					std::string mycreds = myauth.substr(7);
 
-					// Verify token
+					// Try to decode and verify token
 					try
 					{
 						auto decoded = jwt::decode<jwt::traits::nlohmann_json>(mycreds);
@@ -218,7 +236,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					}
 					catch (...)
 					{
-						res = crow::response(403);
+						res = crow::response(crow::status::FORBIDDEN);
 						res.end();
 						return;
 					}
@@ -272,6 +290,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 						CROW_LOG_WARNING << log;
 
 						res = responseJSONManager.createJSONResponse(false, recordSet, "user-deletion");
+						res.code = crow::status::BAD_REQUEST;
 						res.end();
 						return;
 					}
@@ -282,13 +301,13 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 				}
 
 				CROW_LOG_WARNING << "Failed to delete user. Reason: Requesting user isn't authorised!";
-				res = crow::response(403);
+				res = crow::response(crow::status::FORBIDDEN);
 				res.end();
 				return;
 			});
 
 	CROW_BP_ROUTE(api, "/users/@me")
-		.methods(crow::HTTPMethod::Patch)
+		.methods(crow::HTTPMethod::PATCH)
 		.middlewares<crow::App<crow::CORSHandler, AuthorisationMiddleware>, AuthorisationMiddleware>()
 		//CROW_MIDDLEWARES(app, AuthorisationMiddleware)
 		([&](const crow::request& req, crow::response& res)
@@ -312,7 +331,8 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 				// If there are null values
 				if (recordSet.size() != 0)
 				{
-					std::string log = "Failed null validation/s at user with id: " + std::to_string(ctx.userId) + " at: ";
+					std::string log = "Failed null validation/s at user with id: " +
+						std::to_string(ctx.userId) + " at: ";
 
 					for (auto el : recordSet)
 					{
@@ -322,7 +342,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(false, recordSet, "user-update");
-					res.code = 400;
+					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;
 				}
@@ -342,6 +362,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(false, recordSet, "user-update");
+					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;
 				}
@@ -360,6 +381,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(false, recordSet, "user-update");
+					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;
 				}
@@ -370,7 +392,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 			});
 
 	CROW_BP_ROUTE(api, "/users/@me/updateAvatarURL")
-		.methods(crow::HTTPMethod::Patch)
+		.methods(crow::HTTPMethod::PATCH)
 		.middlewares<crow::App<crow::CORSHandler, AuthorisationMiddleware>, AuthorisationMiddleware>()
 		//CROW_MIDDLEWARES(app, AuthorisationMiddleware)
 		([&](const crow::request& req, crow::response& res)
@@ -385,10 +407,15 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 				}
 				catch (...)
 				{
-					CROW_LOG_WARNING << "Failed to update user avatar for user with id: " << ctx.userId << ". Reason: Avatar data and file extensions are missing!";
+					CROW_LOG_WARNING << "Failed to update user avatar for user with id: " <<
+						ctx.userId << ". Reason: Avatar data and file extensions are missing!";
 
-					res = responseJSONManager.createJSONResponse(false, { "avatar", "fileExtensions" }, "user-update");
-					res.code = 400;
+					res = responseJSONManager.createJSONResponse(
+						false,
+						{ "avatar", "fileExtensions" },
+						"user-update"
+					);
+					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;
 				}
@@ -404,10 +431,11 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 				}
 				catch (...)
 				{
-					CROW_LOG_WARNING << "Failed to update user avatar for user with id: " << ctx.userId << ". Reason: Avatar data is missing!";
+					CROW_LOG_WARNING << "Failed to update user avatar for user with id: " <<
+						ctx.userId << ". Reason: Avatar data is missing!";
 
 					res = responseJSONManager.createJSONResponse(false, { "avatar" }, "user-update");
-					res.code = 400;
+					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;
 				}
@@ -418,10 +446,15 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 				}
 				catch (...)
 				{
-					CROW_LOG_WARNING << "Failed to update user avatar for user with id: " << ctx.userId << ". Reason: File extension is missing!";
+					CROW_LOG_WARNING << "Failed to update user avatar for user with id: " <<
+						ctx.userId << ". Reason: File extension is missing!";
 
-					res = responseJSONManager.createJSONResponse(false, { "fileExtensions" }, "user-update");
-					res.code = 400;
+					res = responseJSONManager.createJSONResponse(
+						false,
+						{ "fileExtensions" },
+						"user-update"
+					);
+					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;
 				}
@@ -438,12 +471,13 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 				auto file = filePart.body;
 				auto fileExtension = fileExtensionPart.body;
 
-				auto file_handler = std::ofstream("static/avatars/" + std::to_string(ctx.userId) + fileExtension, std::ofstream::binary);
+				auto file_handler = std::ofstream("static/avatars/" +
+					std::to_string(ctx.userId) + fileExtension, std::ofstream::binary);
 
 				if (!file_handler.is_open())
 				{
 					CROW_LOG_ERROR << "Cannot open file for avatar";
-					res = crow::response(500);
+					res = crow::response(crow::status::INTERNAL_SERVER_ERROR);
 					res.end();
 					return;
 				}
@@ -451,8 +485,9 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 				file_handler << file;
 				file_handler.close();
 
-				std::vector<std::string> recordSet;
-				recordSet = dbManager.updateUserAvatar(ctx.userId, std::to_string(ctx.userId) + fileExtension);
+				std::vector<std::string> recordSet = dbManager.updateUserAvatar(
+					ctx.userId, std::to_string(ctx.userId) + fileExtension
+				);
 
 				if (recordSet.size() != 0)
 				{
@@ -466,6 +501,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(false, recordSet, "user-avatar-update");
+					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;
 				}
@@ -476,7 +512,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 			});
 
 	CROW_BP_ROUTE(api, "/createNewOrg")
-		.methods(crow::HTTPMethod::Post)
+		.methods(crow::HTTPMethod::POST)
 		.middlewares<crow::App<crow::CORSHandler, AuthorisationMiddleware>, AuthorisationMiddleware>()
 		//CROW_MIDDLEWARES(app, AuthorisationMiddleware)
 		([&](const crow::request& req, crow::response& res)
@@ -495,20 +531,22 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 				// If there are null values
 				if (recordSet.size() != 0)
 				{
-					res = responseJSONManager.createJSONResponse(false, recordSet, "user-update");
-					res.code = 400;
+					res = responseJSONManager.createJSONResponse(false, recordSet, "organisation-register");
+					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;
 				}
 
-				CROW_LOG_INFO << "User with id: " << ctx.userId << " is trying to create new organisation with name: " << reqData.get("orgName");
+				CROW_LOG_INFO << "User with id: " << ctx.userId
+					<< " is trying to create new organisation with name: " << reqData.get("orgName");
 
 				recordSet = validationManager.isOrgDataValid(reqData);
 
 				// If validation falls
 				if (recordSet.size() != 0)
 				{
-					std::string log = "Failed validation/s at creating organisation with name: " + std::string(reqData.get("orgName")) + " at: ";
+					std::string log = "Failed validation/s at creating organisation with name: " +
+						std::string(reqData.get("orgName")) + " at: ";
 
 					for (auto el : recordSet)
 					{
@@ -518,6 +556,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(false, recordSet, "organisation-register");
+					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;
 				}
@@ -533,6 +572,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					std::string log = "Failed to generate salt";
 
 					res = responseJSONManager.createJSONResponse(false, { log }, "organisation-register");
+					res.code = crow::status::INTERNAL_SERVER_ERROR;
 					res.end();
 					return;
 				}
@@ -544,6 +584,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					std::string log = "Failed to generate hash";
 
 					res = responseJSONManager.createJSONResponse(false, { log }, "organisation-register");
+					res.code = crow::status::INTERNAL_SERVER_ERROR;
 					res.end();
 					return;
 				}
@@ -553,7 +594,8 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 				// If saving to database fails
 				if (recordSet.size() != 0)
 				{
-					std::string log = "Failed to save organisation with name: " + std::string(reqData.get("orgName")) + " to the database. Reason/s: ";
+					std::string log = "Failed to save organisation with name: " +
+						std::string(reqData.get("orgName")) + " to the database. Reason/s: ";
 
 					for (auto el : recordSet)
 					{
@@ -563,6 +605,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(false, recordSet, "organisation-register");
+					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;
 				}
@@ -573,7 +616,8 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 				// then it is not a number
 				if (recordSet[0].size() > 10)
 				{
-					std::string log = "Failed to get organisation with name: " + std::string(reqData.get("orgName")) + " from the database. Reason/s: ";
+					std::string log = "Failed to get organisation with name: " +
+						std::string(reqData.get("orgName")) + " from the database. Reason/s: ";
 
 					for (auto el : recordSet)
 					{
@@ -583,15 +627,22 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(false, recordSet, "organisation-register");
+
 					res.end();
 					return;
 				}
 
-				recordSet = dbManager.addUserToOrganisation(ctx.userId, std::stoi(recordSet[0]), UserRolesInOrgs::ADMIN);
+				recordSet = dbManager.addUserToOrganisation(
+					ctx.userId,
+					std::stoi(recordSet[0]),
+					UserRolesInOrgs::ADMIN
+				);
 
 				if (recordSet.size() != 0)
 				{
-					std::string log = "Failed to add user with id: " + std::to_string(ctx.userId) + " to organisation with name : " + std::string(reqData.get("orgName"));
+					std::string log = "Failed to add user with id: " +
+						std::to_string(ctx.userId) + " to organisation with name : " +
+						std::string(reqData.get("orgName"));
 
 					for (auto el : recordSet)
 					{
@@ -601,11 +652,13 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(false, recordSet, "organisation-register");
+					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;
 				}
 
-				CROW_LOG_INFO << "Organisation with name: " + std::string(reqData.get("orgName")) + " is successfully saved into the database.";
+				CROW_LOG_INFO << "Organisation with name: " + std::string(reqData.get("orgName")) +
+					" is successfully saved into the database.";
 
 				// Create and send request
 				res = responseJSONManager.createJSONResponse(true, recordSet, "organisation-register");
@@ -614,7 +667,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 			});
 
 	CROW_BP_ROUTE(api, "/joinOrg")
-		.methods(crow::HTTPMethod::Post)
+		.methods(crow::HTTPMethod::POST)
 		.middlewares<crow::App<crow::CORSHandler, AuthorisationMiddleware>, AuthorisationMiddleware>()
 		//CROW_MIDDLEWARES(app, AuthorisationMiddleware)
 		([&](const crow::request& req, crow::response& res)
@@ -637,19 +690,21 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 				if (recordSet.size() != 0)
 				{
 					res = responseJSONManager.createJSONResponse(false, recordSet, "user-update");
-					res.code = 400;
+					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;
 				}
 
-				CROW_LOG_INFO << "User with id: " << ctx.userId << " is trying to join organisation with id: " << reqData.get("orgId");
+				CROW_LOG_INFO << "User with id: " << ctx.userId << " is trying to join organisation with id: "
+					<< reqData.get("orgId");
 
 				recordSet = validationManager.isJoinOrgDataValid(reqData);
 
 				// If validation falls
 				if (recordSet.size() != 0)
 				{
-					std::string log = "Failed validation/s at joining in organisation with id: " + std::string(reqData.get("orgId")) + " at: ";
+					std::string log = "Failed validation/s at joining in organisation with id: "
+						+ std::string(reqData.get("orgId")) + " at: ";
 
 					for (auto el : recordSet)
 					{
@@ -659,11 +714,15 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(false, recordSet, "join-org");
+					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;
 				}
 
-				recordSet = dbManager.doesPasswordMatchOrg(reqData.get("password"), std::stoi(reqData.get("orgId")));
+				recordSet = dbManager.doesPasswordMatchOrg(
+					reqData.get("password"),
+					std::stoi(reqData.get("orgId"))
+				);
 
 				// If password is incorrect
 				if (recordSet[0] == "0")
@@ -673,7 +732,8 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 
 				if (recordSet[0] != "1")
 				{
-					std::string log = "Failed to join user with id: " + std::to_string(ctx.userId) + " to organisation with id: " + std::string(reqData.get("orgId")) + ". Reason: ";
+					std::string log = "Failed to join user with id: " + std::to_string(ctx.userId) +
+						" to organisation with id: " + std::string(reqData.get("orgId")) + ". Reason: ";
 
 					for (auto el : recordSet)
 					{
@@ -683,15 +743,22 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(false, recordSet, "join-org");
+					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;
 				}
 
-				recordSet = dbManager.addUserToOrganisation(ctx.userId, std::stoi(reqData.get("orgId")), UserRolesInOrgs::USER);
+				recordSet = dbManager.addUserToOrganisation(
+					ctx.userId,
+					std::stoi(reqData.get("orgId")),
+					UserRolesInOrgs::USER
+				);
 
 				if (recordSet.size() != 0)
 				{
-					std::string log = "Failed to add user with id: " + std::to_string(ctx.userId) + " to organisation with id: " + std::string(reqData.get("orgId")) + ". Reason: ";
+					std::string log = "Failed to add user with id: " + std::to_string(ctx.userId) +
+						" to organisation with id: " +
+						std::string(reqData.get("orgId")) + ". Reason: ";
 
 					for (auto el : recordSet)
 					{
@@ -701,11 +768,13 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(false, recordSet, "join-org");
+					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;
 				}
 
-				CROW_LOG_INFO << "User with id: " << ctx.userId << " is successfully added to organisation with id: " << reqData.get("orgId");
+				CROW_LOG_INFO << "User with id: " << ctx.userId
+					<< " is successfully added to organisation with id: " << reqData.get("orgId");
 
 				res = responseJSONManager.createJSONResponse(true, recordSet, "join-org");
 				res.end();
@@ -713,7 +782,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 			});
 
 	CROW_BP_ROUTE(api, "/updateRolesInOrg")
-		.methods(crow::HTTPMethod::Post)
+		.methods(crow::HTTPMethod::POST)
 		.middlewares<crow::App<crow::CORSHandler, AuthorisationMiddleware>, AuthorisationMiddleware>()
 		//CROW_MIDDLEWARES(app, AuthorisationMiddleware)
 		([&](const crow::request& req, crow::response& res)
@@ -739,12 +808,13 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 				if (recordSet.size() != 0)
 				{
 					res = responseJSONManager.createJSONResponse(false, recordSet, "user-update");
-					res.code = 400;
+					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;
 				}
 
-				CROW_LOG_INFO << "User with id: " << ctx.userId << " is trying to update role on user with id: " << reqData.get("userId") << " on organisation with id: " << reqData.get("orgId");
+				CROW_LOG_INFO << "User with id: " << ctx.userId << " is trying to update role on user with id: " <<
+					reqData.get("userId") << " on organisation with id: " << reqData.get("orgId");
 
 				// Is user authorised
 				// first element - error or true/false
@@ -753,7 +823,9 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 
 				if (recordSet[0] != "1")
 				{
-					std::string log = "Failed to update role on user with id: " + std::string(reqData.get("userId")) + " on organisation with id: " + std::string(reqData.get("orgId")) + ". Reason: ";
+					std::string log = "Failed to update role on user with id: " +
+						std::string(reqData.get("userId")) + " on organisation with id: " +
+						std::string(reqData.get("orgId")) + ". Reason: ";
 
 					for (auto el : recordSet)
 					{
@@ -763,6 +835,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(false, recordSet, "update-user-role-org");
+					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;
 				}
@@ -771,6 +844,22 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 				if (recordSet[1] != "2")
 				{
 					recordSet[0] = "User is unauthorised";
+
+					std::string log = "Failed to update role on user with id: " +
+						std::string(reqData.get("userId")) + " on organisation with id: " +
+						std::string(reqData.get("orgId")) + ". Reason: User is unauthorised";
+
+					CROW_LOG_WARNING << log;
+
+					res = responseJSONManager.createJSONResponse(
+						false,
+						{ "User is unauthorised" },
+						"update-user-role-org"
+					);
+
+					res.code = crow::status::FORBIDDEN;
+					res.end();
+					return;
 				}
 
 				int roleId = std::stoi(reqData.get("roleId"));
@@ -778,20 +867,45 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 				switch (roleId)
 				{
 				case 1:
-					recordSet = dbManager.addUserToOrganisation(std::stoi(reqData.get("userId")), std::stoi(reqData.get("orgId")), UserRolesInOrgs::TEACHER, false);
+					recordSet = dbManager.addUserToOrganisation(
+						std::stoi(reqData.get("userId")),
+						std::stoi(reqData.get("orgId")),
+						UserRolesInOrgs::TEACHER,
+						false
+					);
+
 					break;
 				case 2:
-					recordSet = dbManager.addUserToOrganisation(std::stoi(reqData.get("userId")), std::stoi(reqData.get("orgId")), UserRolesInOrgs::ADMIN, false);
+					recordSet = dbManager.addUserToOrganisation(
+						std::stoi(reqData.get("userId")),
+						std::stoi(reqData.get("orgId")),
+						UserRolesInOrgs::ADMIN,
+						false
+					);
+
 					break;
 				case 0:
-					recordSet = dbManager.addUserToOrganisation(std::stoi(reqData.get("userId")), std::stoi(reqData.get("orgId")), UserRolesInOrgs::USER, false);
+					recordSet = dbManager.addUserToOrganisation(
+						std::stoi(reqData.get("userId")),
+						std::stoi(reqData.get("orgId")),
+						UserRolesInOrgs::USER,
+						false
+					);
+
 					break;
 				default:
-					std::string log = "Failed to update role on user with id: " + std::string(reqData.get("userId")) + " on organisation with id: " + std::string(reqData.get("orgId")) + ". Reason: Role must be 0, 1 or 2";
+					std::string log = "Failed to update role on user with id: " +
+						std::string(reqData.get("userId")) + " on organisation with id: " +
+						std::string(reqData.get("orgId")) + ". Reason: Role must be 0, 1 or 2";
 
 					CROW_LOG_WARNING << log;
 
-					res = responseJSONManager.createJSONResponse(false, { "Role must be 0, 1 or 2" }, "update-user-role-org");
+					res = responseJSONManager.createJSONResponse(
+						false,
+						{ "Role must be 0, 1 or 2" },
+						"update-user-role-org"
+					);
+					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;
 					break;
@@ -799,7 +913,9 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 
 				if (recordSet.size() != 0)
 				{
-					std::string log = "Failed to update role on user with id: " + std::string(reqData.get("userId")) + " on organisation with id: " + std::string(reqData.get("orgId")) + ". Reason: ";
+					std::string log = "Failed to update role on user with id: " +
+						std::string(reqData.get("userId")) + " on organisation with id: " +
+						std::string(reqData.get("orgId")) + ". Reason: ";
 
 					for (auto el : recordSet)
 					{
@@ -809,13 +925,15 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(false, recordSet, "update-user-role-org");
+					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;
 				}
 
-				CROW_LOG_INFO << "The role on user with id: " << reqData.get("userId") << " is successfully updated on organisation with id: " << reqData.get("orgId");
+				CROW_LOG_INFO << "The role on user with id: " << reqData.get("userId") <<
+					" is successfully updated on organisation with id: " << reqData.get("orgId");
 
-				res = responseJSONManager.createJSONResponse(true, recordSet, "update-user-role-org");
+				res = responseJSONManager.createJSONResponse(true, recordSet, "update-user-role-org");;
 				res.end();
 				return;
 			});
@@ -829,7 +947,9 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 
 				if (orgName == "all")
 				{
-					CROW_LOG_INFO << "User with id: " << ctx.userId << " is trying to get information for all organisations.";
+					CROW_LOG_INFO << "User with id: " << ctx.userId <<
+						" is trying to get information for all organisations.";
+
 					auto orgInfo = dbManager.getAllOrgsInfo();
 
 					if (!orgInfo[0].errors.empty())
@@ -844,6 +964,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 						CROW_LOG_WARNING << log;
 
 						res = responseJSONManager.createJSONResponse(false, orgInfo[0].errors, "get-organisation");
+						res.code = crow::status::BAD_REQUEST;
 						res.end();
 						return;
 					}
@@ -853,7 +974,8 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					return;
 				}
 
-				CROW_LOG_INFO << "User with id: " << ctx.userId << " is trying to get information for organisation: " << orgName;
+				CROW_LOG_INFO << "User with id: " << ctx.userId <<
+					" is trying to get information for organisation: " << orgName;
 
 				// Try to get organisation's id
 				std::vector<std::string> recordSet = dbManager.getOrgIdByName(orgName);
@@ -862,7 +984,8 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 				// then it is not a number
 				if (recordSet[0].size() > 10)
 				{
-					std::string log = "Failed to get organisation's id with name: " + orgName + " from the database. Reason/s: ";
+					std::string log = "Failed to get organisation's id with name: " +
+						orgName + " from the database. Reason/s: ";
 
 					for (auto el : recordSet)
 					{
@@ -872,6 +995,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(false, recordSet, "get-organisation");
+					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;
 				}
@@ -881,13 +1005,14 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 				// Error happend
 				if (recordSet[0] != "1")
 				{
-					std::string log = "Failed to get organisation info with name: " + orgName + ". Reason: User is unauthorised";
+					std::string log = "Failed to get organisation info with name: " +
+						orgName + ". Reason: User is unauthorised";
 					recordSet[0] = "User is unauthorised";
 
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(false, recordSet, "get-organisation");
-					res.code = 403;
+					res.code = crow::status::FORBIDDEN;
 					res.end();
 					return;
 				}
@@ -896,7 +1021,8 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 
 				if (!orgInfo.errors.empty())
 				{
-					std::string log = "Failed to get organisation info with name: " + orgName + ". Reasons: ";
+					std::string log = "Failed to get organisation info with name: " +
+						orgName + ". Reasons: ";
 
 					for (auto el : orgInfo.errors)
 					{
@@ -906,6 +1032,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(false, recordSet, "get-organisation");
+					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;
 				}
@@ -922,7 +1049,8 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 			{
 				auto& ctx = app.get_context<AuthorisationMiddleware>(req);
 
-				CROW_LOG_INFO << "User with id: " << ctx.userId << " is trying to delete organisation with name: " << orgName;
+				CROW_LOG_INFO << "User with id: " << ctx.userId <<
+					" is trying to delete organisation with name: " << orgName;
 
 				// Try to get organisation's id
 				std::vector<std::string> recordSet = dbManager.getOrgIdByName(orgName);
@@ -931,7 +1059,8 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 				// then it is not a number
 				if (recordSet[0].size() > 10)
 				{
-					std::string log = "Failed to get organisation's id with name: " + orgName + " from the database. Reason/s: ";
+					std::string log = "Failed to get organisation's id with name: " +
+						orgName + " from the database. Reason/s: ";
 
 					for (auto el : recordSet)
 					{
@@ -941,6 +1070,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(false, recordSet, "organisation-deletion");
+					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;
 				}
@@ -950,13 +1080,17 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 				// Error happend
 				if (recordSet[0] != "1" || recordSet[1] != "2")
 				{
-					std::string log = "Failed to delete organisation with name: " + orgName + ". Reason: User is unauthorised";
-					recordSet[0] = "User is unauthorised";
+					std::string log = "Failed to delete organisation with name: " +
+						orgName + ". Reason: User is unauthorised";
 
 					CROW_LOG_WARNING << log;
 
-					res = responseJSONManager.createJSONResponse(false, recordSet, "organisation-deletion");
-					res.code = 403;
+					res = responseJSONManager.createJSONResponse(
+						false,
+						{ "User is unauthorised" },
+						"organisation-deletion"
+					);
+					res.code = crow::status::FORBIDDEN;
 					res.end();
 					return;
 				}
@@ -975,6 +1109,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(false, recordSet, "organisation-deletion");
+					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;
 				}
@@ -992,7 +1127,8 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 				auto& ctx = app.get_context<AuthorisationMiddleware>(req);
 				auto updateData = crow::query_string("?" + req.body);
 
-				CROW_LOG_INFO << "User with id: " << ctx.userId << " is trying to update information for organisation with name: " << orgName;
+				CROW_LOG_INFO << "User with id: " << ctx.userId <<
+					" is trying to update information for organisation with name: " << orgName;
 
 				std::vector<std::string> recordSet = validationManager.checkForNullValues(
 					updateData,
@@ -1015,7 +1151,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(false, recordSet, "organisation-deletion");
-					res.code = 400;
+					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;
 				}
@@ -1035,6 +1171,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(false, recordSet, "organisation-update");
+					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;
 				}
@@ -1046,7 +1183,8 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 				// then it is not a number
 				if (recordSet[0].size() > 10)
 				{
-					std::string log = "Failed to get organisation's id with name: " + orgName + " from the database. Reason/s: ";
+					std::string log = "Failed to get organisation's id with name: " +
+						orgName + " from the database. Reason/s: ";
 
 					for (auto el : recordSet)
 					{
@@ -1056,6 +1194,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(false, recordSet, "organisation-update");
+					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;
 				}
@@ -1065,18 +1204,25 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 				// Error happend
 				if (recordSet[0] != "1" || recordSet[1] != "2")
 				{
-					std::string log = "Failed to update organisation info with name: " + orgName + ". Reason: User is unauthorised";
-					recordSet[0] = "User is unauthorised";
+					std::string log = "Failed to update organisation info with name: " +
+						orgName + ". Reason: User is unauthorised";
 
 					CROW_LOG_WARNING << log;
 
-					res = responseJSONManager.createJSONResponse(false, recordSet, "organisation-update");
-					res.code = 403;
+					res = responseJSONManager.createJSONResponse(
+						false,
+						{ "User is unauthorised" },
+						"organisation-update"
+					);
+
+					res.code = crow::status::FORBIDDEN;;
 					res.end();
 					return;
 				}
 
-				recordSet = dbManager.updateOrg(std::stoi(dbManager.getOrgIdByName(orgName)[0]), updateData);
+				recordSet = dbManager.updateOrg(
+					std::stoi(dbManager.getOrgIdByName(orgName)[0]), updateData
+				);
 
 				if (recordSet.size() != 0)
 				{
@@ -1090,6 +1236,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(false, recordSet, "organisation-update");
+					crow::status::BAD_REQUEST;
 					res.end();
 					return;
 				}
@@ -1124,25 +1271,30 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 				if (recordSet.size() != 0)
 				{
 					res = responseJSONManager.createJSONResponse(false, recordSet, "organisation-deletion");
-					res.code = 400;
+					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;
 				}
 
-				CROW_LOG_INFO << "User with id: " << ctx.userId << " is trying to create new course with name: " << reqData.get("courseName") << " in organisation with id: " << reqData.get("orgId");
+				CROW_LOG_INFO << "User with id: " << ctx.userId << " is trying to create new course with name: "
+					<< reqData.get("courseName") << " in organisation with id: " << reqData.get("orgId");
 
 				recordSet = dbManager.isUserInOrgAndGetRole(ctx.userId, std::stoi(reqData.get("orgId")));
 
 				// Error happend
 				if (recordSet[0] != "1" || recordSet[1] != "2")
 				{
-					std::string log = "Failed to create course with name: " + std::string(reqData.get("courseName")) + ". Reason: User is unauthorised";
-					recordSet[0] = "User is unauthorised";
+					std::string log = "Failed to create course with name: " +
+						std::string(reqData.get("courseName")) + ". Reason: User is unauthorised";
 
 					CROW_LOG_WARNING << log;
 
-					res = responseJSONManager.createJSONResponse(false, recordSet, "organisation-deletion");
-					res.code = 403;
+					res = responseJSONManager.createJSONResponse(
+						false,
+						{ "User is unauthorised" },
+						"organisation-deletion"
+					);
+					res.code = crow::status::FORBIDDEN;
 					res.end();
 					return;
 				}
@@ -1152,7 +1304,8 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 				// If validation falls
 				if (recordSet.size() != 0)
 				{
-					std::string log = "Failed validation/s at creating course with name: " + std::string(reqData.get("courseName")) + " at: ";
+					std::string log = "Failed validation/s at creating course with name: " +
+						std::string(reqData.get("courseName")) + " at: ";
 
 					for (auto el : recordSet)
 					{
@@ -1162,6 +1315,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(false, recordSet, "course-register");
+					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;
 				}
@@ -1177,6 +1331,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					std::string log = "Failed to generate salt";
 
 					res = responseJSONManager.createJSONResponse(false, { log }, "course-register");
+					res.code = crow::status::INTERNAL_SERVER_ERROR;
 					res.end();
 					return;
 				}
@@ -1188,6 +1343,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					std::string log = "Failed to generate hash";
 
 					res = responseJSONManager.createJSONResponse(false, { log }, "course-register");
+					res.code = crow::status::INTERNAL_SERVER_ERROR;
 					res.end();
 					return;
 				}
@@ -1197,7 +1353,8 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 				// If saving to database fails
 				if (recordSet.size() != 0)
 				{
-					std::string log = "Failed to save course with name: " + std::string(reqData.get("courseName")) + " to the database. Reason/s: ";
+					std::string log = "Failed to save course with name: " +
+						std::string(reqData.get("courseName")) + " to the database. Reason/s: ";
 
 					for (auto el : recordSet)
 					{
@@ -1207,11 +1364,13 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(false, recordSet, "course-register");
+					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;
 				}
 
-				CROW_LOG_INFO << "Course with name: " + std::string(reqData.get("courseName")) + " is successfully saved into the database.";
+				CROW_LOG_INFO << "Course with name: " + std::string(reqData.get("courseName")) +
+					" is successfully saved into the database.";
 
 				// Create and send request
 				res = responseJSONManager.createJSONResponse(true, recordSet, "course-register");
@@ -1243,18 +1402,20 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 				if (recordSet.size() != 0)
 				{
 					res = responseJSONManager.createJSONResponse(false, recordSet, "join-course");
-					res.code = 400;
+					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;
 				}
 
-				CROW_LOG_INFO << "User with id: " << ctx.userId << " is trying to join course with id: " << reqData.get("courseId");
+				CROW_LOG_INFO << "User with id: " << ctx.userId <<
+					" is trying to join course with id: " << reqData.get("courseId");
 
 				CourseInfo courseInfo = dbManager.getCourseInfo(std::stoi(reqData.get("courseId")));
 
 				if (!courseInfo.errors.empty())
 				{
-					std::string log = "Failed to get course info for course with id: " + std::string(reqData.get("courseId")) + ". Reasons: ";
+					std::string log = "Failed to get course info for course with id: " +
+						std::string(reqData.get("courseId")) + ". Reasons: ";
 
 					for (auto el : courseInfo.errors)
 					{
@@ -1264,6 +1425,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(false, courseInfo.errors, "join-course");
+					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;
 				}
@@ -1273,13 +1435,17 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 				// Error happend
 				if (recordSet[0] != "1")
 				{
-					std::string log = "Failed to join in course with id: " + std::string(reqData.get("courseId")) + ". Reason: User is unauthorised";
-					recordSet[0] = "User is unauthorised";
+					std::string log = "Failed to join in course with id: " +
+						std::string(reqData.get("courseId")) + ". Reason: User is unauthorised";
 
 					CROW_LOG_WARNING << log;
 
-					res = responseJSONManager.createJSONResponse(false, recordSet, "join-course");
-					res.code = 403;
+					res = responseJSONManager.createJSONResponse(
+						false,
+						{ "User is unauthorised" },
+						"join-course"
+					);
+					res.code = crow::status::FORBIDDEN;
 					res.end();
 					return;
 				}
@@ -1289,7 +1455,8 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 				// If validation falls
 				if (recordSet.size() != 0)
 				{
-					std::string log = "Failed validation/s at joining in course with id: " + std::string(reqData.get("courseId")) + " at: ";
+					std::string log = "Failed validation/s at joining in course with id: " +
+						std::string(reqData.get("courseId")) + " at: ";
 
 					for (auto el : recordSet)
 					{
@@ -1299,11 +1466,14 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(false, recordSet, "join-course");
+					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;
 				}
 
-				recordSet = dbManager.doesPasswordMatchCourse(reqData.get("password"), std::stoi(reqData.get("courseId")));
+				recordSet = dbManager.doesPasswordMatchCourse(
+					reqData.get("password"), std::stoi(reqData.get("courseId"))
+				);
 
 				// If password is incorrect
 				if (recordSet[0] == "0")
@@ -1313,7 +1483,9 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 
 				if (recordSet[0] != "1")
 				{
-					std::string log = "Failed to join user with id: " + std::to_string(ctx.userId) + " to course with id: " + std::string(reqData.get("courseId")) + ". Reason: ";
+					std::string log = "Failed to join user with id: " +
+						std::to_string(ctx.userId) + " to course with id: " +
+						std::string(reqData.get("courseId")) + ". Reason: ";
 
 					for (auto el : recordSet)
 					{
@@ -1323,15 +1495,20 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(false, recordSet, "join-course");
+					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;
 				}
 
-				recordSet = dbManager.addUserToCourse(ctx.userId, std::stoi(reqData.get("courseId")), UserRolesInOrgs::USER);
+				recordSet = dbManager.addUserToCourse(
+					ctx.userId, std::stoi(reqData.get("courseId")), UserRolesInOrgs::USER
+				);
 
 				if (recordSet.size() != 0)
 				{
-					std::string log = "Failed to add user with id: " + std::to_string(ctx.userId) + " to course with id: " + std::string(reqData.get("courseId")) + ". Reason: ";
+					std::string log = "Failed to add user with id: " +
+						std::to_string(ctx.userId) + " to course with id: " +
+						std::string(reqData.get("courseId")) + ". Reason: ";
 
 					for (auto el : recordSet)
 					{
@@ -1341,11 +1518,13 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(false, recordSet, "join-course");
+					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;
 				}
 
-				CROW_LOG_INFO << "User with id: " << ctx.userId << " is successfully added to course with id: " << reqData.get("courseId");
+				CROW_LOG_INFO << "User with id: " << ctx.userId <<
+					" is successfully added to course with id: " << reqData.get("courseId");
 
 				res = responseJSONManager.createJSONResponse(true, recordSet, "join-course");
 				res.end();
@@ -1377,18 +1556,20 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 				if (recordSet.size() != 0)
 				{
 					res = responseJSONManager.createJSONResponse(false, recordSet, "add-teacher");
-					res.code = 400;
+					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;
 				}
 
-				CROW_LOG_INFO << "User with id: " << ctx.userId << " is trying to add teacher with id: " << reqData.get("teacherId") << " to course with id: " << reqData.get("courseId");
+				CROW_LOG_INFO << "User with id: " << ctx.userId << " is trying to add teacher with id: " <<
+					reqData.get("teacherId") << " to course with id: " << reqData.get("courseId");
 
 				CourseInfo courseInfo = dbManager.getCourseInfo(std::stoi(reqData.get("courseId")));
 
 				if (!courseInfo.errors.empty())
 				{
-					std::string log = "Failed to get course info for course with name: " + std::string(reqData.get("courseId")) + ". Reasons: ";
+					std::string log = "Failed to get course info for course with name: " +
+						std::string(reqData.get("courseId")) + ". Reasons: ";
 
 					for (auto el : courseInfo.errors)
 					{
@@ -1398,6 +1579,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(false, courseInfo.errors, "add-techer");
+					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;
 				}
@@ -1407,13 +1589,15 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 				// User is not admin
 				if (recordSet[0] != "1" || recordSet[1] != "2")
 				{
-					std::string log = "Failed to add teacher with id: " + std::string(reqData.get("teacherId")) + " to course with id : " + std::string(reqData.get("courseId")) + ". Reason : User is unauthorised";
-					recordSet[0] = "User is unauthorised";
+					std::string log = "Failed to add teacher with id: " +
+						std::string(reqData.get("teacherId")) +
+						" to course with id : " + std::string(reqData.get("courseId")) +
+						". Reason : User is unauthorised";
 
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(false, recordSet, "add-techer");
-					res.code = 403;
+					res.code = crow::status::FORBIDDEN;
 					res.end();
 					return;
 				}
@@ -1423,21 +1607,30 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 				// User is not admin
 				if (recordSet[0] != "1" || recordSet[1] != "1")
 				{
-					std::string log = "Failed to add teacher with id: " + std::string(reqData.get("teacherId")) + " to course with id: " + std::string(reqData.get("courseId")) + ". Reason : User is unauthorised";
-					recordSet[0] = "The user is not a teacher in this org";
+					std::string log = "Failed to add teacher with id: " +
+						std::string(reqData.get("teacherId")) + " to course with id: " +
+						std::string(reqData.get("courseId")) + ". Reason : User is unauthorised";
 
 					CROW_LOG_WARNING << log;
 
-					res = responseJSONManager.createJSONResponse(false, recordSet, "add-techer");
+					res = responseJSONManager.createJSONResponse(
+						false, { "The user is not a teacher in this org" }, "add-techer"
+					);
+					res.code = crow::status::FORBIDDEN;
 					res.end();
 					return;
 				}
 
-				recordSet = dbManager.addUserToCourse(std::stoi(reqData.get("teacherId")), std::stoi(reqData.get("courseId")), UserRolesInOrgs::TEACHER);
+				recordSet = dbManager.addUserToCourse(
+					std::stoi(reqData.get("teacherId")),
+					std::stoi(reqData.get("courseId")),
+					UserRolesInOrgs::TEACHER
+				);
 
 				if (recordSet.size() != 0)
 				{
-					std::string log = "Failed to add user with id: " + std::to_string(ctx.userId) + " to course with id: " + std::string(reqData.get("courseId")) + ". Reason: ";
+					std::string log = "Failed to add user with id: " + std::to_string(ctx.userId) +
+						" to course with id: " + std::string(reqData.get("courseId")) + ". Reason: ";
 
 					for (auto el : recordSet)
 					{
@@ -1447,11 +1640,13 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(false, recordSet, "add-techer");
+					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;
 				}
 
-				CROW_LOG_INFO << "Teacger with id: " << reqData.get("teacherId") << " is successfully added to course with id: " << reqData.get("courseId");
+				CROW_LOG_INFO << "Teacger with id: " << reqData.get("teacherId") <<
+					" is successfully added to course with id: " << reqData.get("courseId");
 
 				res = responseJSONManager.createJSONResponse(true, recordSet, "add-techer");
 				res.end();
@@ -1465,13 +1660,15 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 			{
 				auto& ctx = app.get_context<AuthorisationMiddleware>(req);
 
-				CROW_LOG_INFO << "User with id: " << ctx.userId << " is trying to get information for course: " << courseId;
+				CROW_LOG_INFO << "User with id: " << ctx.userId <<
+					" is trying to get information for course: " << courseId;
 
 				CourseInfo courseInfo = dbManager.getCourseInfo(courseId);
 
 				if (!courseInfo.errors.empty())
 				{
-					std::string log = "Failed to get course info for course with name: " + std::to_string(courseId) + ". Reasons: ";
+					std::string log = "Failed to get course info for course with name: " +
+						std::to_string(courseId) + ". Reasons: ";
 
 					for (auto el : courseInfo.errors)
 					{
@@ -1481,6 +1678,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(false, courseInfo.errors, "get-course");
+					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;
 				}
@@ -1490,13 +1688,13 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 				// Error happend
 				if (recordSet[0] != "1")
 				{
-					std::string log = "Failed to get course info with id: " + std::to_string(courseId) + ". Reason: User is unauthorised";
-					recordSet[0] = "User is unauthorised";
+					std::string log = "Failed to get course info with id: " +
+						std::to_string(courseId) + ". Reason: User is unauthorised";
 
 					CROW_LOG_WARNING << log;
 
-					res = responseJSONManager.createJSONResponse(false, recordSet, "get-course");
-					res.code = 403;
+					res = responseJSONManager.createJSONResponse(false, { "User is unauthorised" }, "get-course");
+					res.code = crow::status::FORBIDDEN;
 					res.end();
 					return;
 				}
@@ -1512,13 +1710,13 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 
 				if (recordSet[0] != "1")
 				{
-					std::string log = "Failed to get course info with id: " + std::to_string(courseId) + ". Reason: User is unauthorised";
-					recordSet[0] = "User is unauthorised";
+					std::string log = "Failed to get course info with id: " +
+						std::to_string(courseId) + ". Reason: User is unauthorised";
 
 					CROW_LOG_WARNING << log;
 
-					res = responseJSONManager.createJSONResponse(false, recordSet, "get-course");
-					res.code = 403;
+					res = responseJSONManager.createJSONResponse(false, { "User is unauthorised" }, "get-course");
+					res.code = crow::status::FORBIDDEN;
 					res.end();
 					return;
 				}
@@ -1535,13 +1733,15 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 			{
 				auto& ctx = app.get_context<AuthorisationMiddleware>(req);
 
-				CROW_LOG_INFO << "User with id: " << ctx.userId << " is trying to delete course with id: " << courseId;
+				CROW_LOG_INFO << "User with id: " << ctx.userId <<
+					" is trying to delete course with id: " << courseId;
 
 				CourseInfo courseInfo = dbManager.getCourseInfo(courseId);
 
 				if (!courseInfo.errors.empty())
 				{
-					std::string log = "Failed to get course info for course with id: " + std::to_string(courseId) + ". Reasons: ";
+					std::string log = "Failed to get course info for course with id: " +
+						std::to_string(courseId) + ". Reasons: ";
 
 					for (auto el : courseInfo.errors)
 					{
@@ -1551,6 +1751,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(false, courseInfo.errors, "course-deletion");
+					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;
 				}
@@ -1560,13 +1761,13 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 				// Error happend
 				if (recordSet[0] != "1" || recordSet[1] != "2")
 				{
-					std::string log = "Failed to delete course with id: " + std::to_string(courseId) + ". Reason: User is unauthorised";
-					recordSet[0] = "User is unauthorised";
+					std::string log = "Failed to delete course with id: " +
+						std::to_string(courseId) + ". Reason: User is unauthorised";
 
 					CROW_LOG_WARNING << log;
 
-					res = responseJSONManager.createJSONResponse(false, recordSet, "course-deletion");
-					res.code = 403;
+					res = responseJSONManager.createJSONResponse(false, { "User is unauthorised" }, "course-deletion");
+					res.code = crow::status::FORBIDDEN;
 					res.end();
 					return;
 				}
@@ -1585,6 +1786,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(false, recordSet, "course-deletion");
+					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;
 				}
@@ -1602,7 +1804,8 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 				auto& ctx = app.get_context<AuthorisationMiddleware>(req);
 				auto updateData = crow::query_string("?" + req.body);
 
-				CROW_LOG_INFO << "User with id: " << ctx.userId << " is trying to update information for course with id: " << courseId;
+				CROW_LOG_INFO << "User with id: " << ctx.userId <<
+					" is trying to update information for course with id: " << courseId;
 
 				std::vector<std::string> recordSet = validationManager.checkForNullValues(
 					updateData,
@@ -1610,7 +1813,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 						"courseName",
 						"password"
 					}
-					);
+				);
 
 				// If there are null values
 				if (recordSet.size() != 0)
@@ -1625,7 +1828,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(false, recordSet, "course-update");
-					res.code = 400;
+					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;
 				}
@@ -1635,7 +1838,8 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 				// If validation falls
 				if (recordSet.size() != 0)
 				{
-					std::string log = "Failed validation/s at course with id: " + std::to_string(courseId) + " at: ";
+					std::string log = "Failed validation/s at course with id: " +
+						std::to_string(courseId) + " at: ";
 
 					for (auto el : recordSet)
 					{
@@ -1645,6 +1849,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(false, recordSet, "course-update");
+					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;
 				}
@@ -1653,13 +1858,17 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 
 				if (recordSet[0] != "1")
 				{
-					std::string log = "Failed to update course info with id: " + std::to_string(courseId) + ". Reason: User is unauthorised";
-					recordSet[0] = "User is unauthorised";
+					std::string log = "Failed to update course info with id: " +
+						std::to_string(courseId) + ". Reason: User is unauthorised";
 
 					CROW_LOG_WARNING << log;
 
-					res = responseJSONManager.createJSONResponse(false, recordSet, "course-update");
-					res.code = 403;
+					res = responseJSONManager.createJSONResponse(
+						false,
+						{ "User is unauthorised" },
+						"course-update"
+					);
+					res.code = crow::status::FORBIDDEN;
 					res.end();
 					return;
 				}
@@ -1678,6 +1887,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(false, recordSet, "course-update");
+					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;
 				}
@@ -1705,30 +1915,39 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					{
 						"courseId"
 					}
-				);
+					);
 
 				// If there are null values
 				if (recordSet.size() != 0)
 				{
 					res = responseJSONManager.createJSONResponse(false, recordSet, "topic-register");
-					res.code = 400;
+					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;
 				}
 
-				CROW_LOG_INFO << "User with id: " << ctx.userId << " is trying to create new topic with name: " << reqData.get("topicName") << " in course with id: " << reqData.get("courseId");
+				CROW_LOG_INFO << "User with id: " << ctx.userId <<
+					" is trying to create new topic with name: " <<
+					reqData.get("topicName") << " in course with id: " <<
+					reqData.get("courseId");
 
 				recordSet = dbManager.canUserAccessCourse(std::stoi(reqData.get("courseId")), ctx.userId, true);
 
 				if (recordSet[0] != "1")
 				{
-					std::string log = "Failed to create new topic with name: " + std::string(reqData.get("topicName")) + ". Reason: User is unauthorised";
-					recordSet[0] = "User is unauthorised";
+					std::string log = "Failed to create new topic with name: " +
+						std::string(reqData.get("topicName")) +
+						". Reason: User is unauthorised";
 
 					CROW_LOG_WARNING << log;
 
-					res = responseJSONManager.createJSONResponse(false, recordSet, "topic-register");
-					res.code = 403;
+					res = responseJSONManager.createJSONResponse(
+						false,
+						{ "User is unauthorised" },
+						"topic-register"
+					);
+
+					res.code = crow::status::FORBIDDEN;
 					res.end();
 					return;
 				}
@@ -1738,7 +1957,8 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 				// If saving to database fails
 				if (recordSet.size() != 0)
 				{
-					std::string log = "Failed to save topic with name: " + std::string(reqData.get("topicName")) + " to the database. Reason/s: ";
+					std::string log = "Failed to save topic with name: " +
+						std::string(reqData.get("topicName")) + " to the database. Reason/s: ";
 
 					for (auto el : recordSet)
 					{
@@ -1748,11 +1968,13 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(false, recordSet, "topic-register");
+					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;
 				}
 
-				CROW_LOG_INFO << "Topic with name: " + std::string(reqData.get("topicName")) + " is successfully saved into the database.";
+				CROW_LOG_INFO << "Topic with name: " + std::string(reqData.get("topicName")) +
+					" is successfully saved into the database.";
 
 				// Create and send request
 				res = responseJSONManager.createJSONResponse(true, recordSet, "topic-register");
@@ -1767,13 +1989,15 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 			{
 				auto& ctx = app.get_context<AuthorisationMiddleware>(req);
 
-				CROW_LOG_INFO << "User with id: " << ctx.userId << " is trying to get information for topic: " << topicId;
+				CROW_LOG_INFO << "User with id: " << ctx.userId << \
+					" is trying to get information for topic: " << topicId;
 
 				TopicInfo topicInfo = dbManager.getTopicInfo(topicId);
 
 				if (!topicInfo.errors.empty())
 				{
-					std::string log = "Failed to get topic info for topic with id: " + std::to_string(topicId) + ". Reasons: ";
+					std::string log = "Failed to get topic info for topic with id: " +
+						std::to_string(topicId) + ". Reasons: ";
 
 					for (auto el : topicInfo.errors)
 					{
@@ -1783,6 +2007,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(false, topicInfo.errors, "get-topic");
+					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;
 				}
@@ -1791,13 +2016,17 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 
 				if (recordSet[0] != "1")
 				{
-					std::string log = "Failed to get topic with id: " + std::to_string(topicId) + ". Reason: User is unauthorised";
-					recordSet[0] = "User is unauthorised";
+					std::string log = "Failed to get topic with id: " +
+						std::to_string(topicId) + ". Reason: User is unauthorised";
 
 					CROW_LOG_WARNING << log;
 
-					res = responseJSONManager.createJSONResponse(false, recordSet, "get-topic");
-					res.code = 403;
+					res = responseJSONManager.createJSONResponse(
+						false,
+						{ "User is unauthorised" },
+						"get-topic"
+					);
+					res.code = crow::status::FORBIDDEN;
 					res.end();
 					return;
 				}
@@ -1814,13 +2043,15 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 			{
 				auto& ctx = app.get_context<AuthorisationMiddleware>(req);
 
-				CROW_LOG_INFO << "User with id: " << ctx.userId << " is trying to delete topic with id: " << topicId;
+				CROW_LOG_INFO << "User with id: " << ctx.userId <<
+					" is trying to delete topic with id: " << topicId;
 
 				TopicInfo topicInfo = dbManager.getTopicInfo(topicId);
 
 				if (!topicInfo.errors.empty())
 				{
-					std::string log = "Failed to delete topic with id: " + std::to_string(topicId) + ". Reasons: ";
+					std::string log = "Failed to delete topic with id: " +
+						std::to_string(topicId) + ". Reasons: ";
 
 					for (auto el : topicInfo.errors)
 					{
@@ -1830,6 +2061,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(false, topicInfo.errors, "topic-deletion");
+					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;
 				}
@@ -1838,13 +2070,13 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 
 				if (recordSet[0] != "1")
 				{
-					std::string log = "Failed to delete topic with id: " + std::to_string(topicId) + ". Reason: User is unauthorised";
-					recordSet[0] = "User is unauthorised";
+					std::string log = "Failed to delete topic with id: " +
+						std::to_string(topicId) + ". Reason: User is unauthorised";
 
 					CROW_LOG_WARNING << log;
 
-					res = responseJSONManager.createJSONResponse(false, recordSet, "topic-deletion");
-					res.code = 403;
+					res = responseJSONManager.createJSONResponse(false, { "User is unauthorised" }, "topic-deletion");
+					res.code = crow::status::FORBIDDEN;
 					res.end();
 					return;
 				}
@@ -1863,6 +2095,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(false, recordSet, "topic-deletion");
+					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;
 				}
@@ -1880,20 +2113,21 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 				auto& ctx = app.get_context<AuthorisationMiddleware>(req);
 				auto updateData = crow::query_string("?" + req.body);
 
-				CROW_LOG_INFO << "User with id: " << ctx.userId << " is trying to update information for topic with id: " << topicId;
+				CROW_LOG_INFO << "User with id: " << ctx.userId <<
+					" is trying to update information for topic with id: " << topicId;
 
 				std::vector<std::string> recordSet = validationManager.checkForNullValues(
 					updateData,
 					{
 						"topicName"
 					}
-					);
+				);
 
 				// If there are null values
 				if (recordSet.size() != 0)
 				{
 					res = responseJSONManager.createJSONResponse(false, recordSet, "topic-update");
-					res.code = 400;
+					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;
 				}
@@ -1902,7 +2136,8 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 
 				if (!topicInfo.errors.empty())
 				{
-					std::string log = "Failed to update topic with id: " + std::to_string(topicId) + ". Reasons: ";
+					std::string log = "Failed to update topic with id: " +
+						std::to_string(topicId) + ". Reasons: ";
 
 					for (auto el : topicInfo.errors)
 					{
@@ -1912,6 +2147,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(false, topicInfo.errors, "topic-update");
+					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;
 				}
@@ -1920,13 +2156,18 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 
 				if (recordSet[0] != "1")
 				{
-					std::string log = "Failed to update topic with id: " + std::to_string(topicId) + ". Reason: User is unauthorised";
-					recordSet[0] = "User is unauthorised";
+					std::string log = "Failed to update topic with id: " +
+						std::to_string(topicId) + ". Reason: User is unauthorised";
 
 					CROW_LOG_WARNING << log;
 
-					res = responseJSONManager.createJSONResponse(false, recordSet, "topic-update");
-					res.code = 403;
+					res = responseJSONManager.createJSONResponse(
+						false,
+						{ "User is unauthorised" },
+						"topic-update"
+					);
+
+					res.code = crow::status::FORBIDDEN;
 					res.end();
 					return;
 				}
@@ -1945,6 +2186,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(false, recordSet, "topic-update");
+					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;
 				}
@@ -1962,7 +2204,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 			{
 				auto reqData = crow::query_string("?" + req.body);
 				auto& ctx = app.get_context<AuthorisationMiddleware>(req);
-				
+
 				std::vector<std::string> recordSet = validationManager.checkForNullValues(
 					reqData,
 					{
@@ -1973,28 +2215,36 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					{
 						"topicId"
 					}
-				);
+					);
 
 				// If there are null values
 				if (recordSet.size() != 0)
 				{
 					res = responseJSONManager.createJSONResponse(false, recordSet, "lesson-register");
-					res.code = 400;
+					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;
 				}
 
-				CROW_LOG_INFO << "User with id: " << ctx.userId << " is trying to create new lesson with name: " << reqData.get("lessonName") << " in topic with id: " << reqData.get("topicId");
+				CROW_LOG_INFO << "User with id: " << ctx.userId <<
+					" is trying to create new lesson with name: " <<
+					reqData.get("lessonName") << " in topic with id: " <<
+					reqData.get("topicId");
 
-				if (std::string(reqData.get("lessonData")).size() == 0 || (std::string(reqData.get("lessonName")).size() == 0))
+				if (
+					std::string(reqData.get("lessonData")).size() == 0 ||
+					std::string(reqData.get("lessonName")).size() == 0
+					)
 				{
-					std::string log = "Failed to create new lesson with name: " + std::string(reqData.get("lessonName")) + ". Reason: Lessond data or Lesson Name is empty";
+					std::string log = "Failed to create new lesson with name: " +
+						std::string(reqData.get("lessonName")) +
+						". Reason: Lessond data or Lesson Name is empty";
 					recordSet.push_back("Lessond data or name is empty");
 
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(false, recordSet, "lesson-register");
-					res.code = 400;
+					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;
 				}
@@ -2003,7 +2253,8 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 
 				if (!topicInfo.errors.empty())
 				{
-					std::string log = "Failed to get topic info for topic with id: " + std::string(reqData.get("topicId")) + ". Reasons: ";
+					std::string log = "Failed to get topic info for topic with id: " +
+						std::string(reqData.get("topicId")) + ". Reasons: ";
 
 					for (auto el : topicInfo.errors)
 					{
@@ -2012,7 +2263,12 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 
 					CROW_LOG_WARNING << log;
 
-					res = responseJSONManager.createJSONResponse(false, topicInfo.errors, "lesson-register");
+					res = responseJSONManager.createJSONResponse(
+						false,
+						topicInfo.errors,
+						"lesson-register"
+					);
+					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;
 				}
@@ -2021,13 +2277,18 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 
 				if (recordSet[0] != "1")
 				{
-					std::string log = "Failed to create new lesson with name: " + std::string(reqData.get("lessonName")) + ". Reason: User is unauthorised";
-					recordSet[0] = "User is unauthorised";
+					std::string log = "Failed to create new lesson with name: " +
+						std::string(reqData.get("lessonName")) +
+						". Reason: User is unauthorised";
 
 					CROW_LOG_WARNING << log;
 
-					res = responseJSONManager.createJSONResponse(false, recordSet, "lesson-register");
-					res.code = 403;
+					res = responseJSONManager.createJSONResponse(
+						false,
+						{ "User is unauthorised" },
+						"lesson-register"
+					);
+					res.code = crow::status::FORBIDDEN;
 					res.end();
 					return;
 				}
@@ -2037,7 +2298,9 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 				// If saving to database fails
 				if (recordSet.size() != 0)
 				{
-					std::string log = "Failed to save lesson with name: " + std::string(reqData.get("lessonName")) + " to the database. Reason/s: ";
+					std::string log = "Failed to save lesson with name: " +
+						std::string(reqData.get("lessonName")) +
+						" to the database. Reason/s: ";
 
 					for (auto el : recordSet)
 					{
@@ -2047,11 +2310,14 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(false, recordSet, "lesson-register");
+					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;
 				}
 
-				CROW_LOG_INFO << "Lesson with name: " + std::string(reqData.get("lessonName")) + " is successfully saved into the database.";
+				CROW_LOG_INFO << "Lesson with name: " +
+					std::string(reqData.get("lessonName")) +
+					" is successfully saved into the database.";
 
 				// Create and send request
 				res = responseJSONManager.createJSONResponse(true, recordSet, "lesson-register");
@@ -2066,13 +2332,15 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 			{
 				auto& ctx = app.get_context<AuthorisationMiddleware>(req);
 
-				CROW_LOG_INFO << "User with id: " << ctx.userId << " is trying to get information for lesson with id: " << lessonId;
+				CROW_LOG_INFO << "User with id: " << ctx.userId <<
+					" is trying to get information for lesson with id: " << lessonId;
 
 				LessonInfo lessonInfo = dbManager.getLessonInfo(lessonId);
 
 				if (!lessonInfo.errors.empty())
 				{
-					std::string log = "Failed to get lesson info for topic with id: " + std::to_string(lessonId) + ". Reasons: ";
+					std::string log = "Failed to get lesson info for topic with id: " +
+						std::to_string(lessonId) + ". Reasons: ";
 
 					for (auto el : lessonInfo.errors)
 					{
@@ -2082,6 +2350,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(false, lessonInfo.errors, "get-lesson");
+					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;
 				}
@@ -2092,13 +2361,17 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 
 				if (recordSet[0] != "1")
 				{
-					std::string log = "Failed to get lesson with id: " + std::to_string(lessonId) + ". Reason: User is unauthorised";
-					recordSet[0] = "User is unauthorised";
+					std::string log = "Failed to get lesson with id: " +
+						std::to_string(lessonId) + ". Reason: User is unauthorised";
 
 					CROW_LOG_WARNING << log;
 
-					res = responseJSONManager.createJSONResponse(false, recordSet, "get-lesson");
-					res.code = 403;
+					res = responseJSONManager.createJSONResponse(
+						false,
+						{ "User is unauthorised" },
+						"get-lesson"
+					);
+					res.code = crow::status::FORBIDDEN;
 					res.end();
 					return;
 				}
@@ -2115,13 +2388,15 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 			{
 				auto& ctx = app.get_context<AuthorisationMiddleware>(req);
 
-				CROW_LOG_INFO << "User with id: " << ctx.userId << " is trying to delete lesson with id: " << lessonId;
+				CROW_LOG_INFO << "User with id: " << ctx.userId <<
+					" is trying to delete lesson with id: " << lessonId;
 
 				LessonInfo lessonInfo = dbManager.getLessonInfo(lessonId);
 
 				if (!lessonInfo.errors.empty())
 				{
-					std::string log = "Failed to delete lesson with id: " + std::to_string(lessonId) + ". Reasons: ";
+					std::string log = "Failed to delete lesson with id: " +
+						std::to_string(lessonId) + ". Reasons: ";
 
 					for (auto el : lessonInfo.errors)
 					{
@@ -2131,23 +2406,27 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(false, lessonInfo.errors, "lesson-deletion");
+					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;
 				}
 
 				TopicInfo topicInfo = dbManager.getTopicInfo(lessonInfo.topicId);
 
-				std::vector<std::string> recordSet = dbManager.canUserAccessCourse(topicInfo.courseId, ctx.userId, true);
+				std::vector<std::string> recordSet = dbManager.canUserAccessCourse(
+					topicInfo.courseId, ctx.userId, true
+				);
 
 				if (recordSet[0] != "1")
 				{
-					std::string log = "Failed to delete lesson with id: " + std::to_string(lessonId) + ". Reason: User is unauthorised";
+					std::string log = "Failed to delete lesson with id: " +
+						std::to_string(lessonId) + ". Reason: User is unauthorised";
 					recordSet[0] = "User is unauthorised";
 
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(false, recordSet, "lesson-deletion");
-					res.code = 403;
+					res.code = crow::status::FORBIDDEN;
 					res.end();
 					return;
 				}
@@ -2183,7 +2462,8 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 				auto& ctx = app.get_context<AuthorisationMiddleware>(req);
 				auto updateData = crow::query_string("?" + req.body);
 
-				CROW_LOG_INFO << "User with id: " << ctx.userId << " is trying to update information for lesson with id: " << lessonId;
+				CROW_LOG_INFO << "User with id: " << ctx.userId <<
+					" is trying to update information for lesson with id: " << lessonId;
 
 				std::vector<std::string> recordSet = validationManager.checkForNullValues(
 					updateData,
@@ -2191,12 +2471,13 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 						"lessonName",
 						"lessonData"
 					}
-					);
+				);
 
 				// If there are null values
 				if (recordSet.size() != 0)
 				{
-					std::string log = "Failed to update lesson with id: " + std::to_string(lessonId) + ". Reasons: ";
+					std::string log = "Failed to update lesson with id: " +
+						std::to_string(lessonId) + ". Reasons: ";
 
 					for (auto el : recordSet)
 					{
@@ -2206,20 +2487,25 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(false, recordSet, "lesson-update");
-					res.code = 400;
+					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;
 				}
 
-				if (std::string(updateData.get("lessonData")).size() == 0 || (std::string(updateData.get("lessonName")).size() == 0))
+				if (
+					std::string(updateData.get("lessonData")).size() == 0 ||
+					std::string(updateData.get("lessonName")).size() == 0
+					)
 				{
-					std::string log = "Failed to update lesson with name: " + std::string(updateData.get("lessonName")) + ". Reason: Lessond data or Lesson name is empty";
+					std::string log = "Failed to update lesson with name: " +
+						std::string(updateData.get("lessonName")) +
+						". Reason: Lessond data or Lesson name is empty";
 					recordSet.push_back("Lessond data or name is empty");
 
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(false, recordSet, "lesson-update");
-					res.code = 400;
+					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;
 				}
@@ -2238,6 +2524,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(false, lessonInfo.errors, "leson-update");
+					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;
 				}
@@ -2248,13 +2535,18 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 
 				if (recordSet[0] != "1")
 				{
-					std::string log = "Failed to update lesson with id: " + std::to_string(lessonId) + ". Reason: User is unauthorised";
-					recordSet[0] = "User is unauthorised";
-
+					std::string log = "Failed to update lesson with id: " +
+						std::to_string(lessonId) +
+						". Reason: User is unauthorised";
+	
 					CROW_LOG_WARNING << log;
 
-					res = responseJSONManager.createJSONResponse(false, recordSet, "lesson-update");
-					res.code = 403;
+					res = responseJSONManager.createJSONResponse(
+						false, 
+						{ "User is unauthorised" },
+						"lesson-update"
+					);
+					res.code = crow::status::FORBIDDEN;
 					res.end();
 					return;
 				}
@@ -2273,6 +2565,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(false, recordSet, "lesson-update");
+					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;
 				}
@@ -2300,28 +2593,31 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					{
 						"topicId"
 					}
-				);
+					);
 
 				// If there are null values
 				if (recordSet.size() != 0)
 				{
 					res = responseJSONManager.createJSONResponse(false, recordSet, "quiz-register");
-					res.code = 400;
+					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;
 				}
 
-				CROW_LOG_INFO << "User with id: " << ctx.userId << " is trying to create new quiz with name: " << reqData.get("quizName") << " in topic with id: " << reqData.get("topicId");
+				CROW_LOG_INFO << "User with id: " << ctx.userId <<
+					" is trying to create new quiz with name: " << 
+					reqData.get("quizName") << " in topic with id: " << reqData.get("topicId");
 
 				if (std::string(reqData.get("quizName")).size() == 0)
 				{
-					std::string log = "Failed to create new quiz with name: " + std::string(reqData.get("quizName")) + ". Reason: Quiz name is empty";
+					std::string log = "Failed to create new quiz with name: " +
+						std::string(reqData.get("quizName")) + ". Reason: Quiz name is empty";
 					recordSet.push_back("Lessond data is empty");
 
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(false, recordSet, "quiz-register");
-					res.code = 400;
+					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;
 				}
@@ -2330,7 +2626,8 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 
 				if (!topicInfo.errors.empty())
 				{
-					std::string log = "Failed to get topic info for topic with id: " + std::string(reqData.get("topicId")) + ". Reasons: ";
+					std::string log = "Failed to get topic info for topic with id: " +
+						std::string(reqData.get("topicId")) + ". Reasons: ";
 
 					for (auto el : topicInfo.errors)
 					{
@@ -2340,6 +2637,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(false, topicInfo.errors, "quiz-register");
+					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;
 				}
@@ -2348,13 +2646,14 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 
 				if (recordSet[0] != "1")
 				{
-					std::string log = "Failed to create new quiz with name: " + std::string(reqData.get("quizName")) + ". Reason: User is unauthorised";
+					std::string log = "Failed to create new quiz with name: " + 
+						std::string(reqData.get("quizName")) + ". Reason: User is unauthorised";
 					recordSet[0] = "User is unauthorised";
 
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(false, recordSet, "quiz-register");
-					res.code = 403;
+					res.code = crow::status::FORBIDDEN;
 					res.end();
 					return;
 				}
@@ -2364,7 +2663,9 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 				// If saving to database fails
 				if (recordSet.size() != 0)
 				{
-					std::string log = "Failed to save quiz with name: " + std::string(reqData.get("quizName")) + " to the database. Reason/s: ";
+					std::string log = "Failed to save quiz with name: " + 
+						std::string(reqData.get("quizName")) + 
+						" to the database. Reason/s: ";
 
 					for (auto el : recordSet)
 					{
@@ -2374,11 +2675,13 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(false, recordSet, "quiz-register");
+					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;
 				}
 
-				CROW_LOG_INFO << "Quiz with name: " + std::string(reqData.get("quizName")) + " is successfully saved into the database.";
+				CROW_LOG_INFO << "Quiz with name: " + std::string(reqData.get("quizName")) +
+					" is successfully saved into the database.";
 
 				// Create and send request
 				res = responseJSONManager.createJSONResponse(true, recordSet, "quiz-register");
@@ -2393,13 +2696,15 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 			{
 				auto& ctx = app.get_context<AuthorisationMiddleware>(req);
 
-				CROW_LOG_INFO << "User with id: " << ctx.userId << " is trying to get information for quiz with id: " << quizId;
+				CROW_LOG_INFO << "User with id: " << ctx.userId <<
+					" is trying to get information for quiz with id: " << quizId;
 
 				QuizInfo quizInfo = dbManager.getQuizInfo(quizId);
 
 				if (!quizInfo.errors.empty())
 				{
-					std::string log = "Failed to get quiz info for topic with id: " + std::to_string(quizId) + ". Reasons: ";
+					std::string log = "Failed to get quiz info for topic with id: " +
+						std::to_string(quizId) + ". Reasons: ";
 
 					for (auto el : quizInfo.errors)
 					{
@@ -2419,18 +2724,29 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 
 				if (recordSet[0] != "1")
 				{
-					std::string log = "Failed to get quiz with id: " + std::to_string(quizId) + ". Reason: User is unauthorised";
-					recordSet[0] = "User is unauthorised";
+					std::string log = "Failed to get quiz with id: " + 
+						std::to_string(quizId) + ". Reason: User is unauthorised";
 
 					CROW_LOG_WARNING << log;
 
-					res = responseJSONManager.createJSONResponse(false, recordSet, "get-quiz");
-					res.code = 403;
+					res = responseJSONManager.createJSONResponse(
+						false, 
+						{ "User is unauthorised" },
+						"get-quiz"
+					);
+					res.code = crow::status::FORBIDDEN;
 					res.end();
 					return;
 				}
 
-				res = responseJSONManager.createQuizJSONResponse(quizInfo, dbManager.isUserInCourseAndGetRole(ctx.userId, topicInfo.courseId)[1] != "0");
+				res = responseJSONManager.createQuizJSONResponse(
+					quizInfo, 
+					dbManager.isUserInCourseAndGetRole(
+						ctx.userId,
+						topicInfo.courseId
+					)[1] != "0"
+				);
+				res.code = crow::status::BAD_REQUEST;
 				res.end();
 				return;
 			});
@@ -2442,13 +2758,15 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 			{
 				auto& ctx = app.get_context<AuthorisationMiddleware>(req);
 
-				CROW_LOG_INFO << "User with id: " << ctx.userId << " is trying to delete lesson with id: " << quizId;
+				CROW_LOG_INFO << "User with id: " << ctx.userId <<
+					" is trying to delete lesson with id: " << quizId;
 
 				QuizInfo quizInfo = dbManager.getQuizInfo(quizId);
 
 				if (!quizInfo.errors.empty())
 				{
-					std::string log = "Failed to delete quiz with id: " + std::to_string(quizId) + ". Reasons: ";
+					std::string log = "Failed to delete quiz with id: " +
+						std::to_string(quizId) + ". Reasons: ";
 
 					for (auto el : quizInfo.errors)
 					{
@@ -2458,6 +2776,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(false, quizInfo.errors, "quiz-deletion");
+					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;
 				}
@@ -2468,13 +2787,17 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 
 				if (recordSet[0] != "1")
 				{
-					std::string log = "Failed to delete quiz with id: " + std::to_string(quizId) + ". Reason: User is unauthorised";
-					recordSet[0] = "User is unauthorised";
+					std::string log = "Failed to delete quiz with id: " + 
+						std::to_string(quizId) + ". Reason: User is unauthorised";
 
 					CROW_LOG_WARNING << log;
 
-					res = responseJSONManager.createJSONResponse(false, recordSet, "quiz-deletion");
-					res.code = 403;
+					res = responseJSONManager.createJSONResponse(
+						false,
+						{ "User is unauthorised" },
+						"quiz-deletion"
+					);
+					res.code = crow::status::FORBIDDEN;
 					res.end();
 					return;
 				}
@@ -2493,6 +2816,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(false, recordSet, "quiz-deletion");
+					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;
 				}
@@ -2510,33 +2834,36 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 				auto& ctx = app.get_context<AuthorisationMiddleware>(req);
 				auto updateData = crow::query_string("?" + req.body);
 
-				CROW_LOG_INFO << "User with id: " << ctx.userId << " is trying to update information for quiz with id: " << quizId;
+				CROW_LOG_INFO << "User with id: " << ctx.userId << 
+					" is trying to update information for quiz with id: " << quizId;
 
 				std::vector<std::string> recordSet = validationManager.checkForNullValues(
 					updateData,
 					{
 						"quizName"
 					}
-					);
+				);
 
 				// If there are null values
 				if (recordSet.size() != 0)
 				{
 					res = responseJSONManager.createJSONResponse(false, recordSet, "quiz-update");
-					res.code = 400;
+					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;
 				}
 
 				if (std::string(updateData.get("quizName")).size() == 0)
 				{
-					std::string log = "Failed to create new quiz with name: " + std::string(updateData.get("quizName")) + ". Reason: Quiz name is empty";
+					std::string log = "Failed to create new quiz with name: " + 
+						std::string(updateData.get("quizName")) + 
+						". Reason: Quiz name is empty";
 					recordSet.push_back("Quiz name is empty");
 
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(false, recordSet, "quiz-register");
-					res.code = 400;
+					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;
 				}
@@ -2555,6 +2882,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(false, lessonInfo.errors, "quiz-update");
+					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;
 				}
@@ -2566,12 +2894,15 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 				if (recordSet[0] != "1")
 				{
 					std::string log = "Failed to update quiz with id: " + std::to_string(quizId) + ". Reason: User is unauthorised";
-					recordSet[0] = "User is unauthorised";
 
 					CROW_LOG_WARNING << log;
 
-					res = responseJSONManager.createJSONResponse(false, recordSet, "quiz-update");
-					res.code = 403;
+					res = responseJSONManager.createJSONResponse(
+						false, 
+						{ "User is unauthorised" }, 
+						"quiz-update"
+					);
+					res.code = crow::status::FORBIDDEN;
 					res.end();
 					return;
 				}
@@ -2608,7 +2939,8 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 				auto reqData = crow::query_string("?" + req.body);
 				auto& ctx = app.get_context<AuthorisationMiddleware>(req);
 
-				CROW_LOG_INFO << "User with id: " << ctx.userId << " is trying to create new question in quiz with id: " << reqData.get("quizId");
+				CROW_LOG_INFO << "User with id: " << ctx.userId << 
+					" is trying to create new question in quiz with id: " << reqData.get("quizId");
 
 				std::string type = reqData.get("type");
 
@@ -2638,7 +2970,8 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 
 				if (!quizInfo.errors.empty())
 				{
-					std::string log = "Failed to get quiz info for quiz with id: " + std::string(reqData.get("quizId")) + ". Reasons: ";
+					std::string log = "Failed to get quiz info for quiz with id: " +
+						std::string(reqData.get("quizId")) + ". Reasons: ";
 
 					for (auto el : quizInfo.errors)
 					{
@@ -2656,7 +2989,8 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 
 				if (!topicInfo.errors.empty())
 				{
-					std::string log = "Failed to get topic info for topic with id: " + std::to_string(quizInfo.topicId) + ". Reasons: ";
+					std::string log = "Failed to get topic info for topic with id: " +
+						std::to_string(quizInfo.topicId) + ". Reasons: ";
 
 					for (auto el : topicInfo.errors)
 					{
@@ -2674,13 +3008,14 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 
 				if (recordSet[0] != "1")
 				{
-					std::string log = "Failed to create new question in quiz with id: " + std::string(reqData.get("quizId")) + ". Reason: User is unauthorised";
+					std::string log = "Failed to create new question in quiz with id: " + 
+						std::string(reqData.get("quizId")) + ". Reason: User is unauthorised";
 					recordSet[0] = "User is unauthorised";
 
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(false, recordSet, "question-register");
-					res.code = 403;
+					res.code = crow::status::FORBIDDEN;
 					res.end();
 					return;
 				}
@@ -2690,7 +3025,8 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 				// If saving to database fails
 				if (recordSet.size() != 0)
 				{
-					std::string log = "Failed to save question in quiz with id: " + std::string(reqData.get("quizId")) + " to the database. Reason/s: ";
+					std::string log = "Failed to save question in quiz with id: " + 
+						std::string(reqData.get("quizId")) + " to the database. Reason/s: ";
 
 					for (auto el : recordSet)
 					{
@@ -2704,7 +3040,8 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					return;
 				}
 
-				CROW_LOG_INFO << "Question in quiz with id: " + std::string(reqData.get("quizId")) + " is successfully saved into the database.";
+				CROW_LOG_INFO << "Question in quiz with id: " + 
+					std::string(reqData.get("quizId")) + " is successfully saved into the database.";
 
 				// Create and send request
 				res = responseJSONManager.createJSONResponse(true, recordSet, "question-register");
@@ -2719,13 +3056,15 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 			{
 				auto& ctx = app.get_context<AuthorisationMiddleware>(req);
 
-				CROW_LOG_INFO << "User with id: " << ctx.userId << " is trying to get information for question with id: " << questionId;
+				CROW_LOG_INFO << "User with id: " << ctx.userId << 
+					" is trying to get information for question with id: " << questionId;
 
 				QuestionInfo questionInfo = dbManager.getQuestionInfo(questionId);
 
 				if (!questionInfo.errors.empty())
 				{
-					std::string log = "Failed to get question info for question with id: " + std::to_string(questionId) + ". Reasons: ";
+					std::string log = "Failed to get question info for question with id: " +
+						std::to_string(questionId) + ". Reasons: ";
 
 					for (auto el : questionInfo.errors)
 					{
@@ -2743,7 +3082,9 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 
 				TopicInfo topicInfo = dbManager.getTopicInfo(quizInfo.topicId);
 
-				std::vector<std::string> recordSet = dbManager.canUserAccessCourse(topicInfo.courseId, ctx.userId, true);
+				std::vector<std::string> recordSet = dbManager.canUserAccessCourse(
+					topicInfo.courseId, ctx.userId, true
+				);
 
 				if (recordSet[0] != "1")
 				{
@@ -2760,13 +3101,14 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 						}
 					}
 
-					std::string log = "Failed to get quiz with id: " + std::to_string(questionId) + ". Reason: User is unauthorised";
+					std::string log = "Failed to get quiz with id: " + 
+						std::to_string(questionId) + ". Reason: User is unauthorised";
 					recordSet[0] = "User is unauthorised";
 
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(false, recordSet, "get-question");
-					res.code = 403;
+					res.code = crow::status::FORBIDDEN;
 					res.end();
 					return;
 				}
@@ -2783,13 +3125,15 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 			{
 				auto& ctx = app.get_context<AuthorisationMiddleware>(req);
 
-				CROW_LOG_INFO << "User with id: " << ctx.userId << " is trying to delete question with id: " << questionId;
+				CROW_LOG_INFO << "User with id: " << ctx.userId <<
+					" is trying to delete question with id: " << questionId;
 
 				QuestionInfo questionInfo = dbManager.getQuestionInfo(questionId);
 
 				if (!questionInfo.errors.empty())
 				{
-					std::string log = "Failed to get question info for question with id: " + std::to_string(questionId) + ". Reasons: ";
+					std::string log = "Failed to get question info for question with id: " +
+						std::to_string(questionId) + ". Reasons: ";
 
 					for (auto el : questionInfo.errors)
 					{
@@ -2807,17 +3151,20 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 
 				TopicInfo topicInfo = dbManager.getTopicInfo(quizInfo.topicId);
 
-				std::vector<std::string> recordSet = dbManager.canUserAccessCourse(topicInfo.courseId, ctx.userId, true);
+				std::vector<std::string> recordSet = dbManager.canUserAccessCourse(
+					topicInfo.courseId, ctx.userId, true
+				);
 
 				if (recordSet[0] != "1")
 				{
-					std::string log = "Failed to delete question with id: " + std::to_string(questionId) + ". Reason: User is unauthorised";
+					std::string log = "Failed to delete question with id: " + 
+						std::to_string(questionId) + ". Reason: User is unauthorised";
 					recordSet[0] = "User is unauthorised";
 
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(false, recordSet, "question-deletion");
-					res.code = 403;
+					res.code = crow::status::FORBIDDEN;
 					res.end();
 					return;
 				}
@@ -2911,7 +3258,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(false, recordSet, "question-update");
-					res.code = 403;
+					res.code = crow::status::FORBIDDEN;
 					res.end();
 					return;
 				}
@@ -2996,7 +3343,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(false, recordSet, "attempt-start");
-					res.code = 403;
+					res.code = crow::status::FORBIDDEN;
 					res.end();
 					return;
 				}
@@ -3071,7 +3418,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(false, recordSet, "get-attempt");
-					res.code = 403;
+					res.code = crow::status::FORBIDDEN;
 					res.end();
 					return;
 				}
@@ -3122,7 +3469,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(false, recordSet, "attempt-deletion");
-					res.code = 403;
+					res.code = crow::status::FORBIDDEN;
 					res.end();
 					return;
 				}
@@ -3243,7 +3590,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(false, recordSet, "answer");
-					res.code = 403;
+					res.code = crow::status::FORBIDDEN;
 					res.end();
 					return;
 				}
@@ -3256,7 +3603,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(false, recordSet, "answer");
-					res.code = 403;
+					res.code = crow::status::FORBIDDEN;
 					res.end();
 					return;
 				}
@@ -3352,7 +3699,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(false, recordSet, "get-answer");
-					res.code = 403;
+					res.code = crow::status::FORBIDDEN;
 					res.end();
 					return;
 				}

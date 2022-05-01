@@ -1,3 +1,7 @@
+/*! @file response.cpp
+*   @brief A sourse file for the response system.
+*/
+
 #include <response.h>
 
 crow::json::wvalue ResponseJSONManager::createJSONResponse(

@@ -376,3 +376,6 @@ middlewares.lib
 routes.lib
 utils.lib
 APIHandler.lib
+
+# Doxygen files
+docs

@@ -1,3 +1,7 @@
+/*! @file loggerHandler.cpp
+*   @brief A source file for the logger system.
+*/
+
 #include <env.h>
 #include <loggerHandler.h>
 #include <graylog_logger/Log.hpp>
