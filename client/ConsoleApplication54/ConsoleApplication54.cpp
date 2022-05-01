@@ -413,6 +413,62 @@ void printOrganisationUser(string acc[], int orgSize)
 	}
 }
 
+void createQuestion()
+{
+	string question = "", answer;
+	char key;
+	do {
+
+		drawButton(5, "   QUESTION   ", 14, 5, 6);
+		drawBox(8, " TYPE HERE  ", 40, 5, 7, question);
+
+		drawButton(12, "    ANSWER    ", 14, 5, 8, 8);
+		drawBox(15, " TYPE HERE  ", 40, 5, 8, " ", 8);
+		drawButton(19, "    SUBMIT    ", 14, 5, 2);
+		key = _getch();
+
+		if (key == '\b')
+		{
+			question = question.substr(0, question.size() - 1);
+		}
+
+		else if (key == '\r')
+		{
+			break;
+		}
+		else
+		{
+			question += key;
+		}
+
+
+
+	} while (key != '\r');
+
+	int subcol = 7;
+	do {
+		drawButton(5, "   QUESTION   ", 14, 5, 8, 8);
+		drawBox(8, " TYPE HERE  ", 40, 5, 8, question, 8);
+		drawButton(12, "    ANSWER    ", 14, 5, 6);
+		drawBox(15, " TYPE HERE  ", 40, 5, 7, answer);
+		drawButton(19, "    SUBMIT    ", 14, 5, 2, subcol);
+		key = _getch();
+
+		if (key == '\b')
+		{
+			answer = answer.substr(0, answer.size() - 1);
+		}
+
+		else
+		{
+			answer += key;
+		}
+
+		answer.size() > 0 ? subcol = 2 : subcol = 7;
+
+	} while (key != '\r');
+}
+
 void displayNumber(int num, int posx, int posy)
 {
 	if (num == 1)
