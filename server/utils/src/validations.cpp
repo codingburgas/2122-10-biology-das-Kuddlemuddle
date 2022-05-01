@@ -160,6 +160,45 @@ std::vector<std::string> ValidationManager::isPunnettSquareDataValid(crow::query
 	return incorrectValidation;
 }
 
+bool isValueNumber(std::string str) 
+{
+	for (auto& el : str)
+	{
+		if (!isdigit(el))
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
+
+std::vector<std::string> ValidationManager::checkForNullValues(crow::query_string data, std::vector<std::string> fields, std::vector<std::string> numFields)
+{
+	std::vector<std::string> nullValues;
+
+	for (auto field : fields)
+	{
+		if (!data.get(field))
+		{
+			nullValues.push_back(field);
+		}
+	}
+
+	if (nullValues.empty())
+	{
+		for (auto field : numFields)
+		{
+			if (!isValueNumber(data.get(field)))
+			{
+				nullValues.push_back(field);
+			}
+		}
+	}
+
+	return nullValues;
+}
+
 ValidationHandler ValidationManager::getValidationHandler(std::string field)
 {
 	// Sorry, you cannot have string in switch statements :(

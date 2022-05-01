@@ -15,9 +15,29 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 			{
 				auto registerData = crow::query_string("?" + req.body);
 
+				std::vector<std::string> recordSet = validationManager.checkForNullValues(
+					registerData,
+					{
+						"firstName",
+						"lastName",
+						"username",
+						"email",
+						"password"
+					}
+				);
+
+				// If there are null values
+				if (recordSet.size() != 0)
+				{
+					res = responseJSONManager.createJSONResponse(false, recordSet, "register");
+					res.code = 400;
+					res.end();
+					return;
+				}
+
 				CROW_LOG_INFO << "User with email: " << registerData.get("email") << " is trying to register.";
 
-				std::vector<std::string> recordSet = validationManager.isRegisterDataValid(registerData);
+				recordSet = validationManager.isRegisterDataValid(registerData);
 
 				// If validation falls
 				if (recordSet.size() != 0)
@@ -39,7 +59,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 				char salt[BCRYPT_HASHSIZE];
 				char hash[BCRYPT_HASHSIZE];
 				int ret;
-				
+
 				ret = bcrypt_gensalt(12, salt);
 
 				if (ret != 0)
@@ -95,9 +115,26 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 			{
 				auto loginData = crow::query_string("?" + req.body);
 
+				std::vector<std::string> recordSet = validationManager.checkForNullValues(
+					loginData,
+					{
+						"loginCredential",
+						"password"
+					}
+				);
+
+				// If there are null values
+				if (recordSet.size() != 0)
+				{
+					res = responseJSONManager.createJSONResponse(false, recordSet, "login");
+					res.code = 400;
+					res.end();
+					return;
+				}
+
 				CROW_LOG_INFO << "User with email: " << loginData.get("loginCredential") << " is trying to register.";
 
-				std::vector<std::string> recordSet = validationManager.isLoginDataValid(loginData);
+				recordSet = validationManager.isLoginDataValid(loginData);
 
 				// If validation falls
 				if (recordSet.size() != 0)
@@ -261,7 +298,36 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 
 				CROW_LOG_INFO << "Trying to update user info with id: " << ctx.userId;
 
-				std::vector<std::string> recordSet = validationManager.isRegisterDataValid(updateData, true);
+				std::vector<std::string> recordSet = validationManager.checkForNullValues(
+					updateData,
+					{
+						"firstName",
+						"lastName",
+						"username",
+						"email",
+						"password"
+					}
+				);
+
+				// If there are null values
+				if (recordSet.size() != 0)
+				{
+					std::string log = "Failed null validation/s at user with id: " + std::to_string(ctx.userId) + " at: ";
+
+					for (auto el : recordSet)
+					{
+						log += el + " ";
+					}
+
+					CROW_LOG_WARNING << log;
+
+					res = responseJSONManager.createJSONResponse(false, recordSet, "user-update");
+					res.code = 400;
+					res.end();
+					return;
+				}
+
+				recordSet = validationManager.isRegisterDataValid(updateData, true);
 
 				// If validation falls
 				if (recordSet.size() != 0)
@@ -313,7 +379,52 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 
 				CROW_LOG_INFO << "Trying to update user avatar with id: " << ctx.userId;
 
+				try
+				{
+					crow::multipart::message msg(req);
+				}
+				catch (...)
+				{
+					CROW_LOG_WARNING << "Failed to update user avatar for user with id: " << ctx.userId << ". Reason: Avatar data and file extensions are missing!";
+
+					res = responseJSONManager.createJSONResponse(false, { "avatar", "fileExtensions" }, "user-update");
+					res.code = 400;
+					res.end();
+					return;
+				}
+
 				crow::multipart::message msg(req);
+
+				crow::multipart::part filePart;
+				crow::multipart::part fileExtensionPart;
+
+				try
+				{
+					filePart = msg.get_part_by_name("avatar");
+				}
+				catch (...)
+				{
+					CROW_LOG_WARNING << "Failed to update user avatar for user with id: " << ctx.userId << ". Reason: Avatar data is missing!";
+
+					res = responseJSONManager.createJSONResponse(false, { "avatar" }, "user-update");
+					res.code = 400;
+					res.end();
+					return;
+				}
+
+				try
+				{
+					fileExtensionPart = msg.get_part_by_name("fileExtensions");
+				}
+				catch (...)
+				{
+					CROW_LOG_WARNING << "Failed to update user avatar for user with id: " << ctx.userId << ". Reason: File extension is missing!";
+
+					res = responseJSONManager.createJSONResponse(false, { "fileExtensions" }, "user-update");
+					res.code = 400;
+					res.end();
+					return;
+				}
 
 				std::filesystem::path dir("static/avatars");
 				if (!(std::filesystem::exists(dir)))
@@ -324,8 +435,8 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					}
 				}
 
-				auto file = msg.parts[0].body;
-				auto fileExtension = msg.parts[1].body;
+				auto file = filePart.body;
+				auto fileExtension = fileExtensionPart.body;
 
 				auto file_handler = std::ofstream("static/avatars/" + std::to_string(ctx.userId) + fileExtension, std::ofstream::binary);
 
@@ -373,9 +484,26 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 				auto reqData = crow::query_string("?" + req.body);
 				auto& ctx = app.get_context<AuthorisationMiddleware>(req);
 
+				std::vector<std::string> recordSet = validationManager.checkForNullValues(
+					reqData,
+					{
+						"orgName",
+						"password"
+					}
+				);
+
+				// If there are null values
+				if (recordSet.size() != 0)
+				{
+					res = responseJSONManager.createJSONResponse(false, recordSet, "user-update");
+					res.code = 400;
+					res.end();
+					return;
+				}
+
 				CROW_LOG_INFO << "User with id: " << ctx.userId << " is trying to create new organisation with name: " << reqData.get("orgName");
 
-				std::vector<std::string> recordSet = validationManager.isOrgDataValid(reqData);
+				recordSet = validationManager.isOrgDataValid(reqData);
 
 				// If validation falls
 				if (recordSet.size() != 0)
@@ -494,9 +622,29 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 				auto reqData = crow::query_string("?" + req.body);
 				auto& ctx = app.get_context<AuthorisationMiddleware>(req);
 
+				std::vector<std::string> recordSet = validationManager.checkForNullValues(
+					reqData,
+					{
+						"orgId",
+						"password"
+					},
+					{
+						"orgId"
+					}
+					);
+
+				// If there are null values
+				if (recordSet.size() != 0)
+				{
+					res = responseJSONManager.createJSONResponse(false, recordSet, "user-update");
+					res.code = 400;
+					res.end();
+					return;
+				}
+
 				CROW_LOG_INFO << "User with id: " << ctx.userId << " is trying to join organisation with id: " << reqData.get("orgId");
 
-				std::vector<std::string> recordSet = validationManager.isJoinOrgDataValid(reqData);
+				recordSet = validationManager.isJoinOrgDataValid(reqData);
 
 				// If validation falls
 				if (recordSet.size() != 0)
@@ -573,12 +721,35 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 				auto reqData = crow::query_string("?" + req.body);
 				auto& ctx = app.get_context<AuthorisationMiddleware>(req);
 
+				std::vector<std::string> recordSet = validationManager.checkForNullValues(
+					reqData,
+					{
+						"orgId",
+						"userId",
+						"roleId"
+					},
+					{
+						"orgId",
+						"userId",
+						"roleId"
+					}
+					);
+
+				// If there are null values
+				if (recordSet.size() != 0)
+				{
+					res = responseJSONManager.createJSONResponse(false, recordSet, "user-update");
+					res.code = 400;
+					res.end();
+					return;
+				}
+
 				CROW_LOG_INFO << "User with id: " << ctx.userId << " is trying to update role on user with id: " << reqData.get("userId") << " on organisation with id: " << reqData.get("orgId");
 
 				// Is user authorised
 				// first element - error or true/false
 				// second element - Role of user
-				std::vector<std::string> recordSet = dbManager.isUserInOrgAndGetRole(ctx.userId, std::stoi(reqData.get("orgId")));
+				recordSet = dbManager.isUserInOrgAndGetRole(ctx.userId, std::stoi(reqData.get("orgId")));
 
 				if (recordSet[0] != "1")
 				{
@@ -613,8 +784,16 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					recordSet = dbManager.addUserToOrganisation(std::stoi(reqData.get("userId")), std::stoi(reqData.get("orgId")), UserRolesInOrgs::ADMIN, false);
 					break;
 				case 0:
-				default:
 					recordSet = dbManager.addUserToOrganisation(std::stoi(reqData.get("userId")), std::stoi(reqData.get("orgId")), UserRolesInOrgs::USER, false);
+					break;
+				default:
+					std::string log = "Failed to update role on user with id: " + std::string(reqData.get("userId")) + " on organisation with id: " + std::string(reqData.get("orgId")) + ". Reason: Role must be 0, 1 or 2";
+
+					CROW_LOG_WARNING << log;
+
+					res = responseJSONManager.createJSONResponse(false, { "Role must be 0, 1 or 2" }, "update-user-role-org");
+					res.end();
+					return;
 					break;
 				}
 
@@ -815,7 +994,33 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 
 				CROW_LOG_INFO << "User with id: " << ctx.userId << " is trying to update information for organisation with name: " << orgName;
 
-				std::vector<std::string> recordSet = validationManager.isOrgDataValid(updateData, true);
+				std::vector<std::string> recordSet = validationManager.checkForNullValues(
+					updateData,
+					{
+						"orgName",
+						"password"
+					}
+				);
+
+				// If there are null values
+				if (recordSet.size() != 0)
+				{
+					std::string log = "Failed to update org. Reason: ";
+
+					for (auto el : recordSet)
+					{
+						log += el + " ";
+					}
+
+					CROW_LOG_WARNING << log;
+
+					res = responseJSONManager.createJSONResponse(false, recordSet, "organisation-deletion");
+					res.code = 400;
+					res.end();
+					return;
+				}
+
+				recordSet = validationManager.isOrgDataValid(updateData, true);
 
 				// If validation falls
 				if (recordSet.size() != 0)
@@ -903,9 +1108,30 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 				auto reqData = crow::query_string("?" + req.body);
 				auto& ctx = app.get_context<AuthorisationMiddleware>(req);
 
+				std::vector<std::string> recordSet = validationManager.checkForNullValues(
+					reqData,
+					{
+						"courseName",
+						"password",
+						"orgId"
+					},
+					{
+						"orgId"
+					}
+					);
+
+				// If there are null values
+				if (recordSet.size() != 0)
+				{
+					res = responseJSONManager.createJSONResponse(false, recordSet, "organisation-deletion");
+					res.code = 400;
+					res.end();
+					return;
+				}
+
 				CROW_LOG_INFO << "User with id: " << ctx.userId << " is trying to create new course with name: " << reqData.get("courseName") << " in organisation with id: " << reqData.get("orgId");
 
-				std::vector<std::string> recordSet = dbManager.isUserInOrgAndGetRole(ctx.userId, std::stoi(reqData.get("orgId")));
+				recordSet = dbManager.isUserInOrgAndGetRole(ctx.userId, std::stoi(reqData.get("orgId")));
 
 				// Error happend
 				if (recordSet[0] != "1" || recordSet[1] != "2")
@@ -1002,13 +1228,33 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 				auto reqData = crow::query_string("?" + req.body);
 				auto& ctx = app.get_context<AuthorisationMiddleware>(req);
 
+				std::vector<std::string> recordSet = validationManager.checkForNullValues(
+					reqData,
+					{
+						"courseId",
+						"password"
+					},
+					{
+						"courseId"
+					}
+					);
+
+				// If there are null values
+				if (recordSet.size() != 0)
+				{
+					res = responseJSONManager.createJSONResponse(false, recordSet, "join-course");
+					res.code = 400;
+					res.end();
+					return;
+				}
+
 				CROW_LOG_INFO << "User with id: " << ctx.userId << " is trying to join course with id: " << reqData.get("courseId");
 
 				CourseInfo courseInfo = dbManager.getCourseInfo(std::stoi(reqData.get("courseId")));
 
 				if (!courseInfo.errors.empty())
 				{
-					std::string log = "Failed to get course info for course with name: " + std::string(reqData.get("courseId")) + ". Reasons: ";
+					std::string log = "Failed to get course info for course with id: " + std::string(reqData.get("courseId")) + ". Reasons: ";
 
 					for (auto el : courseInfo.errors)
 					{
@@ -1022,7 +1268,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					return;
 				}
 
-				std::vector<std::string> recordSet = dbManager.isUserInOrgAndGetRole(ctx.userId, courseInfo.orgId);
+				recordSet = dbManager.isUserInOrgAndGetRole(ctx.userId, courseInfo.orgId);
 
 				// Error happend
 				if (recordSet[0] != "1")
@@ -1115,6 +1361,27 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 				auto reqData = crow::query_string("?" + req.body);
 				auto& ctx = app.get_context<AuthorisationMiddleware>(req);
 
+				std::vector<std::string> recordSet = validationManager.checkForNullValues(
+					reqData,
+					{
+						"courseId",
+						"teacherId"
+					},
+					{
+						"courseId",
+						"teacherId"
+					}
+					);
+
+				// If there are null values
+				if (recordSet.size() != 0)
+				{
+					res = responseJSONManager.createJSONResponse(false, recordSet, "add-teacher");
+					res.code = 400;
+					res.end();
+					return;
+				}
+
 				CROW_LOG_INFO << "User with id: " << ctx.userId << " is trying to add teacher with id: " << reqData.get("teacherId") << " to course with id: " << reqData.get("courseId");
 
 				CourseInfo courseInfo = dbManager.getCourseInfo(std::stoi(reqData.get("courseId")));
@@ -1135,7 +1402,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					return;
 				}
 
-				std::vector<std::string> recordSet = dbManager.isUserInOrgAndGetRole(ctx.userId, courseInfo.orgId);
+				recordSet = dbManager.isUserInOrgAndGetRole(ctx.userId, courseInfo.orgId);
 
 				// User is not admin
 				if (recordSet[0] != "1" || recordSet[1] != "2")
@@ -1337,7 +1604,33 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 
 				CROW_LOG_INFO << "User with id: " << ctx.userId << " is trying to update information for course with id: " << courseId;
 
-				std::vector<std::string> recordSet = validationManager.isCourseDataValid(updateData, true);
+				std::vector<std::string> recordSet = validationManager.checkForNullValues(
+					updateData,
+					{
+						"courseName",
+						"password"
+					}
+					);
+
+				// If there are null values
+				if (recordSet.size() != 0)
+				{
+					std::string log = "Failed to update course. Reason: ";
+
+					for (auto el : recordSet)
+					{
+						log += el + " ";
+					}
+
+					CROW_LOG_WARNING << log;
+
+					res = responseJSONManager.createJSONResponse(false, recordSet, "course-update");
+					res.code = 400;
+					res.end();
+					return;
+				}
+
+				recordSet = validationManager.isCourseDataValid(updateData, true);
 
 				// If validation falls
 				if (recordSet.size() != 0)
@@ -1403,9 +1696,29 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 				auto reqData = crow::query_string("?" + req.body);
 				auto& ctx = app.get_context<AuthorisationMiddleware>(req);
 
+				std::vector<std::string> recordSet = validationManager.checkForNullValues(
+					reqData,
+					{
+						"topicName",
+						"courseId"
+					},
+					{
+						"courseId"
+					}
+				);
+
+				// If there are null values
+				if (recordSet.size() != 0)
+				{
+					res = responseJSONManager.createJSONResponse(false, recordSet, "topic-register");
+					res.code = 400;
+					res.end();
+					return;
+				}
+
 				CROW_LOG_INFO << "User with id: " << ctx.userId << " is trying to create new topic with name: " << reqData.get("topicName") << " in course with id: " << reqData.get("courseId");
 
-				std::vector<std::string> recordSet = dbManager.canUserAccessCourse(std::stoi(reqData.get("courseId")), ctx.userId, true);
+				recordSet = dbManager.canUserAccessCourse(std::stoi(reqData.get("courseId")), ctx.userId, true);
 
 				if (recordSet[0] != "1")
 				{
@@ -1569,6 +1882,22 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 
 				CROW_LOG_INFO << "User with id: " << ctx.userId << " is trying to update information for topic with id: " << topicId;
 
+				std::vector<std::string> recordSet = validationManager.checkForNullValues(
+					updateData,
+					{
+						"topicName"
+					}
+					);
+
+				// If there are null values
+				if (recordSet.size() != 0)
+				{
+					res = responseJSONManager.createJSONResponse(false, recordSet, "topic-update");
+					res.code = 400;
+					res.end();
+					return;
+				}
+
 				TopicInfo topicInfo = dbManager.getTopicInfo(topicId);
 
 				if (!topicInfo.errors.empty())
@@ -1587,7 +1916,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					return;
 				}
 
-				std::vector<std::string> recordSet = dbManager.canUserAccessCourse(topicInfo.courseId, ctx.userId, true);
+				recordSet = dbManager.canUserAccessCourse(topicInfo.courseId, ctx.userId, true);
 
 				if (recordSet[0] != "1")
 				{
@@ -1633,8 +1962,42 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 			{
 				auto reqData = crow::query_string("?" + req.body);
 				auto& ctx = app.get_context<AuthorisationMiddleware>(req);
+				
+				std::vector<std::string> recordSet = validationManager.checkForNullValues(
+					reqData,
+					{
+						"lessonName",
+						"lessonData",
+						"topicId"
+					},
+					{
+						"topicId"
+					}
+				);
+
+				// If there are null values
+				if (recordSet.size() != 0)
+				{
+					res = responseJSONManager.createJSONResponse(false, recordSet, "lesson-register");
+					res.code = 400;
+					res.end();
+					return;
+				}
 
 				CROW_LOG_INFO << "User with id: " << ctx.userId << " is trying to create new lesson with name: " << reqData.get("lessonName") << " in topic with id: " << reqData.get("topicId");
+
+				if (std::string(reqData.get("lessonData")).size() == 0 || (std::string(reqData.get("lessonName")).size() == 0))
+				{
+					std::string log = "Failed to create new lesson with name: " + std::string(reqData.get("lessonName")) + ". Reason: Lessond data or Lesson Name is empty";
+					recordSet.push_back("Lessond data or name is empty");
+
+					CROW_LOG_WARNING << log;
+
+					res = responseJSONManager.createJSONResponse(false, recordSet, "lesson-register");
+					res.code = 400;
+					res.end();
+					return;
+				}
 
 				TopicInfo topicInfo = dbManager.getTopicInfo(std::stoi(reqData.get("topicId")));
 
@@ -1654,7 +2017,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					return;
 				}
 
-				std::vector<std::string> recordSet = dbManager.canUserAccessCourse(std::stoi(reqData.get("topicId")), ctx.userId, true);
+				recordSet = dbManager.canUserAccessCourse(std::stoi(reqData.get("topicId")), ctx.userId, true);
 
 				if (recordSet[0] != "1")
 				{
@@ -1822,6 +2185,45 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 
 				CROW_LOG_INFO << "User with id: " << ctx.userId << " is trying to update information for lesson with id: " << lessonId;
 
+				std::vector<std::string> recordSet = validationManager.checkForNullValues(
+					updateData,
+					{
+						"lessonName",
+						"lessonData"
+					}
+					);
+
+				// If there are null values
+				if (recordSet.size() != 0)
+				{
+					std::string log = "Failed to update lesson with id: " + std::to_string(lessonId) + ". Reasons: ";
+
+					for (auto el : recordSet)
+					{
+						log += el + " ";
+					}
+
+					CROW_LOG_WARNING << log;
+
+					res = responseJSONManager.createJSONResponse(false, recordSet, "lesson-update");
+					res.code = 400;
+					res.end();
+					return;
+				}
+
+				if (std::string(updateData.get("lessonData")).size() == 0 || (std::string(updateData.get("lessonName")).size() == 0))
+				{
+					std::string log = "Failed to update lesson with name: " + std::string(updateData.get("lessonName")) + ". Reason: Lessond data or Lesson name is empty";
+					recordSet.push_back("Lessond data or name is empty");
+
+					CROW_LOG_WARNING << log;
+
+					res = responseJSONManager.createJSONResponse(false, recordSet, "lesson-update");
+					res.code = 400;
+					res.end();
+					return;
+				}
+
 				LessonInfo lessonInfo = dbManager.getLessonInfo(lessonId);
 
 				if (!lessonInfo.errors.empty())
@@ -1842,7 +2244,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 
 				TopicInfo topicInfo = dbManager.getTopicInfo(lessonInfo.topicId);
 
-				std::vector<std::string> recordSet = dbManager.canUserAccessCourse(topicInfo.courseId, ctx.userId, true);
+				recordSet = dbManager.canUserAccessCourse(topicInfo.courseId, ctx.userId, true);
 
 				if (recordSet[0] != "1")
 				{
@@ -1889,7 +2291,40 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 				auto reqData = crow::query_string("?" + req.body);
 				auto& ctx = app.get_context<AuthorisationMiddleware>(req);
 
+				std::vector<std::string> recordSet = validationManager.checkForNullValues(
+					reqData,
+					{
+						"quizName",
+						"topicId"
+					},
+					{
+						"topicId"
+					}
+				);
+
+				// If there are null values
+				if (recordSet.size() != 0)
+				{
+					res = responseJSONManager.createJSONResponse(false, recordSet, "quiz-register");
+					res.code = 400;
+					res.end();
+					return;
+				}
+
 				CROW_LOG_INFO << "User with id: " << ctx.userId << " is trying to create new quiz with name: " << reqData.get("quizName") << " in topic with id: " << reqData.get("topicId");
+
+				if (std::string(reqData.get("quizName")).size() == 0)
+				{
+					std::string log = "Failed to create new quiz with name: " + std::string(reqData.get("quizName")) + ". Reason: Quiz name is empty";
+					recordSet.push_back("Lessond data is empty");
+
+					CROW_LOG_WARNING << log;
+
+					res = responseJSONManager.createJSONResponse(false, recordSet, "quiz-register");
+					res.code = 400;
+					res.end();
+					return;
+				}
 
 				TopicInfo topicInfo = dbManager.getTopicInfo(std::stoi(reqData.get("topicId")));
 
@@ -1909,7 +2344,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					return;
 				}
 
-				std::vector<std::string> recordSet = dbManager.canUserAccessCourse(topicInfo.courseId, ctx.userId, true);
+				recordSet = dbManager.canUserAccessCourse(topicInfo.courseId, ctx.userId, true);
 
 				if (recordSet[0] != "1")
 				{
@@ -2077,6 +2512,35 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 
 				CROW_LOG_INFO << "User with id: " << ctx.userId << " is trying to update information for quiz with id: " << quizId;
 
+				std::vector<std::string> recordSet = validationManager.checkForNullValues(
+					updateData,
+					{
+						"quizName"
+					}
+					);
+
+				// If there are null values
+				if (recordSet.size() != 0)
+				{
+					res = responseJSONManager.createJSONResponse(false, recordSet, "quiz-update");
+					res.code = 400;
+					res.end();
+					return;
+				}
+
+				if (std::string(updateData.get("quizName")).size() == 0)
+				{
+					std::string log = "Failed to create new quiz with name: " + std::string(updateData.get("quizName")) + ". Reason: Quiz name is empty";
+					recordSet.push_back("Quiz name is empty");
+
+					CROW_LOG_WARNING << log;
+
+					res = responseJSONManager.createJSONResponse(false, recordSet, "quiz-register");
+					res.code = 400;
+					res.end();
+					return;
+				}
+
 				QuizInfo lessonInfo = dbManager.getQuizInfo(quizId);
 
 				if (!lessonInfo.errors.empty())
@@ -2097,7 +2561,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 
 				TopicInfo topicInfo = dbManager.getTopicInfo(lessonInfo.topicId);
 
-				std::vector<std::string> recordSet = dbManager.canUserAccessCourse(topicInfo.courseId, ctx.userId, true);
+				recordSet = dbManager.canUserAccessCourse(topicInfo.courseId, ctx.userId, true);
 
 				if (recordSet[0] != "1")
 				{
@@ -2853,7 +3317,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 				auto& ctx = app.get_context<AuthorisationMiddleware>(req);
 
 				CROW_LOG_INFO << "User with id: " << ctx.userId << " is trying to get information for answer with id: " << answerId;
-				
+
 				AnswerInfo answerInfo = dbManager.getAnswersInfo(answerId);
 
 				if (!answerInfo.errors.empty())

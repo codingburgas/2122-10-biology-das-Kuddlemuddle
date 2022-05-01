@@ -518,7 +518,7 @@ std::vector<std::string> DBManager::doesPasswordMatchOrg(std::string password, i
 		}
 	}
 
-	recordSet.push_back("Could not find organisation with id: " + orgId);
+	recordSet.push_back("Could not find organisation with id: " + std::to_string(orgId));
 	return recordSet;
 }
 
@@ -549,7 +549,7 @@ std::vector<std::string> DBManager::isUserInOrgAndGetRole(int userId, int orgId)
 		}
 	}
 
-	recordSet.push_back("Could not find organisation with id: " + std::to_string(orgId));
+	recordSet.push_back("Could not find organisation with id: " + std::to_string(orgId) + " or this user is not part of it");
 	return recordSet;
 }
 
