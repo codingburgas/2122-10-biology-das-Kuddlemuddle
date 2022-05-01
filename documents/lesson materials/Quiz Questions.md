@@ -28,6 +28,39 @@
 1. Which virus cause smallpox and kills 1 person from 1000 diseased?   // morbillivirus
 1. Which RNA virus causes hemorrhage and is passed on by direct contact with blood, bodily fluids, or skin.   // ebola virus
 
+### Structures and processes in the cell
+
+1. What is the process by which a double-stranded DNA molecule is copied to produce two identical DNA molecules?    //replication
+1. What is the enzyme used to carry out transcription?    //RNA polymerase
+1. What does mRNA stand for?    //messenger RNA
+1. How many nucleotides are contained in one codon?    //3
+
+### Reproduction of cells
+
+1. What is the complex of DNA plus histones and other structural proteins called?    //chromatin
+1. What is the usual state of chromatin?    //decondensed
+1. How many pairs of chromosomes do humans have?    //23
+1. What are the X and Y chromosomes?     //sex chromosomes
+1. What sex is a person with XX pair of chromosomes?    //female
+1. How many phases does mitosis have?    //4
+1. In what mitotic phase do chromosomes begin to decondense?    //telophase
+1. Are gametes produced through meiosis or mitosis?    //meiosis
+1. How many meiosis stages are there?    //2
+1. What is the process in which homologous chromosomes trade parts called?    //crossing over
+
+### Genetics
+
+1. What is the process by which genetic information is passed on from parent to child called?    //heredity
+1. What is an individual's collection of genes called?    //genotype
+1. What are an individual's observable traits, such as height, eye color, and blood type called?    //phenotype
+1. What are the two types of alleles?    //dominant and recessive
+1. What is the ratio of Mendel's pea dihybrid crossing?    //9:3:3:1
+1. Is the genotype (YY) heterozygote or homozygote?    //homozygote
+1. How many heterozygote children do we get when we cross (Yy) and (yy)?    //2
+1. Which type of variability is nonhereditary?    //modification
+1. What is a sudden, abrupt change in genetic information that often leads to changes in the phenotype called?    //mutation
+1. How may types of variability ae there?    //2
+
 ### Biosphere
 
 1. What is a bioceonosis made up from the faunal community called?    // zoocenosis
