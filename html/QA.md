@@ -27,163 +27,139 @@ The program has to be fully tested so any problems can be reported and solved.
 The result of a tested program are that there will be fewer malfunctions and it will be more accessible for use.
 
 # Test Cases
-## Console and handle related function
+## Validation of the data
 ### Test Case 1
 | | | | | | | | |
 |-|-|-|-|-|-|-|-|
-| | |ID|TS1_001|Created by|Teodor Karchev| | |
-| | |Name|Setting cursor| | | | |
-| | |Description|Moving the cursor to a specific point in screen|Created on|06/11/2021| | |
+| | |ID|LTH-1|Created by|Mariya Ilcheva| | |
+| | |Name|Is email valid| | | | |
+| | |Description|Checks whether the email entered by the user is valid|Created on|15/02/2022| | |
 | | | | | | | | |
 | | |#|Description|Test Data|Expectations|Actual Result|Status|
-| | |1|When starting of the game, it puts the mouse to a specific point.|X coordinate|Puts the cursor to the coordinates.|Puts the cursor to the coordinates.|PASSED|
-| | | | |Y coordinate| | | |
-### Test Case 2
-| | | | | | | | |
-|-|-|-|-|-|-|-|-|
-| | |ID|TS1_002|Created by|Teodor Karchev| | |
-| | |Name|Color change| | | | |
-| | |Description|Changes the foreground color|Created on|06/11/2021| | |
+| | |1|Enter invalid email.|mzilcheva|The program does not accept the invalid email and outputs the following message "Please, enter a valid email!" till the user enters a valid one|The program does not accept the invalid email and outputs the following message "Please, enter a valid email!" till the user enters a valid one|PASSED|
 | | | | | | | | |
 | | |#|Description|Test Data|Expectations|Actual Result|Status|
-| | |1|Changes the background of the game.|FOREGROUND_BLUE|Changes color to blue.|Changes color to blue.|PASSED|
-| | | | | | | | |
-| | |#|Description|Test Data|Expectations|Actual Result|Status|
-| | |2|Changes the background of the game.|FOREGROUND_RED|Changes color to red.|Changes color to red.|PASSED|
-### Test Case 3
-| | | | | | | | |
-|-|-|-|-|-|-|-|-|
-| | |ID|TS1_003|Created by|Teodor Karchev| | |
-| | |Name|Clear the console| | | | |
-| | |Description|A function that clears the console|Created on|06/11/2021| | |
-| | | | | | | | |
-| | |#|Description|Test Data|Expectations|Actual Result|Status|
-| | |1|Should clear the console.| |Clears the console.|Clears the console!|PASSED|
-
-## Logs related function
-### Test Case 1
-| | | | | | | | |
-|-|-|-|-|-|-|-|-|
-| | |ID|TS2_001|Created by|Teodor Karchev| | |
-| | |Name|Showing error on the screen and save it to the logs| | | | |
-| | |Description|Shows a error and logs it into a file.|Created on|06/11/2021| | |
-| | | | | | | | |
-| | |#|Description|Test Data|Expectations|Actual Result|Status|
-| | |1|Shows a error and logs it into a file.|Name of file|Shows a error and logs it into a file.|Shows a error and logs it into a file.|PASSED|
-| | | | |Name of function| | | |
-| | | | |Error code| | | |
-| | | | |The message| | | |
-
-## Menu related functions
-### Test Case 1
-| | | | | | | | |
-|-|-|-|-|-|-|-|-|
-| | |ID|TS3_001|Created by|Teodor Karchev| | |
-| | |Name|Shows the options| | | | |
-| | |Description|Checking if it prints the option of the given menu|Created on|06/11/2021| | |
-| | | | | | | | |
-| | |#|Description|Test Data|Expectations|Actual Result|Status|
-| | |1|It should shows the option menu and we can select an option.|Vector that holds all the options.|Shows the option menu and we can select an option.|shows the option menu and we can select an option.|PASSED|
-| | | | |Variable that represents the selected option| | | |
-| | | | |Pointer to function| | | |
+| | |2|Enter valid email.|MZIlcheva19@cb.bg|The program accepts the email|The program accepts the email|PASSED|
 
 ### Test Case 2
 | | | | | | | | |
 |-|-|-|-|-|-|-|-|
-| | |ID|TS3_002|Created by|Teodor Karchev| | |
-| | |Name|Shows the main logo| | | | |
-| | |Description|Function that prints the main logo|Created on|06/11/2021| | |
+| | |ID|LTH-2|Created by|Mariya Ilcheva| | |
+| | |Name|Is username valid| | | | |
+| | |Description|Checks whether the username entered by the user is valid|Created on|15/02/2022| | |
 | | | | | | | | |
 | | |#|Description|Test Data|Expectations|Actual Result|Status|
-| | |1|It should print the main logo of the game and team.| |Shows the main logo.|Shows the main logo.|PASSED|
+| | |1|Enter invalid username|232323|The program does not accept the invalid username and outputs the following message "Please, enter a valid username" till the user enters a valid one|The program does not accept the invalid username and outputs the following message "Please, enter a valid username" till the user enters a valid one|PASSED|
+| | | | | | | | |
+| | |#|Description|Test Data|Expectations|Actual Result|Status|
+| | |2|Enter valid username|Mariya143|The program accepts the username|The program accepts the username|PASSED|
+### Test Case 3
+| | | | | | | | |
+|-|-|-|-|-|-|-|-|
+| | |ID|LTH-3|Created by|Mariya Ilcheva| | |
+| | |Name|Is password valid| | | | |
+| | |Description|Checks whether the password entered by the user is valid|Created on|15/02/2022| | |
+| | | | | | | | |
+| | |#|Description|Test Data|Expectations|Actual Result|Status|
+| | |1|Enter invalid password|sdkhbuw2|The program does not accept the invalid password and outputs the following message "Please, enter a valid password!" till the user enters a valid one|The program does not accept the invalid password and outputs the following message "Please, enter a valid password!" till the user enters a valid one|PASSED|
+
+## Visualization of the data
+### Test Case 1
+| | | | | | | | |
+|-|-|-|-|-|-|-|-|
+| | |ID|LTH-4|Created by|Mariya Ilcheva| | |
+| | |Name|Team logo| | | | |
+| | |Description|Check if the team logo is printed when the program is started|Created on|15/02/2022| | |
+| | | | | | | | |
+| | |#|Description|Test Data|Expectations|Actual Result|Status|
+| | |1|The user runs the program|#|The team logo is printed on the console|The team logo is printed on the console|PASSED|
+
+### Test Case 2
+| | | | | | | | |
+|-|-|-|-|-|-|-|-|
+| | |ID|LTH-5|Created by|Mariya Ilcheva| | |
+| | |Name|Loading page| | | | |
+| | |Description|Check if the loading page is printed when the program is started|Created on|15/02/2022| | |
+| | | | | | | | |
+| | |#|Description|Test Data|Expectations|Actual Result|Status|
+| | |1|The user runs the program|#|The team loading page is printed on the console|The team loading page is printed on the console|PASSED|
 
 ### Test Case 3
 | | | | | | | | |
 |-|-|-|-|-|-|-|-|
-| | |ID|TS3_003|Created by|Teodor Karchev| | |
-| | |Name|Shows the settings logo| | | | |
-| | |Description|Function that prints the settings logo|Created on|06/11/2021| | |
+| | |ID|LTH-6|Created by|Mariya Ilcheva| | |
+| | |Name|Closed book| | | | |
+| | |Description|Check if the closed book is printed when the program is started|Created on|15/02/2022| | |
 | | | | | | | | |
 | | |#|Description|Test Data|Expectations|Actual Result|Status|
-| | |1|It should print the settings logo of the game and team.| |Shows the settings logo.|Shows the settings logo.|PASSED|
+| | |1|The user runs the program|#|The team closed book is printed on the console|The team closed book is printed on the console|PASSED|
 
 ### Test Case 4
 | | | | | | | | |
 |-|-|-|-|-|-|-|-|
-| | |ID|TS3_004|Created by|Teodor Karchev| | |
-| | |Name|Shows the settings menu| | | | |
-| | |Description|Checking if it prints the settings menu.|Created on|06/11/2021| | |
+| | |ID|LTH-7|Created by|Mariya Ilcheva| | |
+| | |Name|Snake sword| | | | |
+| | |Description|Check if the snake sword is printed on the closed book when the program is started|Created on|15/02/2022| | |
 | | | | | | | | |
 | | |#|Description|Test Data|Expectations|Actual Result|Status|
-| | |1|It should shows the settings menu.| |Shows the settings menu.|Shows the settings menu.|PASSED|
+| | |1|The user runs the program|#|The snake sword is printed on the closed book|The snake sword is printed on the closed book|PASSED|
 
 ### Test Case 5
 | | | | | | | | |
 |-|-|-|-|-|-|-|-|
-| | |ID|TS3_005|Created by|Teodor Karchev| | |
-| | |Name|Show "how to play" logo| | | | |
-| | |Description|Function that prints the "how to play" logo.|Created on|06/11/2021| | |
+| | |ID|LTH-8|Created by|Mariya Ilcheva| | |
+| | |Name|Book decorations| | | | |
+| | |Description|Check if the book decorations are printed on the closed book when the program is started|Created on|15/02/2022| | |
 | | | | | | | | |
 | | |#|Description|Test Data|Expectations|Actual Result|Status|
-| | |1|It should print the "how to play" logo| |Shows the "how to play" logo.|shows the "how to play" logo.|PASSED|
+| | |1|The user runs the program|#|The book decorations are printed on the closed book|The book decorations are printed on the closed book|PASSED|
 
 ### Test Case 6
 | | | | | | | | |
 |-|-|-|-|-|-|-|-|
-| | |ID|TS3_006|Created by|Teodor Karchev| | |
-| | |Name|Show the "how to play" menu| | | | |
-| | |Description|Checking if it prints the "how to play" menu.|Created on|06/11/2021| | |
+| | |ID|LTH-9|Created by|Mariya Ilcheva| | |
+| | |Name|Print event as encyclopedia| | | | |
+| | |Description|Check if the event data is printed as an encyclopedia|Created on|15/02/2022| | |
 | | | | | | | | |
 | | |#|Description|Test Data|Expectations|Actual Result|Status|
-| | |1|It should shows the "how to play"menu|Number of selected options|Shows the "how to play" menu.|Shows the "how to play" menu.|PASSED|
-| | | | |Should the logo be printed?| | | |
+| | |1|The user chooses the option "Print as encyclopedia"|#|The encyclopedia with the event data is printed on the console|The encyclopedia with the event data is printed on the console|PASSED|
 
-## Game related functions
-### Test Case 1
+### Test Case 7
 | | | | | | | | |
 |-|-|-|-|-|-|-|-|
-| | |ID|TS4_001|Created by|Teodor Karchev| | |
-| | |Name|Movement| | | | |
-| | |Description|Testing if the movement is possible.|Created on|06/11/2021| | |
+| | |ID|LTH-10|Created by|Mariya Ilcheva| | |
+| | |Name|Print event as map| | | | |
+| | |Description|Check if the event data is printed as a map|Created on|15/02/2022| | |
 | | | | | | | | |
 | | |#|Description|Test Data|Expectations|Actual Result|Status|
-| | |1|When the player run into a wall not to get inside it.|X coordinate of the player|It doesn't go inside the wall.|It doesn't go inside the wall.|PASSED|
-| | | | |Y coordinate of the player| | | |
-### Test Case 2
+| | |1|The user chooses the option "Print as map"|#|The map with the event data is printed on the console|The map with the event data is printed on the console|PASSED|
+
+### Test Case 8
 | | | | | | | | |
 |-|-|-|-|-|-|-|-|
-| | |ID|TS4_002|Created by|Teodor Karchev| | |
-| | |Name|Room drawing| | | | |
-| | |Description|Draws a room/part of the map.|Created on|06/11/2021| | |
+| | |ID|LTH-11|Created by|Mariya Ilcheva| | |
+| | |Name|Print event as timeline| | | | |
+| | |Description|Check if the storyline is correctly printed on the timeline with year and title|Created on|15/02/2022| | |
 | | | | | | | | |
 | | |#|Description|Test Data|Expectations|Actual Result|Status|
-| | |1|It should draw a room with 2 to 4 doors to near rooms.|Pointer to dynamic two-dimensional array of Room|It doesn't go inside the wall.|It doesn't go inside the wall.|PASSED|
-| | | | |The size of the room| | | |
-### Test Case 3
+| | |1|The user chooses to display a storyline as timeline|#|The timeline is printed with the events' years and titles|The timeline is printed with the events' years and titles|PASSED|
+
+### Test Case 9
 | | | | | | | | |
 |-|-|-|-|-|-|-|-|
-| | |ID|TS4_003|Created by|Teodor Karchev| | |
-| | |Name|Maze drawing| | | | |
-| | |Description|Draws a maze.|Created on|06/11/2021| | |
+| | |ID|LTH-12|Created by|Mariya Ilcheva| | |
+| | |Name|Users visualization| | | | |
+| | |Description|Check if all the users are printed on the console|Created on|15/02/2022| | |
 | | | | | | | | |
 | | |#|Description|Test Data|Expectations|Actual Result|Status|
-| | |1|it should draw the maze for the player to move within.|Pointer to dynamic two-dimensional array of Room|Draws the maze.|Draws the maze.|PASSED|
-| | | | |The size of the maze| | | |
-### Test Case 4
+| | |1|The user chooses to display all the users|#|All the users are printed on the console|All the users are printed on the console|PASSED|
+
+### Test Case 10
 | | | | | | | | |
 |-|-|-|-|-|-|-|-|
-| | |ID|TS4_004|Created by|Teodor Karchev| | |
-| | |Name|Shows the player information| | | | |
-| | |Description|Prints player information.|Created on|06/11/2021| | |
+| | |ID|LTH-13|Created by|Mariya Ilcheva| | |
+| | |Name|Book opening animation| | | | |
+| | |Description|Check if when a menu option is choosed the book on the console is opening|Created on|15/02/2022| | |
 | | | | | | | | |
 | | |#|Description|Test Data|Expectations|Actual Result|Status|
-| | |1|It should prints player information (Health, Armour, etc) on the board.| |Prints Health, Armour, Keys amd money.|Prints Health, Armour, Keys amd money.|PASSED|
-### Test Case 5
-| | | | | | | | |
-|-|-|-|-|-|-|-|-|
-| | |ID|TS4_005|Created by|Teodor Karchev| | |
-| | |Name|Shows a message on the UI| | | | |
-| | |Description|Shows a message on the UI. (For example: Dialogue)|Created on|06/11/2021| | |
-| | | | | | | | |
-| | |#|Description|Test Data|Expectations|Actual Result|Status|
-| | |1|It should show a message on the console.|The message to be shown|Shows a message.|Shows a message.|PASSED|
+| | |1|The user chooses an option from the menu|#|The book animation is played on the console|The book animation is played on the console|PASSED|

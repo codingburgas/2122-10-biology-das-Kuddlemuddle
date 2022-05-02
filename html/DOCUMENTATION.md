@@ -1,19 +1,20 @@
 # Documentation 
 ## Information and development of a plan
 ### Presentation of the project
-Our game generates a maze that is different each time and you have to go to the exit while dogging enemies and helping the wizards.
+Our main goal was to make a program, helping you add, edit, remove, connect or visualize events. 
 
 ### Roles in the team
-Stoyan Ivanov - [SSIvanov19](https://github.com/SSIvanov19) - Scrum trainer  
-Stas Uzunov - [SSUzunov19](https://github.com/SSUzunov19) - Back-end Developer  
-Viktor Kirov - [VRKirov19](https://github.com/vrkirov19) - Front-end Developer  
-Teodor Karchev - [ТТКarchev19](https://github.com/TTKarchev19) - QA Engineer
+Vasilen Mihaylov - [VMMihaylov19](https://github.com/VMMihaylov19) - Scrum trainer  
+Stoyan Ivanov - [SSIvanov19](https://github.com/SSIvanov19) - Back-end Developer  
+Mariya Ilcheva - [MZIlcheva19](https://github.com/MZIlcheva19) -  Front-end Developer  
+Vesela Dekova - [VBDekova19](https://github.com/VBDekova19) - Front-end Developer  
+Polina Petrova - [PIPetrova19](https://github.com/PIPetrova19) - QA Engineer
 
 ### Introduction
 #### What is the product?
-The product is a C++ console application about mazes and maze generation. It represents a simple game, where you need to escape from the maze while dogging enemies and helping the wizards.
+The product is a C++ console application about history event management. It represents a simple app, where you can manage your events, storylines and users is a simple way.
 #### Where is it available?
-Our collaborative work took place in GitHub and for the files to be accessible to everyone they were uploaded in the GitHub Repository of our project. You can download the latest release from GitHub releases (Insert URL here) or the download section (Insert URL here).
+Our collaborative work took place in GitHub and for the files to be accessible to everyone they were uploaded in the GitHub Repository of our project. You can download the latest release from [GitHub releases](https://github.com/SSIvanov19/lathraea-rhodopaea/releases/download/v1.0.0/Release.zip) or the [download section](DOWNLOAD.md).
 #### Communication?
 Communication is realized through Teams. Thanks to all the features and the provided visualization - on-screen communication and feedback are sufficiently complete.
 #### What technologies are used?
@@ -28,22 +29,22 @@ For each task, a person is selected who is more familiar with the field and will
 Observance of dates was reminded by the Scrum Trainer. A meeting of the team is held every week to discuss the amount of time needed to complete the assigned task.
 
 ## Testing the plan
-### Develope a algorithm to generate a maze
-This was the start of our project. The first thing that we should do is an algorithm to generate a maze.
-### Develope a menu
-The menu will help the user to see more info about our project, to change settings and see how to play the game.
-### Visualization of the maze
-Implement a function for visualizing the maze on the console.
-### Implement a player
-The player will be spawned into the maze and should move in any direction, while it should check for obstacles.
-### Implement advanced back-end features
-Implement features like health, enemies, armour, etc.
-### Developing a UI
-Make UI element for showing different different stats of the player.
-### Implement visualization for the enemies.
-Show enemies and shop in the console.
-### Add final thing
-Add details to the project.
+### Organise the folder structure
+This was the start of our project. The first thing that we should do is to organise the folder structure.
+### Back-end account system
+The account system is a good start for our project, as it is a core part of our project.
+### Encryption system
+Every good account system should have an encryption system. This is where we implemented the gray code.
+### Add some basic graphics of book
+There should be some basic graphics of the book.
+### Add event system
+The event system is a core part of our project.
+### Add main menu
+The main menu will help the user to navigate through the app.
+### Implement storyline manager
+The storyline manager is a core part of our project.
+### Front-end data visualization
+The front-end data visualization is used to present the data in a more convenient way.
 ### Fix bugs
 Fix the reaming bugs. 
 ### QA Documentation
@@ -54,33 +55,14 @@ Periodically made documentation describes the whole work and each application of
 The aim of the presentation is to be short and tell everything important about the project.
 
 ## Back-end developer
-The Back-end is the whole logic of our game, starting from the creation of a room and the monsters in it, to the maze we have to go through to continue the game. The rules of the game are designed to be balanced against whether the player is playing correctly or not
-All the room and everything that can fall into it, as well as the maze are randomly checked, which is also checked for errors. 
+The back-end developer is responsible for the core functionality of the project. The main tasks of the back-end developer are:
+### Account system
+Account system, where the user can create an account, log in, log out, and visualise the events. It also has a admin account, where the admin can create, edit, delete and manager the events.
+### Event system
+Event system, where the admin can create, edit, delete and manage the events. 
+### Storyline system
+Storyline system, where the admin can create, edit, delete and manage the storylines.
+
 
 ## Front-end developer
-The task of our front-end developer was to make the game look good and to make it more interactive. For this purpose, he used different ASCII characters that you can see just under this text.
-### Here you can see what ASCII characters are used and what they represent 
-▲ = Wizard  
-█ = Chest  
-$ = Money  
-│ = upper part sword  
-╪ = down part sword  
-♀ = Key  
-♥ = Health  
-Θ = Armour  
-■ = First monster  
-♦ = Second monster  
-╦ = First part third monster  
-░ = Second part third monster  
-╤ = First part fourth monster  
-╫ = Second part fourth monster  
-╬ = First part fourth boss  
-▓ = Second part fourth boss  
-╔ = Third part fourth boss  
-╗ = Fourth part fourth boss  
-¥ = bush  
-≡ = rock  
-╔ = hole up-left  
-╗ = hole up-right  
-═ = hole mid part (Horizontal)  
-║ = hole mid part (Vertical)  
+The task of our front-end developer was to make the app look good and to make it more interactive. For this purpose, he used different ASCII art.

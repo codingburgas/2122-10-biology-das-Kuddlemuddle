@@ -1,13 +1,17 @@
+/*! @file misc.cpp
+*   @brief A source file for miscellaneous functions.
+*/
+
 #include <misc.h>
 
 std::string toLowerCase(std::string input)
 {
-	std::transform(input.begin(), input.end(), input.begin(),
-		[](unsigned char c) { return std::tolower(c); });
+	std::transform(input.begin(), input.end(), input.begin(), [](unsigned char c) {
+		return std::tolower(c);
+	});
 
 	return input;
 }
-
 std::vector<std::string> convertP1andP2toAnswers(std::string P1, std::string P2)
 {
 	std::vector<std::string> returnVal;
@@ -46,7 +50,7 @@ std::vector<std::string> convertP1andP2toAnswers(std::string P1, std::string P2)
 			{
 				value += col.substr(0, 1) + row.substr(0, 1);
 			}
-			
+
 			// Starts with B	
 			if (row[1] < col[1])
 			{

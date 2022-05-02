@@ -20,7 +20,7 @@
 
 ---
 ## About 💻 <a name = "about"></a>
-Explaining a variety of Biology-related concepts in an easily-accessible way with graphics and quzzes.
+Explaining a variety of Biology-related concepts in an easily-accessible way with graphics and quizzes.
 
 ## Demo of our project 🎥 <a name = "demo"></a>
 <img src = "" alt = "demo img 1">
