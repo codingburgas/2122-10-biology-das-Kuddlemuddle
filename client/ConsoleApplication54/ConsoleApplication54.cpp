@@ -1055,6 +1055,400 @@ void addTopicsInCourse(string acc[], int orgSize)
 	}
 }
 
+void viewLessonsInTopic(string acc[], int orgSize)
+{
+	system("cls");
+	char key; // Key to be entered
+	int counter = 0, counter2 = 0;
+
+	while (true)
+	{
+		int posy = 5;
+		gotoxy(2, 3); color(6); cout << "L E S S O N S  I N   T H E   T O P I C"; color(7);
+		for (int i = 0; i < orgSize; i++)
+		{
+			gotoxy(4, posy); cout << "-->";
+			if (i == counter)
+			{
+				color(6); gotoxy(9, posy); cout << acc[i];
+			}
+			else
+			{
+				gotoxy(9, posy); cout << acc[i];
+			}
+
+			posy += 2;
+			color(7);
+		}
+
+		key = _getch();
+
+		if (key == 72 && (counter >= 1 && counter <= orgSize)) // 72/75 is the ASCII code for the up arrow
+		{
+			counter--;
+		}
+
+		if (key == 80 && (counter >= 0 && counter < orgSize - 1)) // 80/77 is the ASCII code for the up arrow
+		{
+			counter++;
+		}
+
+		if (key == 75 && (counter2 == 1)) // 72/75 is the ASCII code for the up arrow
+		{
+			counter2--;
+		}
+
+		if (key == 77 && (counter2 == 0)) // 80/77 is the ASCII code for the up arrow
+		{
+			counter2++;
+		}
+
+
+	}
+}
+void updateDeleteLessons(string acc[], int orgSize)
+{
+	system("cls");
+	char key; // Key to be entered
+	int counter = 0, counter2 = 0;
+
+	while (true)
+	{
+		int posy = 5;
+		gotoxy(2, 3); color(6); cout << "L E S S O N S  I N   T H E   T O P I C"; color(7);
+		for (int i = 0; i < orgSize; i++)
+		{
+			gotoxy(4, posy); cout << "-->";
+			if (i == counter)
+			{
+				color(6); gotoxy(9, posy); cout << acc[i];
+				gotoxy(60, posy);
+				if (counter2 == 0)
+				{
+					color(2); cout << "Settings"; color(7); cout << " | Delete";
+				}
+				else
+				{
+					color(7); cout << "Settings | "; color(4); cout << "Delete";
+				}
+			}
+			else
+			{
+				gotoxy(9, posy); cout << acc[i];
+				gotoxy(60, posy); color(8); cout << "Settings | Delete";
+			}
+
+
+			posy += 2;
+			color(7);
+		}
+
+		key = _getch();
+
+		if (key == 72 && (counter >= 1 && counter <= orgSize)) // 72/75 is the ASCII code for the up arrow
+		{
+			counter--;
+		}
+
+		if (key == 80 && (counter >= 0 && counter < orgSize - 1)) // 80/77 is the ASCII code for the up arrow
+		{
+			counter++;
+		}
+
+		if (key == 75 && (counter2 == 1)) // 72/75 is the ASCII code for the up arrow
+		{
+			counter2--;
+		}
+
+		if (key == 77 && (counter2 == 0)) // 80/77 is the ASCII code for the up arrow
+		{
+			counter2++;
+		}
+
+	}
+}
+void addLesson(string acc[], int orgSize)
+{
+	char key; // Key to be entered
+	int counter = 0, counter2 = 0;
+
+
+	while (true)
+	{
+		system("cls");
+		int posy = 5;
+		gotoxy(2, 3); color(6); cout << "L E S S O N S  I N   T H E   T O P I C"; color(7);
+		for (int i = 0; i < orgSize; i++)
+		{
+			gotoxy(4, posy); cout << "-->";
+			if (i == counter)
+			{
+				color(6); gotoxy(9, posy); cout << acc[i];
+			}
+			else
+			{
+				gotoxy(9, posy); cout << acc[i];
+			}
+
+			posy += 2;
+			color(7);
+		}
+		createButton(posy, " + NEW TOPIC  ", 14, 4, 2);
+
+		key = _getch();
+
+		if (key == 72 && (counter >= 1 && counter <= orgSize)) // 72/75 is the ASCII code for the up arrow
+		{
+			counter--;
+		}
+
+		if (key == 80 && (counter >= 0 && counter < orgSize - 1)) // 80/77 is the ASCII code for the up arrow
+		{
+			counter++;
+		}
+
+		if (key == 75 && (counter2 == 1)) // 72/75 is the ASCII code for the up arrow
+		{
+			counter2--;
+		}
+
+		if (key == 77 && (counter2 == 0)) // 80/77 is the ASCII code for the up arrow
+		{
+			counter2++;
+		}
+
+		if (key == '+')
+		{
+			string newTopic = "";
+			while (true)
+			{
+				createInputField(posy + 3, "  TOPIC NAME", 40, 4, 7, newTopic);
+				key = _getch();
+
+				if (key == '\r')
+				{
+					break;
+				}
+
+				else
+				{
+					if (key == '\b')
+					{
+						newTopic = newTopic.substr(0, newTopic.size() - 1);
+					}
+
+					else
+					{
+						newTopic += key;
+					}
+
+				}
+			}
+			acc[orgSize] = newTopic;
+			orgSize++;
+		}
+	}
+}
+
+void addQuizz(string acc[], int orgSize)
+{
+	char key; // Key to be entered
+	int counter = 0, counter2 = 0;
+
+
+	while (true)
+	{
+		system("cls");
+		int posy = 5;
+		gotoxy(2, 3); color(6); cout << "Q U I Z Z E S"; color(7);
+		for (int i = 0; i < orgSize; i++)
+		{
+			gotoxy(4, posy); cout << "-->";
+			if (i == counter)
+			{
+				color(6); gotoxy(9, posy); cout << acc[i];
+			}
+			else
+			{
+				gotoxy(9, posy); cout << acc[i];
+			}
+
+			posy += 2;
+			color(7);
+		}
+		createButton(posy, " + NEW TOPIC  ", 14, 4, 2);
+
+		key = _getch();
+
+		if (key == 72 && (counter >= 1 && counter <= orgSize)) // 72/75 is the ASCII code for the up arrow
+		{
+			counter--;
+		}
+
+		if (key == 80 && (counter >= 0 && counter < orgSize - 1)) // 80/77 is the ASCII code for the up arrow
+		{
+			counter++;
+		}
+
+		if (key == 75 && (counter2 == 1)) // 72/75 is the ASCII code for the up arrow
+		{
+			counter2--;
+		}
+
+		if (key == 77 && (counter2 == 0)) // 80/77 is the ASCII code for the up arrow
+		{
+			counter2++;
+		}
+
+		if (key == '+')
+		{
+			string newTopic = "";
+			while (true)
+			{
+				createInputField(posy + 3, "  TOPIC NAME", 40, 4, 7, newTopic);
+				key = _getch();
+
+				if (key == '\r')
+				{
+					break;
+				}
+
+				else
+				{
+					if (key == '\b')
+					{
+						newTopic = newTopic.substr(0, newTopic.size() - 1);
+					}
+
+					else
+					{
+						newTopic += key;
+					}
+
+				}
+			}
+			acc[orgSize] = newTopic;
+			orgSize++;
+		}
+	}
+}
+void updateDeleteQuizz(string acc[], int orgSize)
+{
+	system("cls");
+	char key; // Key to be entered
+	int counter = 0, counter2 = 0;
+
+	while (true)
+	{
+		int posy = 5;
+		gotoxy(2, 3); color(6); cout << "Q U I Z Z E S"; color(7);
+		for (int i = 0; i < orgSize; i++)
+		{
+			gotoxy(4, posy); cout << "-->";
+			if (i == counter)
+			{
+				color(6); gotoxy(9, posy); cout << acc[i];
+				gotoxy(60, posy);
+				if (counter2 == 0)
+				{
+					color(2); cout << "Settings"; color(7); cout << " | Delete";
+				}
+				else
+				{
+					color(7); cout << "Settings | "; color(4); cout << "Delete";
+				}
+			}
+			else
+			{
+				gotoxy(9, posy); cout << acc[i];
+				gotoxy(60, posy); color(8); cout << "Settings | Delete";
+			}
+
+
+			posy += 2;
+			color(7);
+		}
+
+		key = _getch();
+
+		if (key == 72 && (counter >= 1 && counter <= orgSize)) // 72/75 is the ASCII code for the up arrow
+		{
+			counter--;
+		}
+
+		if (key == 80 && (counter >= 0 && counter < orgSize - 1)) // 80/77 is the ASCII code for the up arrow
+		{
+			counter++;
+		}
+
+		if (key == 75 && (counter2 == 1)) // 72/75 is the ASCII code for the up arrow
+		{
+			counter2--;
+		}
+
+		if (key == 77 && (counter2 == 0)) // 80/77 is the ASCII code for the up arrow
+		{
+			counter2++;
+		}
+
+	}
+}
+
+void addQuestionToQuizz()
+{
+	string question = "", answer;
+	char key;
+	do {
+
+		createButton(5, "   QUESTION   ", 14, 5, 6);
+		createInputField(8, " TYPE HERE  ", 40, 5, 7, question);
+
+		createButton(12, "    ANSWER    ", 14, 5, 8, 8);
+		createInputField(15, " TYPE HERE  ", 40, 5, 8, " ", 8);
+		createButton(19, "    SUBMIT    ", 14, 5, 2);
+		key = _getch();
+
+		if (key == '\b')
+		{
+			question = question.substr(0, question.size() - 1);
+		}
+
+		else if (key == '\r')
+		{
+			break;
+		}
+		else
+		{
+			question += key;
+		}
+
+
+
+	} while (key != '\r');
+
+	int subcol = 7;
+	do {
+		createButton(5, "   QUESTION   ", 14, 5, 8, 8);
+		createInputField(8, " TYPE HERE  ", 40, 5, 8, question, 8);
+		createButton(12, "    ANSWER    ", 14, 5, 6);
+		createInputField(15, " TYPE HERE  ", 40, 5, 7, answer);
+		createButton(19, "    SUBMIT    ", 14, 5, 2, subcol);
+		key = _getch();
+
+		if (key == '\b')
+		{
+			answer = answer.substr(0, answer.size() - 1);
+		}
+
+		else
+		{
+			answer += key;
+		}
+
+		answer.size() > 0 ? subcol = 2 : subcol = 7;
+
+	} while (key != '\r');
+}
 void displayQuestion()
 {
 	string info = "", question = "Who is the person who loves vscpi the most";
@@ -1077,6 +1471,7 @@ void displayQuestion()
 
 	} while (key != '\r');
 }
+
 void displayNumber(int num, int posx, int posy)
 {
 	if (num == 1)
@@ -1226,61 +1621,6 @@ void drawPunnettRows(int y, int start, int middSymb, int middSymb2, int end)
 		j == 4 ? cout << char(end) : cout << char(middSymb2);
 	}
 
-}
-void createQuestion()
-{
-	string question = "", answer;
-	char key;
-	do {
-
-		createButton(5, "   QUESTION   ", 14, 5, 6);
-		createInputField(8, " TYPE HERE  ", 40, 5, 7, question);
-
-		createButton(12, "    ANSWER    ", 14, 5, 8, 8);
-		createInputField(15, " TYPE HERE  ", 40, 5, 8, " ", 8);
-		createButton(19, "    SUBMIT    ", 14, 5, 2);
-		key = _getch();
-
-		if (key == '\b')
-		{
-			question = question.substr(0, question.size() - 1);
-		}
-
-		else if (key == '\r')
-		{
-			break;
-		}
-		else
-		{
-			question += key;
-		}
-
-
-
-	} while (key != '\r');
-
-	int subcol = 7;
-	do {
-		createButton(5, "   QUESTION   ", 14, 5, 8, 8);
-		createInputField(8, " TYPE HERE  ", 40, 5, 8, question, 8);
-		createButton(12, "    ANSWER    ", 14, 5, 6);
-		createInputField(15, " TYPE HERE  ", 40, 5, 7, answer);
-		createButton(19, "    SUBMIT    ", 14, 5, 2, subcol);
-		key = _getch();
-
-		if (key == '\b')
-		{
-			answer = answer.substr(0, answer.size() - 1);
-		}
-
-		else
-		{
-			answer += key;
-		}
-
-		answer.size() > 0 ? subcol = 2 : subcol = 7;
-
-	} while (key != '\r');
 }
 void drawPunnettSquare()
 {
