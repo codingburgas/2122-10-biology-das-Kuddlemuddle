@@ -328,15 +328,38 @@ void adminPage(vector<string> systemOrg, vector<string> systemUser)
 	}
 }
 
+void drawOrganisationLogo() 
+{
+	gotoxy(15, 7); cout << "WWWWWWWWWWWWWWWWWWWWWWMWWMMWMMWWWWWWWWWWWWWWWWWWWWW";
+	gotoxy(15, 8); cout << "WWWWWWWWWWWWWWWWWWWWWNkdddddddKWWWWWWWWWWWWWWWWWWWW";
+	gotoxy(15, 9); cout << "WWWWWWWWWWWWWWWWWWWWW0'       :OKNWWWWWWWWWWWWWWWWW";
+	gotoxy(15, 10); cout << "WWWWWWWWWWWWWWWWWWWWW0'         ;KWWWWWWWWWWWWWWWWW";
+	gotoxy(15, 11); cout << "WWWWWWWWWWWWWWWWWWWWW0' ;kOo.   ,KWWWWWWWWWWWWWWWWW";
+	gotoxy(15, 12); cout << "WWWWWWWWWWWWWWWWWWWWWO. .cokddddkNWWWWWWWWWWWWWWWWW";
+	gotoxy(15, 13); cout << "WWWWWWWWWWWWWWWWWWXkl'     .,lkXWWWWWWWWWWWWWWWWWWW";
+	gotoxy(15, 14); cout << "WWWWWWWWWWWWWWN0d:.            .:d0NWWWWWWWWWWWWWWW";
+	gotoxy(15, 15); cout << "WWWWWWWWWWWXkl,.                  .,lkXWWWWWWWWWWWW";
+	gotoxy(15, 16); cout << "WWWWWWWN0d:.                          .:d0NWWWWWWWW";
+	gotoxy(15, 17); cout << "WWWWWWNo.                                .oNWWWWWWW";
+	gotoxy(15, 18); cout << "WWWWWWNkl,    .c:.    ;lcll;    .:c.    ,lkNWWWWWWW";
+	gotoxy(15, 19); cout << "WWWWWWWWWx.   ;XK,   .OWWWMO.   ,KX;   .xWWWWWWWWWW";
+	gotoxy(15, 20); cout << "WWWWWWWWWx.   ;XK,   .OWWWWO.   ,KX;   .xWWWWWWWWWW";
+	gotoxy(15, 21); cout << "WWWWWWWWWx.   ;XK,   .OWWWWO.   ,KX;   .xWWWWWWWWWW";
+	gotoxy(15, 22); cout << "WWWWWWWWWx.   ;XK,   .OWWWWO.   ,KX;   .xWWWWWWWWWW";
+	gotoxy(15, 23); cout << "WWWWWWWWWx.   ;XK,   .OWWWWO.   ,KX;   .xWWWWWWWWWW";
+	gotoxy(15, 24); cout << "WWWWWWWWWx.   ;XK,   .OWWWWO.   ,KX;   .xWWWWWWWWWW";
+	gotoxy(15, 25); cout << "WWWWWWWK0l    ,kx.   .o0OO0o.   .xk'    l0KWWWWWWWW";
+	gotoxy(15, 26); cout << "WWWWWNK:               .                  :KNWWWWWW";
+	gotoxy(15, 27); cout << "WWWWO;.                                    .;0WWWWW";
+	gotoxy(15, 28); cout << "WWWWXxodoododoodoodoooodooodoodoooodoodoododxXWWWWW";
+	gotoxy(15, 29); cout << "WWWWWWMWMWWMWWMWMMWMWWMWWMMWMWWMWWMWWMWMWWMWWWWWWWW";
+}
 void viewOrganisationAdmin(string acc[], int orgSize)
 {
 	/*APIHandler apiHandler;
 	apiHandler.getAllOrgs("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJleHAiOjE2NTEzOTQ4MTMsImlhdCI6MTY1MTMwODQxMywiaXNBZG1pbiI6MCwic3ViIjoiMSJ9.lFWn7AUKArrNMiqggBmnkOEHMt7sJFdshvN2JeCCtjw"); */
 	system("cls");
-
-
 	char key; // Key to be entered
-
 	int counter = 0, counter2 = 0;
 	int ckey = 0;
 
@@ -440,31 +463,10 @@ void createOrganisation()
 		colors[iPut] = 6;
 		color(6);
 		printLogo(26);
-		gotoxy(15, 7); cout << "WWWWWWWWWWWWWWWWWWWWWWMWWMMWMMWWWWWWWWWWWWWWWWWWWWW";
-		gotoxy(15, 8); cout << "WWWWWWWWWWWWWWWWWWWWWNkdddddddKWWWWWWWWWWWWWWWWWWWW";
+		drawOrganisationLogo();
 		createInputField(8, " Course name", 40, 75, colors[0], info[0]);
-		gotoxy(15, 9); cout << "WWWWWWWWWWWWWWWWWWWWW0'       :OKNWWWWWWWWWWWWWWWWW";
-		gotoxy(15, 10); cout << "WWWWWWWWWWWWWWWWWWWWW0'         ;KWWWWWWWWWWWWWWWWW";
-		gotoxy(15, 11); cout << "WWWWWWWWWWWWWWWWWWWWW0' ;kOo.   ,KWWWWWWWWWWWWWWWWW";
-		gotoxy(15, 12); cout << "WWWWWWWWWWWWWWWWWWWWWO. .cokddddkNWWWWWWWWWWWWWWWWW";
 		createInputField(12, " Password   ", 40, 75, colors[1], info[1]);
-		gotoxy(15, 13); cout << "WWWWWWWWWWWWWWWWWWXkl'     .,lkXWWWWWWWWWWWWWWWWWWW";
-		gotoxy(15, 14); cout << "WWWWWWWWWWWWWWN0d:.            .:d0NWWWWWWWWWWWWWWW";
-		gotoxy(15, 15); cout << "WWWWWWWWWWWXkl,.                  .,lkXWWWWWWWWWWWW";
-		gotoxy(15, 16); cout << "WWWWWWWN0d:.                          .:d0NWWWWWWWW";
-		gotoxy(15, 17); cout << "WWWWWWNo.                                .oNWWWWWWW";
-		gotoxy(15, 18); cout << "WWWWWWNkl,    .c:.    ;lcll;    .:c.    ,lkNWWWWWWW";
-		gotoxy(15, 19); cout << "WWWWWWWWWx.   ;XK,   .OWWWMO.   ,KX;   .xWWWWWWWWWW";
-		gotoxy(15, 20); cout << "WWWWWWWWWx.   ;XK,   .OWWWWO.   ,KX;   .xWWWWWWWWWW";
-		gotoxy(15, 21); cout << "WWWWWWWWWx.   ;XK,   .OWWWWO.   ,KX;   .xWWWWWWWWWW";
-		gotoxy(15, 22); cout << "WWWWWWWWWx.   ;XK,   .OWWWWO.   ,KX;   .xWWWWWWWWWW";
-		gotoxy(15, 23); cout << "WWWWWWWWWx.   ;XK,   .OWWWWO.   ,KX;   .xWWWWWWWWWW";
-		gotoxy(15, 24); cout << "WWWWWWWWWx.   ;XK,   .OWWWWO.   ,KX;   .xWWWWWWWWWW";
-		gotoxy(15, 25); cout << "WWWWWWWK0l    ,kx.   .o0OO0o.   .xk'    l0KWWWWWWWW";
-		gotoxy(15, 26); cout << "WWWWWNK:               .                  :KNWWWWWW";
-		gotoxy(15, 27); cout << "WWWWO;.                                    .;0WWWWW";
-		gotoxy(15, 28); cout << "WWWWXxodoododoodoodoooodooodoodoooodoodoododxXWWWWW";
-		gotoxy(15, 29); cout << "WWWWWWMWMWWMWWMWMMWMWWMWWMMWMWWMWWMWWMWMWWMWWWWWWWW";
+		
 
 		if (iPut == 2)
 		{
@@ -513,32 +515,10 @@ void joinOrganisation()
 		colors[iPut] = 6;
 		color(6);
 		printLogo(26); 
-		gotoxy(15, 7); cout << "WWWWWWWWWWWWWWWWWWWWWWMWWMMWMMWWWWWWWWWWWWWWWWWWWWW";
-		gotoxy(15, 8); cout << "WWWWWWWWWWWWWWWWWWWWWNkdddddddKWWWWWWWWWWWWWWWWWWWW";
+		drawOrganisationLogo();
 		createInputField(8, " Course name", 40, 75, colors[0], info[0]);
-		gotoxy(15, 9); cout << "WWWWWWWWWWWWWWWWWWWWW0'       :OKNWWWWWWWWWWWWWWWWW";
-		gotoxy(15, 10); cout << "WWWWWWWWWWWWWWWWWWWWW0'         ;KWWWWWWWWWWWWWWWWW";
-		gotoxy(15, 11); cout << "WWWWWWWWWWWWWWWWWWWWW0' ;kOo.   ,KWWWWWWWWWWWWWWWWW";
-		gotoxy(15, 12); cout << "WWWWWWWWWWWWWWWWWWWWWO. .cokddddkNWWWWWWWWWWWWWWWWW";
 		createInputField(12, " Password   ", 40, 75, colors[1], info[1]);
-		gotoxy(15, 13); cout << "WWWWWWWWWWWWWWWWWWXkl'     .,lkXWWWWWWWWWWWWWWWWWWW";
-		gotoxy(15, 14); cout << "WWWWWWWWWWWWWWN0d:.            .:d0NWWWWWWWWWWWWWWW";
-		gotoxy(15, 15); cout << "WWWWWWWWWWWXkl,.                  .,lkXWWWWWWWWWWWW";
-		gotoxy(15, 16); cout << "WWWWWWWN0d:.                          .:d0NWWWWWWWW";
-		gotoxy(15, 17); cout << "WWWWWWNo.                                .oNWWWWWWW";
-		gotoxy(15, 18); cout << "WWWWWWNkl,    .c:.    ;lcll;    .:c.    ,lkNWWWWWWW";
-		gotoxy(15, 19); cout << "WWWWWWWWWx.   ;XK,   .OWWWMO.   ,KX;   .xWWWWWWWWWW";
-		gotoxy(15, 20); cout << "WWWWWWWWWx.   ;XK,   .OWWWWO.   ,KX;   .xWWWWWWWWWW";
-		gotoxy(15, 21); cout << "WWWWWWWWWx.   ;XK,   .OWWWWO.   ,KX;   .xWWWWWWWWWW";
-		gotoxy(15, 22); cout << "WWWWWWWWWx.   ;XK,   .OWWWWO.   ,KX;   .xWWWWWWWWWW";
-		gotoxy(15, 23); cout << "WWWWWWWWWx.   ;XK,   .OWWWWO.   ,KX;   .xWWWWWWWWWW";
-		gotoxy(15, 24); cout << "WWWWWWWWWx.   ;XK,   .OWWWWO.   ,KX;   .xWWWWWWWWWW";
-		gotoxy(15, 25); cout << "WWWWWWWK0l    ,kx.   .o0OO0o.   .xk'    l0KWWWWWWWW";
-		gotoxy(15, 26); cout << "WWWWWNK:               .                  :KNWWWWWW";
-		gotoxy(15, 27); cout << "WWWWO;.                                    .;0WWWWW";
-		gotoxy(15, 28); cout << "WWWWXxodoododoodoodoooodooodoodoooodoodoododxXWWWWW";
-		gotoxy(15, 29); cout << "WWWWWWMWMWWMWWMWMMWMWWMWWMMWMWWMWWMWWMWMWWMWWWWWWWW";
-
+		
 		if (iPut == 2)
 		{
 			createButton(16, "   Join now   ", 14, 75, 2);
@@ -573,8 +553,119 @@ void joinOrganisation()
 
 	} while (key != '\r' && iPut <= 2);
 }
+void updateOrganisation(string orgName, string orgPass)
+{
+	system("cls");
+	char key = ' ';
+	int iPut = 0;
+	string info[5] = { orgName, orgPass };
+
+	do
+	{
+		int colors[3] = { 7, 7 };
+		colors[iPut] = 6;
+		color(6);
+		printLogo(26);
+		drawOrganisationLogo();
+		createInputField(8, " Course name", 40, 75, colors[0], info[0]);
+		createInputField(12, " Password   ", 40, 75, colors[1], info[1]);
+
+		if (iPut == 2)
+		{
+			createButton(16, "    Update    ", 14, 75, 2);
+		}
+		else {
+			createButton(16, "    Update    ", 14, 75, 7);
+		}
+
+		key = _getch();
+
+		if (key == '\r')
+		{
+			iPut++;
+			key = ' ';
+		}
+
+		else
+		{
+			if (iPut < 2)
+			{
+				if (key == '\b')
+				{
+					info[iPut] = info[iPut].substr(0, info[iPut].size() - 1);
+				}
+
+				else
+				{
+					info[iPut] += key;
+				}
+			}
+		}
+
+	} while (key != '\r' && iPut <= 2);
+}
+
+void manageUserRoles(string acc[], int orgSize)
+{
+	/*APIHandler apiHandler;
+	apiHandler.getAllOrgs("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJleHAiOjE2NTEzOTQ4MTMsImlhdCI6MTY1MTMwODQxMywiaXNBZG1pbiI6MCwic3ViIjoiMSJ9.lFWn7AUKArrNMiqggBmnkOEHMt7sJFdshvN2JeCCtjw"); */
+	system("cls");
+	char key; // Key to be entered
+	int counter = 0, counter2 = 0;
+	int ckey = 0;
+
+	while (true)
+	{
+		// Button for history notebook section
+		int posy = 5;
+		gotoxy(2, 3); color(6); cout << "O R G A N I Z A T I O N   U S E R S"; color(7);
+		for (int i = 0; i < orgSize; i++) {
+			gotoxy(4, posy); cout << "-->";
+			if (i == counter) {
+				color(6); gotoxy(9, posy); cout << acc[i];
+				gotoxy(60, posy);
+				if (counter2 == 0) {
+					color(3); cout << "Teacher"; color(7); cout << " | Admin";
+				}
+				else {
+					color(7); cout << "Teacher | "; color(3); cout << "Admin";
+				}
+			}
+			else {
+				gotoxy(9, posy); cout << acc[i];
+				gotoxy(60, posy); color(8); cout << "Teacher | Admin";
+			}
 
 
+			posy += 2;
+			color(7);
+		}
+
+		key = _getch();
+
+		if (key == 72 && (counter >= 1 && counter <= orgSize)) // 72/75 is the ASCII code for the up arrow
+		{
+			counter--;
+		}
+
+		if (key == 80 && (counter >= 0 && counter < orgSize - 1)) // 80/77 is the ASCII code for the up arrow
+		{
+			counter++;
+		}
+
+		if (key == 75 && (counter2 == 1)) // 72/75 is the ASCII code for the up arrow
+		{
+			counter2--;
+		}
+
+		if (key == 77 && (counter2 == 0)) // 80/77 is the ASCII code for the up arrow
+		{
+			counter2++;
+		}
+
+
+	}
+}
 void displayQuestion()
 {
 	string info = "", question = "Who is the person who loves vscpi the most";
@@ -984,10 +1075,10 @@ int Menu() //Main menu with three options
 
 int main()
 {
-	/*string acc[5] = { "Vocational school of Programing", "United states of America",
+	string acc[5] = { "Vocational school of Programing", "United states of America",
 		"Kethering und scisorss", "Code block for Specialists", "Cooking restaurnat um France" };
-	vector<string> users = { "Vesko Stoyanov", "Tereza Opanska", "KOstadin Tlg", "MC Stojan", "Yoana Smn" };
-	viewOrganisationUser(acc, 5);*/
-	joinOrganisation();
+	string users[5] = { "Vesko Stoyanov", "Tereza Opanska", "KOstadin Tlg", "MC Stojan", "Yoana Smn" };
+
+	manageUserRoles(users, 5);
 
 }
