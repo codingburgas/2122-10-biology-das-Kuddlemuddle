@@ -44,7 +44,7 @@ std::string APIHandler::registerHandler(RegisterData regData)
     return JSONRes["fields"][0];
 }
 
-std::string APIHandler::loginHandler(LoginData logData, LayerContex* ctx)
+std::string APIHandler::loginHandler(LoginData logData, SceneContex* ctx)
 {
     cpr::Response r = cpr::Post(cpr::Url{ "http://localhost:18080/api/login" },
         cpr::Payload{
@@ -70,17 +70,23 @@ std::string APIHandler::loginHandler(LoginData logData, LayerContex* ctx)
         return "";
     }
 
-    std::string returnVal = "";
+    std::string returnVal;
 
-    for (auto& el : JSONRes["fields"].items())
+    if (JSONRes["fields"].size() != 1)
     {
-        returnVal += el.value();
+        returnVal = "The following fileds are incorrect: ";
+
+        for (auto& el : JSONRes["fields"].items())
+        {
+            returnVal += el.value();
+            returnVal += " ";
+        }
     }
 
-    return returnVal;
+    return JSONRes["fields"][0];
 }
 
-std::string APIHandler::getUserInfo(std::string userId, LayerContex* ctx, User &user)
+std::string APIHandler::getUserInfo(std::string userId, SceneContex* ctx, User &user)
 {
     cpr::Response r;
     if (!ctx->JWTToken.empty())

@@ -78,7 +78,7 @@ void createInputField(int posy, std::string text, int size, int posx, int col, s
 
 void SceneManager::LoadScenes()
 {
-	SceneManager* sceneManager = this;
+	SceneContex* sceneContex = new SceneContex();
 
 	scenes.push_back(
 		{
@@ -261,25 +261,40 @@ void SceneManager::LoadScenes()
 						iPut++;
 						inputKey = ' ';
 					}
-
-					if (inputKey == '\t')
+					else if (inputKey == '\t')
 					{
 						return "Register";
 					}
-
+					else if (inputKey == '\b')
+					{
+						info[iPut] = info[iPut].substr(0, info[iPut].size() - 1);
+					}
 					else
 					{
-						if (inputKey == '\b')
-						{
-							info[iPut] = info[iPut].substr(0, info[iPut].size() - 1);
-						}
-						else
-						{
-							info[iPut] += inputKey;
-						}
+						info[iPut] += inputKey;
 					}
-
 				} while (inputKey != '\r' && iPut <= 1);
+
+				LoginData loginData = { info[0], info[1] };
+				
+				APIHandler apiHandler;
+
+				std::string recordSet = apiHandler.loginHandler(loginData, sceneContex);
+
+				if (recordSet.empty())
+				{
+					outputPosition(15, 31); std::cout << "The account was created successfully! Press any key to continue!";
+
+					(void)_getch();
+
+					return "Login";
+				}
+
+				outputPosition(15, 31); std::cout << recordSet;
+
+				(void)_getch();
+
+				return "Login";
 			}
 		}
 	);
