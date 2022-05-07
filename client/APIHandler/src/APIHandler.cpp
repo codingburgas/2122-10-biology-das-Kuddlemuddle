@@ -28,14 +28,20 @@ std::string APIHandler::registerHandler(RegisterData regData)
         return "";
     }
 
-    std::string returnVal = "";
+    std::string returnVal;
 
-    for (auto& el: JSONRes["fields"].items())
+    if (JSONRes["fields"].size() != 1)
     {
-        returnVal += el.value();
+         returnVal = "The following fileds are incorrect: ";
+
+        for (auto& el: JSONRes["fields"].items())
+        {
+            returnVal += el.value();
+            returnVal += " ";
+        }
     }
 
-    return returnVal;
+    return JSONRes["fields"][0];
 }
 
 std::string APIHandler::loginHandler(LoginData logData, LayerContex* ctx)

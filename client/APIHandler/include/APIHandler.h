@@ -39,7 +39,6 @@ struct OrgInfo
 };
 
 
-
 struct RegisterData
 {
     std::string fname;

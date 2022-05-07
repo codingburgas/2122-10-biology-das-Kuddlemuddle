@@ -18,94 +18,94 @@ void gotoxy(int x, int y)  //Get the coordinates inside the console
 void createInputField(int posy, string text, int size, int posx, int col, string input = "", int col2 = 7)
 {
 	color(col);
-	gotoxy(posx, posy); cout << char(201);
+	gotoxy(posx, posy); std::cout << char(201);
 
 	for (int i = 0; i < 14; i++)
 	{
-		cout << char(205);
+		std::cout << char(205);
 	}
 
-	cout << char(203);
+	std::cout << char(203);
 
 	for (int i = 0; i < size - 14; i++)
 	{
-		cout << char(205);
+		std::cout << char(205);
 	}
 
-	cout << char(187);
+	std::cout << char(187);
 
-	gotoxy(posx, posy + 1); cout << char(186); 
+	gotoxy(posx, posy + 1); std::cout << char(186); 
 	color(col2);
 
-	cout << text << "  "; color(col); cout << char(186) << " ";
+	std::cout << text << "  "; color(col); std::cout << char(186) << " ";
 	color(col2);
 
 	size_t inputLength = 0;
 
 	if (input.size() > 24) 
 	{
-		cout << input.substr(input.size() - 24, input.size());
+		std::cout << input.substr(input.size() - 24, input.size());
 		inputLength = 24;
 	}
 
 	else 
 	{
-		cout << input;
+		std::cout << input;
 		inputLength = input.size();
 	}
 
 	for (size_t i = 0; i < 25 - inputLength; i++)
 	{
-		cout << " ";
+		std::cout << " ";
 	}
 
-	color(col); cout << char(186) << endl;
-	gotoxy(posx, posy + 2); cout << char(200);
+	color(col); std::cout << char(186) << std::endl;
+	gotoxy(posx, posy + 2); std::cout << char(200);
 
 	for (int i = 0; i < 14; i++)
 	{
-		cout << char(205);
+		std::cout << char(205);
 	}
 
-	cout << char(202);
+	std::cout << char(202);
 
 	for (int i = 0; i < size - 14; i++)
 	{
-		cout << char(205);
+		std::cout << char(205);
 	}
 
-	cout << char(188);
+	std::cout << char(188);
 	color(6);
 }
 void createButton(int posy, string text, int size, int posx, int col, int col2 = 7)
 {
-	color(col); gotoxy(posx, posy); cout << char(201);
+	color(col); gotoxy(posx, posy); std::cout << char(201);
 
 	for (int i = 0; i < size; i++)
 	{
-		cout << char(205);
+		std::cout << char(205);
 	}
-	cout << char(187);
+	std::cout << char(187);
 
-	gotoxy(posx, posy + 1); cout << char(186); color(col2); cout << text; color(col); cout << char(186) << endl;
-	gotoxy(posx, posy + 2); cout << char(200);
+	gotoxy(posx, posy + 1); std::cout << char(186); color(col2); std::cout << text; color(col); std::cout << char(186) << std::endl;
+	gotoxy(posx, posy + 2); std::cout << char(200);
 
 	for (int i = 0; i < size; i++)
 	{
-		cout << char(205);
+		std::cout << char(205);
 	}
 
-	cout << char(188); color(7);
+	std::cout << char(188); color(7);
 }
 void printLogo(int posx) {
-	gotoxy(posx, 0); cout << "     _             _  __         _     _ _                          _     _ _      " << endl;
-	gotoxy(posx, 1); cout << "  __| | __ _ ___  | |/ /   _  __| | __| | | ___ _ __ ___  _   _  __| | __| | | ___ " << endl;
-	gotoxy(posx, 2); cout << " / _` |/ _` / __| | ' / | | |/ _` |/ _` | |/ _ \\ '_ ` _ \\| | | |/ _` |/ _` | |/ _ \\" << endl;
-	gotoxy(posx, 3); cout << "| (_| | (_| \\__ \\ | . \\ |_| | (_| | (_| | |  __/ | | | | | |_| | (_| | (_| | |  __/" << endl;
-	gotoxy(posx, 4); cout << " \\__,_|\\__,_|___/ |_|\\_\\__,_|\\__,_|\\__,_|_|\\___|_| |_| |_|\\__,_|\\__,_|\\__,_|_|\\___|" << endl;
+	gotoxy(posx, 0); std::cout << "     _             _  __         _     _ _                          _     _ _      " << std::endl;
+	gotoxy(posx, 1); std::cout << "  __| | __ _ ___  | |/ /   _  __| | __| | | ___ _ __ ___  _   _  __| | __| | | ___ " << std::endl;
+	gotoxy(posx, 2); std::cout << " / _` |/ _` / __| | ' / | | |/ _` |/ _` | |/ _ \\ '_ ` _ \\| | | |/ _` |/ _` | |/ _ \\" << std::endl;
+	gotoxy(posx, 3); std::cout << "| (_| | (_| \\__ \\ | . \\ |_| | (_| | (_| | |  __/ | | | | | |_| | (_| | (_| | |  __/" << std::endl;
+	gotoxy(posx, 4); std::cout << " \\__,_|\\__,_|___/ |_|\\_\\__,_|\\__,_|\\__,_|_|\\___|_| |_| |_|\\__,_|\\__,_|\\__,_|_|\\___|" << std::endl;
 }
 
-LoginData loginPage()
+void loginPage()
 {
 	system("cls");
 	char key = ' ';
@@ -117,30 +117,30 @@ LoginData loginPage()
 		printLogo(30);
 		int colors[2] = { 7,7 };
 		colors[iPut] = 6;
-		gotoxy(15, 7); cout << "MMMMMMMMMMMMMNX0kXXXXXXk0XNMMMMMMMMMMMMMMM" << endl;
-		gotoxy(15, 8); cout << "MMMMMMMMMMMMMNX0kXXXXXXk0XNMMMMMMMMMMMMMMM" << endl;
+		gotoxy(15, 7); std::cout << "MMMMMMMMMMMMMNX0kXXXXXXk0XNMMMMMMMMMMMMMMM" << std::endl;
+		gotoxy(15, 8); std::cout << "MMMMMMMMMMMMMNX0kXXXXXXk0XNMMMMMMMMMMMMMMM" << std::endl;
 		createInputField(8, " Email      ", 40, 65, colors[0], info[0]);
-		gotoxy(15, 9); cout << "MMMMMMMMMNOd:'.            .':dONMMMMMMMMM" << endl;
-		gotoxy(15, 10); cout << "MMMMMMW0o'                      'o0WMMMMMM" << endl;
-		gotoxy(15, 11); cout << "MMMMW0c.                          .c0WMMMM" << endl;
-		gotoxy(15, 12); cout << "MMMNd.                              .dNMMM" << endl;
+		gotoxy(15, 9); std::cout << "MMMMMMMMMNOd:'.            .':dONMMMMMMMMM" << std::endl;
+		gotoxy(15, 10); std::cout << "MMMMMMW0o'                      'o0WMMMMMM" << std::endl;
+		gotoxy(15, 11); std::cout << "MMMMW0c.                          .c0WMMMM" << std::endl;
+		gotoxy(15, 12); std::cout << "MMMNd.                              .dNMMM" << std::endl;
 		createInputField(12, " Password   ", 40, 65, colors[1], info[1]);
-		gotoxy(15, 13); cout << "MMXl             ,oxkkxl'             lXMM" << endl;
-		gotoxy(15, 14); cout << "MNo            .dNMMMMMMXc             oNM" << endl;
-		gotoxy(15, 15); cout << "MO.            ;XMMMMMMMMO.            .OM" << endl;
-		gotoxy(15, 16); cout << "Wl             .kWMMMMMMNo.             lW" << endl;
-		gotoxy(15, 17); cout << "N:              .cx000Od;.              :N" << endl;
-		gotoxy(15, 18); cout << "Nc             .;:lodooc:,.             cN" << endl;
-		gotoxy(15, 19); cout << "Wd.          'dKWMMMMMMMMN0l.          .dW" << endl;
-		gotoxy(15, 20); cout << "MK,         '0MMMMMMMMMMMMMWx.         ,KM" << endl;
-		gotoxy(15, 21); cout << "MWk.        ;0WMMMMMMMMMMMMWk.        .kWM" << endl;
-		gotoxy(15, 22); cout << "MMWk'       .,::::::::::::::,.       'kWMM" << endl;
-		gotoxy(15, 23); cout << "MMMWKc.                            .cKMMMM" << endl;
-		gotoxy(15, 24); cout << "MMMMMNO:.                        .:ONMMMMM" << endl;
-		gotoxy(15, 25); cout << "MMMMMMMW0o;.                  .;o0WMMMMMMM" << endl;
-		gotoxy(15, 26); cout << "MMMMMMMMMMWKkoc;,'......',;cokKWMMMMMMMMMM" << endl;
-		gotoxy(15, 27); cout << "MMMMMMMMMMMMMMMWWNNXXNNWMMWMMMMMMMMMMMMMMM" << endl;
-		gotoxy(15, 28); cout << "MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM" << endl;
+		gotoxy(15, 13); std::cout << "MMXl             ,oxkkxl'             lXMM" << std::endl;
+		gotoxy(15, 14); std::cout << "MNo            .dNMMMMMMXc             oNM" << std::endl;
+		gotoxy(15, 15); std::cout << "MO.            ;XMMMMMMMMO.            .OM" << std::endl;
+		gotoxy(15, 16); std::cout << "Wl             .kWMMMMMMNo.             lW" << std::endl;
+		gotoxy(15, 17); std::cout << "N:              .cx000Od;.              :N" << std::endl;
+		gotoxy(15, 18); std::cout << "Nc             .;:lodooc:,.             cN" << std::endl;
+		gotoxy(15, 19); std::cout << "Wd.          'dKWMMMMMMMMN0l.          .dW" << std::endl;
+		gotoxy(15, 20); std::cout << "MK,         '0MMMMMMMMMMMMMWx.         ,KM" << std::endl;
+		gotoxy(15, 21); std::cout << "MWk.        ;0WMMMMMMMMMMMMWk.        .kWM" << std::endl;
+		gotoxy(15, 22); std::cout << "MMWk'       .,::::::::::::::,.       'kWMM" << std::endl;
+		gotoxy(15, 23); std::cout << "MMMWKc.                            .cKMMMM" << std::endl;
+		gotoxy(15, 24); std::cout << "MMMMMNO:.                        .:ONMMMMM" << std::endl;
+		gotoxy(15, 25); std::cout << "MMMMMMMW0o;.                  .;o0WMMMMMMM" << std::endl;
+		gotoxy(15, 26); std::cout << "MMMMMMMMMMWKkoc;,'......',;cokKWMMMMMMMMMM" << std::endl;
+		gotoxy(15, 27); std::cout << "MMMMMMMMMMMMMMMWWNNXXNNWMMWMMMMMMMMMMMMMMM" << std::endl;
+		gotoxy(15, 28); std::cout << "MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM" << std::endl;
 		color(6);
 
 		key = _getch();
@@ -166,48 +166,79 @@ LoginData loginPage()
 	} while (key != '\r' && iPut <= 1);
 
 	LoginData account = { info[0], info[1] };
-	return account;
 }
-RegisterData registerPage()
+
+void registerPage()
 {
 	char key = ' ';
 	int iPut = 0;
 	string info[5] = { "", "", "", "", "" };
-
+	bool firstShow = true;
 	color(6);
-	do {
-
-		int colors[5] = { 7,7,7,7,7 };
+	int colors[5] = { 7,7,7,7,7 };
+	
+	do 
+	{
 		colors[iPut] = 6;
-		printLogo(30);
-		gotoxy(15, 7); cout << "MMMMMMMMMMMMMNX0kXXXXXXk0XNMMMMMMMMMMMMMMM" << endl;
-		gotoxy(15, 8); cout << "MMMMMMMMMMMMMNX0kXXXXXXk0XNMMMMMMMMMMMMMMM" << endl;
+		if (firstShow)
+		{
+			printLogo(30);
+			gotoxy(15, 7); std::cout << "MMMMMMMMMMMMMNX0kXXXXXXk0XNMMMMMMMMMMMMMMM" << std::endl;
+			gotoxy(15, 8); std::cout << "MMMMMMMMMMMMMNX0kXXXXXXk0XNMMMMMMMMMMMMMMM" << std::endl;
+		}
+		
 		createInputField(8, " First name ", 40, 65, colors[0], info[0]);
-		gotoxy(15, 9); cout << "MMMMMMMMMNOd:'.            .':dONMMMMMMMMM" << endl;
-		gotoxy(15, 10); cout << "MMMMMMW0o'                      'o0WMMMMMM" << endl;
-		gotoxy(15, 11); cout << "MMMMW0c.                          .c0WMMMM" << endl;
-		gotoxy(15, 12); cout << "MMMNd.                              .dNMMM" << endl;
+		
+		if (firstShow)
+		{
+			gotoxy(15, 9); std::cout << "MMMMMMMMMNOd:'.            .':dONMMMMMMMMM" << std::endl;
+			gotoxy(15, 10); std::cout << "MMMMMMW0o'                      'o0WMMMMMM" << std::endl;
+			gotoxy(15, 11); std::cout << "MMMMW0c.                          .c0WMMMM" << std::endl;
+			gotoxy(15, 12); std::cout << "MMMNd.                              .dNMMM" << std::endl;
+		}
+			
 		createInputField(12, " Last name  ", 40, 65, colors[1], info[1]);
-		gotoxy(15, 13); cout << "MMXl             ,oxkkxl'             lXMM" << endl;
-		gotoxy(15, 14); cout << "MNo            .dNMMMMMMXc             oNM" << endl;
-		gotoxy(15, 15); cout << "MO.            ;XMMMMMMMMO.            .OM" << endl;
-		gotoxy(15, 16); cout << "Wl             .kWMMMMMMNo.             lW" << endl;
+
+		if (firstShow)
+		{
+			gotoxy(15, 13); std::cout << "MMXl             ,oxkkxl'             lXMM" << std::endl;
+			gotoxy(15, 14); std::cout << "MNo            .dNMMMMMMXc             oNM" << std::endl;
+			gotoxy(15, 15); std::cout << "MO.            ;XMMMMMMMMO.            .OM" << std::endl;
+			gotoxy(15, 16); std::cout << "Wl             .kWMMMMMMNo.             lW" << std::endl;
+		}
+		
 		createInputField(16, " Username   ", 40, 65, colors[2], info[2]);
-		gotoxy(15, 17); cout << "N:              .cx000Od;.              :N" << endl;
-		gotoxy(15, 18); cout << "Nc             .;:lodooc:,.             cN" << endl;
-		gotoxy(15, 19); cout << "Wd.          'dKWMMMMMMMMN0l.          .dW" << endl;
-		gotoxy(15, 20); cout << "MK,         '0MMMMMMMMMMMMMWx.         ,KM" << endl;
+		
+		if (firstShow)
+		{
+			gotoxy(15, 17); std::cout << "N:              .cx000Od;.              :N" << std::endl;
+			gotoxy(15, 18); std::cout << "Nc             .;:lodooc:,.             cN" << std::endl;
+			gotoxy(15, 19); std::cout << "Wd.          'dKWMMMMMMMMN0l.          .dW" << std::endl;
+			gotoxy(15, 20); std::cout << "MK,         '0MMMMMMMMMMMMMWx.         ,KM" << std::endl;
+		}
+		
 		createInputField(20, " Email      ", 40, 65, colors[3], info[3]);
-		gotoxy(15, 21); cout << "MWk.        ;0WMMMMMMMMMMMMWk.        .kWM" << endl;
-		gotoxy(15, 22); cout << "MMWk'       .,::::::::::::::,.       'kWMM" << endl;
-		gotoxy(15, 23); cout << "MMMWKc.                            .cKMMMM" << endl;
-		gotoxy(15, 24); cout << "MMMMMNO:.                        .:ONMMMMM" << endl;
+
+		if (firstShow)
+		{
+			gotoxy(15, 21); std::cout << "MWk.        ;0WMMMMMMMMMMMMWk.        .kWM" << std::endl;
+			gotoxy(15, 22); std::cout << "MMWk'       .,::::::::::::::,.       'kWMM" << std::endl;
+			gotoxy(15, 23); std::cout << "MMMWKc.                            .cKMMMM" << std::endl;
+			gotoxy(15, 24); std::cout << "MMMMMNO:.                        .:ONMMMMM" << std::endl;
+		}
+
 		createInputField(24, " Password   ", 40, 65, colors[4], info[4]);
-		gotoxy(15, 25); cout << "MMMMMMMW0o;.                  .;o0WMMMMMMM" << endl;
-		gotoxy(15, 26); cout << "MMMMMMMMMMWKkoc;,'......',;cokKWMMMMMMMMMM" << endl;
-		gotoxy(15, 27); cout << "MMMMMMMMMMMMMMMWWNNXXNNWMMWMMMMMMMMMMMMMMM" << endl;
-		gotoxy(15, 28); cout << "MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM" << endl;
-		color(6);
+		
+		if (firstShow)
+		{
+			gotoxy(15, 25); std::cout << "MMMMMMMW0o;.                  .;o0WMMMMMMM" << std::endl;
+			gotoxy(15, 26); std::cout << "MMMMMMMMMMWKkoc;,'......',;cokKWMMMMMMMMMM" << std::endl;
+			gotoxy(15, 27); std::cout << "MMMMMMMMMMMMMMMWWNNXXNNWMMWMMMMMMMMMMMMMMM" << std::endl;
+			gotoxy(15, 28); std::cout << "MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM" << std::endl;
+			color(6);
+		}
+
+		firstShow = false;
 
 		key = _getch();
 
@@ -235,22 +266,21 @@ RegisterData registerPage()
 
 	APIHandler newprof;
 	newprof.registerHandler(account);
-	return account;
 }
 
 void accountPage(RegisterData acc)
 {
-	gotoxy(40, 6); color(6); cout << "A C C O U N T     S E T T I N G S"; color(7);
-	gotoxy(43, 8); cout << "First name  ";
-	gotoxy(58, 8); cout << acc.fname;
-	gotoxy(44, 10); cout << "Last name  ";
-	gotoxy(58, 10); cout << acc.lname;
-	gotoxy(37, 12); cout << "Account Username  ";
-	gotoxy(58, 12); cout << acc.username;
-	gotoxy(40, 14); cout << "Email address  ";
-	gotoxy(58, 14); cout << acc.email;
-	gotoxy(45, 16); cout << "Password  ";
-	gotoxy(58, 16); cout << acc.password;
+	gotoxy(40, 6); color(6); std::cout << "A C C O U N T     S E T T I N G S"; color(7);
+	gotoxy(43, 8); std::cout << "First name  ";
+	gotoxy(58, 8); std::cout << acc.fname;
+	gotoxy(44, 10); std::cout << "Last name  ";
+	gotoxy(58, 10); std::cout << acc.lname;
+	gotoxy(37, 12); std::cout << "Account Username  ";
+	gotoxy(58, 12); std::cout << acc.username;
+	gotoxy(40, 14); std::cout << "Email address  ";
+	gotoxy(58, 14); std::cout << acc.email;
+	gotoxy(45, 16); std::cout << "Password  ";
+	gotoxy(58, 16); std::cout << acc.password;
 
 	char key; // Key to be entered
 	int SetColor[2] = { 2, 7 };
@@ -261,16 +291,16 @@ void accountPage(RegisterData acc)
 	{
 		// Button for history notebook section
 
-		gotoxy(42, 18); color(SetColor[0]); cout << "U P D A T E";
+		gotoxy(42, 18); color(SetColor[0]); std::cout << "U P D A T E";
 		if (counter == 0) 
 		{
-			gotoxy(54, 18); color(7); cout << "<--";
+			gotoxy(54, 18); color(7); std::cout << "<--";
 		}
 		if (counter == 1) 
 		{
-			gotoxy(54, 18); color(7); cout << "-->";
+			gotoxy(54, 18); color(7); std::cout << "-->";
 		}
-		gotoxy(58, 18); color(SetColor[1]); cout << "D E L E T E";
+		gotoxy(58, 18); color(SetColor[1]); std::cout << "D E L E T E";
 
 		key = _getch();
 
@@ -316,13 +346,13 @@ void adminPage(vector<string> systemOrg, vector<string> systemUser)
 		for (int i = 0; i < systemOrg.size(); i++)
 		{
 			counter2 == 0 ? counter == i ? color(6) : color(7) : color(8);
-			gotoxy(15, 8 + i); cout << char(186) << " " << systemOrg[i];
+			gotoxy(15, 8 + i); std::cout << char(186) << " " << systemOrg[i];
 		}
 
 		for (int i = 0; i < systemUser.size(); i++)
 		{
 			counter2 == 1 ? counter == i ? color(6) : color(7) : color(8);
-			gotoxy(70, 8 + i); cout << char(186) << " " << systemUser[i];
+			gotoxy(70, 8 + i); std::cout << char(186) << " " << systemUser[i];
 		}
 
 		key = _getch();
@@ -351,29 +381,29 @@ void adminPage(vector<string> systemOrg, vector<string> systemUser)
 
 void drawOrganisationLogo()
 {
-	gotoxy(15, 7); cout << "WWWWWWWWWWWWWWWWWWWWWWMWWMMWMMWWWWWWWWWWWWWWWWWWWWW";
-	gotoxy(15, 8); cout << "WWWWWWWWWWWWWWWWWWWWWNkdddddddKWWWWWWWWWWWWWWWWWWWW";
-	gotoxy(15, 9); cout << "WWWWWWWWWWWWWWWWWWWWW0'       :OKNWWWWWWWWWWWWWWWWW";
-	gotoxy(15, 10); cout << "WWWWWWWWWWWWWWWWWWWWW0'         ;KWWWWWWWWWWWWWWWWW";
-	gotoxy(15, 11); cout << "WWWWWWWWWWWWWWWWWWWWW0' ;kOo.   ,KWWWWWWWWWWWWWWWWW";
-	gotoxy(15, 12); cout << "WWWWWWWWWWWWWWWWWWWWWO. .cokddddkNWWWWWWWWWWWWWWWWW";
-	gotoxy(15, 13); cout << "WWWWWWWWWWWWWWWWWWXkl'     .,lkXWWWWWWWWWWWWWWWWWWW";
-	gotoxy(15, 14); cout << "WWWWWWWWWWWWWWN0d:.            .:d0NWWWWWWWWWWWWWWW";
-	gotoxy(15, 15); cout << "WWWWWWWWWWWXkl,.                  .,lkXWWWWWWWWWWWW";
-	gotoxy(15, 16); cout << "WWWWWWWN0d:.                          .:d0NWWWWWWWW";
-	gotoxy(15, 17); cout << "WWWWWWNo.                                .oNWWWWWWW";
-	gotoxy(15, 18); cout << "WWWWWWNkl,    .c:.    ;lcll;    .:c.    ,lkNWWWWWWW";
-	gotoxy(15, 19); cout << "WWWWWWWWWx.   ;XK,   .OWWWMO.   ,KX;   .xWWWWWWWWWW";
-	gotoxy(15, 20); cout << "WWWWWWWWWx.   ;XK,   .OWWWWO.   ,KX;   .xWWWWWWWWWW";
-	gotoxy(15, 21); cout << "WWWWWWWWWx.   ;XK,   .OWWWWO.   ,KX;   .xWWWWWWWWWW";
-	gotoxy(15, 22); cout << "WWWWWWWWWx.   ;XK,   .OWWWWO.   ,KX;   .xWWWWWWWWWW";
-	gotoxy(15, 23); cout << "WWWWWWWWWx.   ;XK,   .OWWWWO.   ,KX;   .xWWWWWWWWWW";
-	gotoxy(15, 24); cout << "WWWWWWWWWx.   ;XK,   .OWWWWO.   ,KX;   .xWWWWWWWWWW";
-	gotoxy(15, 25); cout << "WWWWWWWK0l    ,kx.   .o0OO0o.   .xk'    l0KWWWWWWWW";
-	gotoxy(15, 26); cout << "WWWWWNK:               .                  :KNWWWWWW";
-	gotoxy(15, 27); cout << "WWWWO;.                                    .;0WWWWW";
-	gotoxy(15, 28); cout << "WWWWXxodoododoodoodoooodooodoodoooodoodoododxXWWWWW";
-	gotoxy(15, 29); cout << "WWWWWWMWMWWMWWMWMMWMWWMWWMMWMWWMWWMWWMWMWWMWWWWWWWW";
+	gotoxy(15, 7); std::cout << "WWWWWWWWWWWWWWWWWWWWWWMWWMMWMMWWWWWWWWWWWWWWWWWWWWW";
+	gotoxy(15, 8); std::cout << "WWWWWWWWWWWWWWWWWWWWWNkdddddddKWWWWWWWWWWWWWWWWWWWW";
+	gotoxy(15, 9); std::cout << "WWWWWWWWWWWWWWWWWWWWW0'       :OKNWWWWWWWWWWWWWWWWW";
+	gotoxy(15, 10); std::cout << "WWWWWWWWWWWWWWWWWWWWW0'         ;KWWWWWWWWWWWWWWWWW";
+	gotoxy(15, 11); std::cout << "WWWWWWWWWWWWWWWWWWWWW0' ;kOo.   ,KWWWWWWWWWWWWWWWWW";
+	gotoxy(15, 12); std::cout << "WWWWWWWWWWWWWWWWWWWWWO. .cokddddkNWWWWWWWWWWWWWWWWW";
+	gotoxy(15, 13); std::cout << "WWWWWWWWWWWWWWWWWWXkl'     .,lkXWWWWWWWWWWWWWWWWWWW";
+	gotoxy(15, 14); std::cout << "WWWWWWWWWWWWWWN0d:.            .:d0NWWWWWWWWWWWWWWW";
+	gotoxy(15, 15); std::cout << "WWWWWWWWWWWXkl,.                  .,lkXWWWWWWWWWWWW";
+	gotoxy(15, 16); std::cout << "WWWWWWWN0d:.                          .:d0NWWWWWWWW";
+	gotoxy(15, 17); std::cout << "WWWWWWNo.                                .oNWWWWWWW";
+	gotoxy(15, 18); std::cout << "WWWWWWNkl,    .c:.    ;lcll;    .:c.    ,lkNWWWWWWW";
+	gotoxy(15, 19); std::cout << "WWWWWWWWWx.   ;XK,   .OWWWMO.   ,KX;   .xWWWWWWWWWW";
+	gotoxy(15, 20); std::cout << "WWWWWWWWWx.   ;XK,   .OWWWWO.   ,KX;   .xWWWWWWWWWW";
+	gotoxy(15, 21); std::cout << "WWWWWWWWWx.   ;XK,   .OWWWWO.   ,KX;   .xWWWWWWWWWW";
+	gotoxy(15, 22); std::cout << "WWWWWWWWWx.   ;XK,   .OWWWWO.   ,KX;   .xWWWWWWWWWW";
+	gotoxy(15, 23); std::cout << "WWWWWWWWWx.   ;XK,   .OWWWWO.   ,KX;   .xWWWWWWWWWW";
+	gotoxy(15, 24); std::cout << "WWWWWWWWWx.   ;XK,   .OWWWWO.   ,KX;   .xWWWWWWWWWW";
+	gotoxy(15, 25); std::cout << "WWWWWWWK0l    ,kx.   .o0OO0o.   .xk'    l0KWWWWWWWW";
+	gotoxy(15, 26); std::cout << "WWWWWNK:               .                  :KNWWWWWW";
+	gotoxy(15, 27); std::cout << "WWWWO;.                                    .;0WWWWW";
+	gotoxy(15, 28); std::cout << "WWWWXxodoododoodoodoooodooodoodoooodoodoododxXWWWWW";
+	gotoxy(15, 29); std::cout << "WWWWWWMWMWWMWWMWMMWMWWMWWMMWMWWMWWMWWMWMWWMWWWWWWWW";
 }
 void viewOrganisationAdmin(string acc[], int orgSize)
 {
@@ -388,22 +418,22 @@ void viewOrganisationAdmin(string acc[], int orgSize)
 	{
 		// Button for history notebook section
 		int posy = 5;
-		gotoxy(2, 3); color(6); cout << "O R G A N I S A T I O N S"; color(7);
+		gotoxy(2, 3); color(6); std::cout << "O R G A N I S A T I O N S"; color(7);
 		for (int i = 0; i < orgSize; i++) {
-			gotoxy(4, posy); cout << "-->";
+			gotoxy(4, posy); std::cout << "-->";
 			if (i == counter) {
-				color(6); gotoxy(9, posy); cout << acc[i];
+				color(6); gotoxy(9, posy); std::cout << acc[i];
 				gotoxy(60, posy);
 				if (counter2 == 0) {
-					color(2); cout << "Update"; color(7); cout << " | Delete";
+					color(2); std::cout << "Update"; color(7); std::cout << " | Delete";
 				}
 				else {
-					color(7); cout << "Update | "; color(4); cout << "Delete";
+					color(7); std::cout << "Update | "; color(4); std::cout << "Delete";
 				}
 			}
 			else {
-				gotoxy(9, posy); cout << acc[i];
-				gotoxy(60, posy); color(8); cout << "Update | Delete";
+				gotoxy(9, posy); std::cout << acc[i];
+				gotoxy(60, posy); color(8); std::cout << "Update | Delete";
 			}
 
 
@@ -445,14 +475,14 @@ void viewOrganisationUser(string acc[], int orgSize)
 
 	while (true)
 	{
-		gotoxy(2, 3); color(6); cout << "O R G A N I S A T I O N S"; color(7);
+		gotoxy(2, 3); color(6); std::cout << "O R G A N I S A T I O N S"; color(7);
 		posy = 5;
 
 		for (int i = 0; i < orgSize; i++)
 		{
-			gotoxy(4, posy); cout << "-->";
+			gotoxy(4, posy); std::cout << "-->";
 			i == counter ? color(6) : color(7);
-			gotoxy(9, posy); cout << acc[i];
+			gotoxy(9, posy); std::cout << acc[i];
 
 			posy += 2;
 		}
@@ -636,31 +666,31 @@ void manageUserRoles(string acc[], int orgSize)
 	{
 		// Button for history notebook section
 		int posy = 5;
-		gotoxy(2, 3); color(6); cout << "O R G A N I Z A T I O N   U S E R S"; color(7);
+		gotoxy(2, 3); color(6); std::cout << "O R G A N I Z A T I O N   U S E R S"; color(7);
 		for (int i = 0; i < orgSize; i++)
 		{
-			gotoxy(4, posy); cout << "-->";
+			gotoxy(4, posy); std::cout << "-->";
 
 			if (i == counter)
 			{
-				color(6); gotoxy(9, posy); cout << acc[i];
+				color(6); gotoxy(9, posy); std::cout << acc[i];
 				gotoxy(60, posy);
 
 				if (counter2 == 0)
 				{
-					color(3); cout << "Teacher"; color(7); cout << " | Admin";
+					color(3); std::cout << "Teacher"; color(7); std::cout << " | Admin";
 				}
 
 				else
 				{
-					color(7); cout << "Teacher | "; color(3); cout << "Admin";
+					color(7); std::cout << "Teacher | "; color(3); std::cout << "Admin";
 				}
 			}
 
 			else
 			{
-				gotoxy(9, posy); cout << acc[i];
-				gotoxy(60, posy); color(8); cout << "Teacher | Admin";
+				gotoxy(9, posy); std::cout << acc[i];
+				gotoxy(60, posy); color(8); std::cout << "Teacher | Admin";
 			}
 
 
@@ -703,27 +733,27 @@ void viewCoursesInOrganisation(string acc[], int orgSize)
 	while (true)
 	{
 		int posy = 5;
-		gotoxy(2, 3); color(6); cout << "O R G A N I S A T I O N   C O U R S E S"; color(7);
+		gotoxy(2, 3); color(6); std::cout << "O R G A N I S A T I O N   C O U R S E S"; color(7);
 		for (int i = 0; i < orgSize; i++)
 		{
-			gotoxy(4, posy); cout << "-->";
+			gotoxy(4, posy); std::cout << "-->";
 			if (i == counter)
 			{
-				color(6); gotoxy(9, posy); cout << acc[i];
+				color(6); gotoxy(9, posy); std::cout << acc[i];
 				gotoxy(60, posy);
 				if (counter2 == 0)
 				{
-					color(2); cout << "Settings"; color(7); cout << " | Delete";
+					color(2); std::cout << "Settings"; color(7); std::cout << " | Delete";
 				}
 				else
 				{
-					color(7); cout << "Settings | "; color(4); cout << "Delete";
+					color(7); std::cout << "Settings | "; color(4); std::cout << "Delete";
 				}
 			}
 			else
 			{
-				gotoxy(9, posy); cout << acc[i];
-				gotoxy(60, posy); color(8); cout << "Settings | Delete";
+				gotoxy(9, posy); std::cout << acc[i];
+				gotoxy(60, posy); color(8); std::cout << "Settings | Delete";
 			}
 
 
@@ -760,7 +790,7 @@ void createCourse()
 {
 	string question = "", answer, teacher;
 	char key;
-	gotoxy(5, 4); cout << "C R E A T E   C O U R S E ";
+	gotoxy(5, 4); std::cout << "C R E A T E   C O U R S E ";
 	do
 	{
 		createInputField(6, " Course name", 40, 5, 6, question);
@@ -824,7 +854,7 @@ void createCourse()
 void manageCourse(string question, string answer, string teacher)
 {
 	char key;
-	gotoxy(5, 4); cout << "M A N A G E   C O U R S E ";
+	gotoxy(5, 4); std::cout << "M A N A G E   C O U R S E ";
 
 	while (true)
 	{
@@ -889,17 +919,17 @@ void viewTopicsInCourse(string acc[], int orgSize)
 	while (true)
 	{
 		int posy = 5;
-		gotoxy(2, 3); color(6); cout << "C O U R S E ' S   T O P I C S"; color(7);
+		gotoxy(2, 3); color(6); std::cout << "C O U R S E ' S   T O P I C S"; color(7);
 		for (int i = 0; i < orgSize; i++)
 		{
-			gotoxy(4, posy); cout << "-->";
+			gotoxy(4, posy); std::cout << "-->";
 			if (i == counter)
 			{
-				color(6); gotoxy(9, posy); cout << acc[i];
+				color(6); gotoxy(9, posy); std::cout << acc[i];
 			}
 			else
 			{
-				gotoxy(9, posy); cout << acc[i];
+				gotoxy(9, posy); std::cout << acc[i];
 			}
 
 			posy += 2;
@@ -940,27 +970,27 @@ void updateDeleteTopicsInCourse(string acc[], int orgSize)
 	while (true)
 	{
 		int posy = 5;
-		gotoxy(2, 3); color(6); cout << "C O U R S E ' S   T O P I C S"; color(7);
+		gotoxy(2, 3); color(6); std::cout << "C O U R S E ' S   T O P I C S"; color(7);
 		for (int i = 0; i < orgSize; i++)
 		{
-			gotoxy(4, posy); cout << "-->";
+			gotoxy(4, posy); std::cout << "-->";
 			if (i == counter)
 			{
-				color(6); gotoxy(9, posy); cout << acc[i];
+				color(6); gotoxy(9, posy); std::cout << acc[i];
 				gotoxy(60, posy);
 				if (counter2 == 0)
 				{
-					color(2); cout << "Settings"; color(7); cout << " | Delete";
+					color(2); std::cout << "Settings"; color(7); std::cout << " | Delete";
 				}
 				else
 				{
-					color(7); cout << "Settings | "; color(4); cout << "Delete";
+					color(7); std::cout << "Settings | "; color(4); std::cout << "Delete";
 				}
 			}
 			else
 			{
-				gotoxy(9, posy); cout << acc[i];
-				gotoxy(60, posy); color(8); cout << "Settings | Delete";
+				gotoxy(9, posy); std::cout << acc[i];
+				gotoxy(60, posy); color(8); std::cout << "Settings | Delete";
 			}
 
 
@@ -1002,17 +1032,17 @@ void addTopicsInCourse(string acc[], int orgSize)
 	{
 		system("cls");
 		int posy = 5;
-		gotoxy(2, 3); color(6); cout << "C O U R S E ' S   T O P I C S"; color(7);
+		gotoxy(2, 3); color(6); std::cout << "C O U R S E ' S   T O P I C S"; color(7);
 		for (int i = 0; i < orgSize; i++)
 		{
-			gotoxy(4, posy); cout << "-->";
+			gotoxy(4, posy); std::cout << "-->";
 			if (i == counter)
 			{
-				color(6); gotoxy(9, posy); cout << acc[i];
+				color(6); gotoxy(9, posy); std::cout << acc[i];
 			}
 			else
 			{
-				gotoxy(9, posy); cout << acc[i];
+				gotoxy(9, posy); std::cout << acc[i];
 			}
 
 			posy += 2;
@@ -1084,17 +1114,17 @@ void viewLessonsInTopic(string acc[], int orgSize)
 	while (true)
 	{
 		int posy = 5;
-		gotoxy(2, 3); color(6); cout << "L E S S O N S  I N   T H E   T O P I C"; color(7);
+		gotoxy(2, 3); color(6); std::cout << "L E S S O N S  I N   T H E   T O P I C"; color(7);
 		for (int i = 0; i < orgSize; i++)
 		{
-			gotoxy(4, posy); cout << "-->";
+			gotoxy(4, posy); std::cout << "-->";
 			if (i == counter)
 			{
-				color(6); gotoxy(9, posy); cout << acc[i];
+				color(6); gotoxy(9, posy); std::cout << acc[i];
 			}
 			else
 			{
-				gotoxy(9, posy); cout << acc[i];
+				gotoxy(9, posy); std::cout << acc[i];
 			}
 
 			posy += 2;
@@ -1135,27 +1165,27 @@ void updateDeleteLessons(string acc[], int orgSize)
 	while (true)
 	{
 		int posy = 5;
-		gotoxy(2, 3); color(6); cout << "L E S S O N S  I N   T H E   T O P I C"; color(7);
+		gotoxy(2, 3); color(6); std::cout << "L E S S O N S  I N   T H E   T O P I C"; color(7);
 		for (int i = 0; i < orgSize; i++)
 		{
-			gotoxy(4, posy); cout << "-->";
+			gotoxy(4, posy); std::cout << "-->";
 			if (i == counter)
 			{
-				color(6); gotoxy(9, posy); cout << acc[i];
+				color(6); gotoxy(9, posy); std::cout << acc[i];
 				gotoxy(60, posy);
 				if (counter2 == 0)
 				{
-					color(2); cout << "Settings"; color(7); cout << " | Delete";
+					color(2); std::cout << "Settings"; color(7); std::cout << " | Delete";
 				}
 				else
 				{
-					color(7); cout << "Settings | "; color(4); cout << "Delete";
+					color(7); std::cout << "Settings | "; color(4); std::cout << "Delete";
 				}
 			}
 			else
 			{
-				gotoxy(9, posy); cout << acc[i];
-				gotoxy(60, posy); color(8); cout << "Settings | Delete";
+				gotoxy(9, posy); std::cout << acc[i];
+				gotoxy(60, posy); color(8); std::cout << "Settings | Delete";
 			}
 
 
@@ -1197,17 +1227,17 @@ void addLesson(string acc[], int orgSize)
 	{
 		system("cls");
 		int posy = 5;
-		gotoxy(2, 3); color(6); cout << "L E S S O N S  I N   T H E   T O P I C"; color(7);
+		gotoxy(2, 3); color(6); std::cout << "L E S S O N S  I N   T H E   T O P I C"; color(7);
 		for (int i = 0; i < orgSize; i++)
 		{
-			gotoxy(4, posy); cout << "-->";
+			gotoxy(4, posy); std::cout << "-->";
 			if (i == counter)
 			{
-				color(6); gotoxy(9, posy); cout << acc[i];
+				color(6); gotoxy(9, posy); std::cout << acc[i];
 			}
 			else
 			{
-				gotoxy(9, posy); cout << acc[i];
+				gotoxy(9, posy); std::cout << acc[i];
 			}
 
 			posy += 2;
@@ -1280,17 +1310,17 @@ void addQuizz(string acc[], int orgSize)
 	{
 		system("cls");
 		int posy = 5;
-		gotoxy(2, 3); color(6); cout << "Q U I Z Z E S"; color(7);
+		gotoxy(2, 3); color(6); std::cout << "Q U I Z Z E S"; color(7);
 		for (int i = 0; i < orgSize; i++)
 		{
-			gotoxy(4, posy); cout << "-->";
+			gotoxy(4, posy); std::cout << "-->";
 			if (i == counter)
 			{
-				color(6); gotoxy(9, posy); cout << acc[i];
+				color(6); gotoxy(9, posy); std::cout << acc[i];
 			}
 			else
 			{
-				gotoxy(9, posy); cout << acc[i];
+				gotoxy(9, posy); std::cout << acc[i];
 			}
 
 			posy += 2;
@@ -1361,27 +1391,27 @@ void updateDeleteQuizz(string acc[], int orgSize)
 	while (true)
 	{
 		int posy = 5;
-		gotoxy(2, 3); color(6); cout << "Q U I Z Z E S"; color(7);
+		gotoxy(2, 3); color(6); std::cout << "Q U I Z Z E S"; color(7);
 		for (int i = 0; i < orgSize; i++)
 		{
-			gotoxy(4, posy); cout << "-->";
+			gotoxy(4, posy); std::cout << "-->";
 			if (i == counter)
 			{
-				color(6); gotoxy(9, posy); cout << acc[i];
+				color(6); gotoxy(9, posy); std::cout << acc[i];
 				gotoxy(60, posy);
 				if (counter2 == 0)
 				{
-					color(2); cout << "Settings"; color(7); cout << " | Delete";
+					color(2); std::cout << "Settings"; color(7); std::cout << " | Delete";
 				}
 				else
 				{
-					color(7); cout << "Settings | "; color(4); cout << "Delete";
+					color(7); std::cout << "Settings | "; color(4); std::cout << "Delete";
 				}
 			}
 			else
 			{
-				gotoxy(9, posy); cout << acc[i];
-				gotoxy(60, posy); color(8); cout << "Settings | Delete";
+				gotoxy(9, posy); std::cout << acc[i];
+				gotoxy(60, posy); color(8); std::cout << "Settings | Delete";
 			}
 
 
@@ -1476,7 +1506,7 @@ void displayQuestion()
 
 	do {
 		createButton(7, "     QUESTION    ", 17, 6, 6);
-		gotoxy(26, 8); color(7); cout << question;
+		gotoxy(26, 8); color(7); std::cout << question;
 		createInputField(10, "  TYPE HERE ", 40, 6, 7, info);
 
 		createButton(13, "      SUBMIT     ", 17, 6, 2);
@@ -1496,150 +1526,150 @@ void displayNumber(int num, int posx, int posy)
 {
 	if (num == 1)
 	{
-		gotoxy(posx, posy + 2); cout << " __  ";
-		gotoxy(posx, posy + 3); cout << "/_ | ";
-		gotoxy(posx, posy + 4); cout << " | |";
-		gotoxy(posx, posy + 5); cout << " | |";
-		gotoxy(posx, posy + 6); cout << " | |";
-		gotoxy(posx, posy + 7); cout << " |_| ";
+		gotoxy(posx, posy + 2); std::cout << " __  ";
+		gotoxy(posx, posy + 3); std::cout << "/_ | ";
+		gotoxy(posx, posy + 4); std::cout << " | |";
+		gotoxy(posx, posy + 5); std::cout << " | |";
+		gotoxy(posx, posy + 6); std::cout << " | |";
+		gotoxy(posx, posy + 7); std::cout << " |_| ";
 	}
 	if (num == 2)
 	{
-		gotoxy(posx, posy + 2); cout << " ___  ";
-		gotoxy(posx, posy + 3); cout << "|__  \\  ";
-		gotoxy(posx, posy + 4); cout << "   ) | ";
-		gotoxy(posx, posy + 5); cout << "  / /  ";
-		gotoxy(posx, posy + 6); cout << " / /_  ";
-		gotoxy(posx, posy + 7); cout << "|____| ";
+		gotoxy(posx, posy + 2); std::cout << " ___  ";
+		gotoxy(posx, posy + 3); std::cout << "|__  \\  ";
+		gotoxy(posx, posy + 4); std::cout << "   ) | ";
+		gotoxy(posx, posy + 5); std::cout << "  / /  ";
+		gotoxy(posx, posy + 6); std::cout << " / /_  ";
+		gotoxy(posx, posy + 7); std::cout << "|____| ";
 	}
 	if (num == 3)
 	{
-		gotoxy(posx, posy + 2); cout << " ____";
-		gotoxy(posx, posy + 3); cout << "|___ \\ ";
-		gotoxy(posx, posy + 4); cout << "  __) | ";
-		gotoxy(posx, posy + 5); cout << " |__ <  ";
-		gotoxy(posx, posy + 6); cout << " ___) | ";
-		gotoxy(posx, posy + 7); cout << "|____/  ";
+		gotoxy(posx, posy + 2); std::cout << " ____";
+		gotoxy(posx, posy + 3); std::cout << "|___ \\ ";
+		gotoxy(posx, posy + 4); std::cout << "  __) | ";
+		gotoxy(posx, posy + 5); std::cout << " |__ <  ";
+		gotoxy(posx, posy + 6); std::cout << " ___) | ";
+		gotoxy(posx, posy + 7); std::cout << "|____/  ";
 	}
 	if (num == 4)
 	{
-		gotoxy(posx, posy + 2); cout << " _  _   ";
-		gotoxy(posx, posy + 3); cout << "| || |   ";
-		gotoxy(posx, posy + 4); cout << "| || |_  ";
-		gotoxy(posx, posy + 5); cout << "|__   _| ";
-		gotoxy(posx, posy + 6); cout << "   | |   ";
-		gotoxy(posx, posy + 7); cout << "   |_|   ";
+		gotoxy(posx, posy + 2); std::cout << " _  _   ";
+		gotoxy(posx, posy + 3); std::cout << "| || |   ";
+		gotoxy(posx, posy + 4); std::cout << "| || |_  ";
+		gotoxy(posx, posy + 5); std::cout << "|__   _| ";
+		gotoxy(posx, posy + 6); std::cout << "   | |   ";
+		gotoxy(posx, posy + 7); std::cout << "   |_|   ";
 	}
 	if (num == 5)
 	{
-		gotoxy(posx, posy + 2); cout << " _____  ";
-		gotoxy(posx, posy + 3); cout << "| ____| ";
-		gotoxy(posx, posy + 4); cout << "| |__   ";
-		gotoxy(posx, posy + 5); cout << "|___ \\  ";
-		gotoxy(posx, posy + 6); cout << " ___) | ";
-		gotoxy(posx, posy + 7); cout << "|____/  ";
+		gotoxy(posx, posy + 2); std::cout << " _____  ";
+		gotoxy(posx, posy + 3); std::cout << "| ____| ";
+		gotoxy(posx, posy + 4); std::cout << "| |__   ";
+		gotoxy(posx, posy + 5); std::cout << "|___ \\  ";
+		gotoxy(posx, posy + 6); std::cout << " ___) | ";
+		gotoxy(posx, posy + 7); std::cout << "|____/  ";
 	}
 	if (num == 6) {
-		gotoxy(posx, posy + 2); cout << "   __   ";
-		gotoxy(posx, posy + 3); cout << "  / /   ";
-		gotoxy(posx, posy + 4); cout << " / /_   ";
-		gotoxy(posx, posy + 5); cout << "| '_ \\  ";
-		gotoxy(posx, posy + 6); cout << "| (_) | ";
-		gotoxy(posx, posy + 7); cout << " \\___/  ";
+		gotoxy(posx, posy + 2); std::cout << "   __   ";
+		gotoxy(posx, posy + 3); std::cout << "  / /   ";
+		gotoxy(posx, posy + 4); std::cout << " / /_   ";
+		gotoxy(posx, posy + 5); std::cout << "| '_ \\  ";
+		gotoxy(posx, posy + 6); std::cout << "| (_) | ";
+		gotoxy(posx, posy + 7); std::cout << " \\___/  ";
 	}
 	if (num == 7) {
-		gotoxy(posx, posy + 2); cout << " ______  ";
-		gotoxy(posx, posy + 3); cout << "|____  | ";
-		gotoxy(posx, posy + 4); cout << "    / /  ";
-		gotoxy(posx, posy + 5); cout << "   / /   ";
-		gotoxy(posx, posy + 6); cout << "  / /    ";
-		gotoxy(posx, posy + 7); cout << " /_/ ";
+		gotoxy(posx, posy + 2); std::cout << " ______  ";
+		gotoxy(posx, posy + 3); std::cout << "|____  | ";
+		gotoxy(posx, posy + 4); std::cout << "    / /  ";
+		gotoxy(posx, posy + 5); std::cout << "   / /   ";
+		gotoxy(posx, posy + 6); std::cout << "  / /    ";
+		gotoxy(posx, posy + 7); std::cout << " /_/ ";
 	}
 	if (num == 8)
 	{
-		gotoxy(posx, posy + 2); cout << "  ___   ";
-		gotoxy(posx, posy + 3); cout << " / _ \\  ";
-		gotoxy(posx, posy + 4); cout << "| (_) | ";
-		gotoxy(posx, posy + 5); cout << " > _ <  ";
-		gotoxy(posx, posy + 6); cout << "| (_) | ";
-		gotoxy(posx, posy + 7); cout << " \\___/ ";
+		gotoxy(posx, posy + 2); std::cout << "  ___   ";
+		gotoxy(posx, posy + 3); std::cout << " / _ \\  ";
+		gotoxy(posx, posy + 4); std::cout << "| (_) | ";
+		gotoxy(posx, posy + 5); std::cout << " > _ <  ";
+		gotoxy(posx, posy + 6); std::cout << "| (_) | ";
+		gotoxy(posx, posy + 7); std::cout << " \\___/ ";
 
 	}
 
 	if (num == 9)
 	{
-		gotoxy(posx, posy + 2); cout << "  ___  ";
-		gotoxy(posx, posy + 3); cout << " / _ \\ ";
-		gotoxy(posx, posy + 4); cout << "| (_) | ";
-		gotoxy(posx, posy + 5); cout << " \\__, | ";
-		gotoxy(posx, posy + 6); cout << "   / /  ";
-		gotoxy(posx, posy + 7); cout << "  /_/  ";
+		gotoxy(posx, posy + 2); std::cout << "  ___  ";
+		gotoxy(posx, posy + 3); std::cout << " / _ \\ ";
+		gotoxy(posx, posy + 4); std::cout << "| (_) | ";
+		gotoxy(posx, posy + 5); std::cout << " \\__, | ";
+		gotoxy(posx, posy + 6); std::cout << "   / /  ";
+		gotoxy(posx, posy + 7); std::cout << "  /_/  ";
 	}
 
 	if (num == 0) {
-		gotoxy(posx, posy + 2); cout << "  ___   ";
-		gotoxy(posx, posy + 3); cout << " / _ \\  ";
-		gotoxy(posx, posy + 4); cout << "| | | | ";
-		gotoxy(posx, posy + 5); cout << "| | | | ";
-		gotoxy(posx, posy + 6); cout << "| |_| | ";
-		gotoxy(posx, posy + 7); cout << " \\___/  ";
+		gotoxy(posx, posy + 2); std::cout << "  ___   ";
+		gotoxy(posx, posy + 3); std::cout << " / _ \\  ";
+		gotoxy(posx, posy + 4); std::cout << "| | | | ";
+		gotoxy(posx, posy + 5); std::cout << "| | | | ";
+		gotoxy(posx, posy + 6); std::cout << "| |_| | ";
+		gotoxy(posx, posy + 7); std::cout << " \\___/  ";
 	}
 }
 void displayGrade(int points)
 {
-	gotoxy(40, 2); cout << char(218);
+	gotoxy(40, 2); std::cout << char(218);
 	for (int i = 0; i < 50; i++) {
-		cout << char(196);
+		std::cout << char(196);
 	}
-	gotoxy(91, 2); cout << char(191);
+	gotoxy(91, 2); std::cout << char(191);
 
-	gotoxy(54, 5);  cout << "Y O U R   S C O R E   I S";
+	gotoxy(54, 5);  std::cout << "Y O U R   S C O R E   I S";
 
 	for (int i = 0; i < 25; i++)
 	{
-		gotoxy(40, 3 + i);  cout << char(179);
-		gotoxy(91, 3 + i);  cout << char(179);
+		gotoxy(40, 3 + i);  std::cout << char(179);
+		gotoxy(91, 3 + i);  std::cout << char(179);
 	}
 
 	color(3); displayNumber(points / 10, 58, 4);
 	displayNumber(points % 10, 67, 4); color(7);
-	gotoxy(62, 13);  cout << "O U T  O F";
+	gotoxy(62, 13);  std::cout << "O U T  O F";
 
 
 	color(8); displayNumber(1, 55, 12);
 	displayNumber(0, 62, 12);
 	displayNumber(0, 71, 12); color(7);
 
-	gotoxy(54, 21);  cout << "Y O U R "; color(3); cout << " S T A T U S "; color(7); cout << " I S";
+	gotoxy(54, 21);  std::cout << "Y O U R "; color(3); std::cout << " S T A T U S "; color(7); std::cout << " I S";
 	if (points < 40) {
-		gotoxy(65, 23); color(4); cout << "B A D";
+		gotoxy(65, 23); color(4); std::cout << "B A D";
 	}
 	else if (points <= 70) {
-		gotoxy(61, 23); color(6); cout << "A V E R A G E";
+		gotoxy(61, 23); color(6); std::cout << "A V E R A G E";
 	}
 	else if (points <= 100) {
-		gotoxy(59, 23); color(2); cout << "E X C E L E N T";
+		gotoxy(59, 23); color(2); std::cout << "E X C E L E N T";
 	}
 	color(7);
-	gotoxy(40, 26); cout << char(192);
+	gotoxy(40, 26); std::cout << char(192);
 	for (int i = 0; i < 50; i++)
 	{
-		cout << char(196);
+		std::cout << char(196);
 	}
-	gotoxy(91, 26); cout << char(217);
+	gotoxy(91, 26); std::cout << char(217);
 
 }
 
 void drawPunnettRows(int y, int start, int middSymb, int middSymb2, int end)
 {
-	gotoxy(5, y); cout << char(start);
+	gotoxy(5, y); std::cout << char(start);
 	for (int j = 0; j < 5; j++)
 	{
 		for (int i = 0; i < 6; i++)
 		{
-			cout << char(middSymb);
+			std::cout << char(middSymb);
 		}
-		j == 4 ? cout << char(end) : cout << char(middSymb2);
+		j == 4 ? std::cout << char(end) : std::cout << char(middSymb2);
 	}
 
 }
@@ -1654,50 +1684,50 @@ void drawPunnettSquare()
 		system("cls");
 		row = 0;
 		drawPunnettRows(8, 218, 196, 194, 191);
-		gotoxy(2, 9 + counter); color(6);  cout << char(254); color(7);
-		gotoxy(9 + counter2, 7); color(6);  cout << char(254); color(7);
+		gotoxy(2, 9 + counter); color(6);  std::cout << char(254); color(7);
+		gotoxy(9 + counter2, 7); color(6);  std::cout << char(254); color(7);
 
 		for (int i = 0; i < 36; i += 7)
 		{
-			gotoxy(5 + i, 9); cout << char(179) << " ";
+			gotoxy(5 + i, 9); std::cout << char(179) << " ";
 
 		}
 		for (int i = 0; i < 26; i += 7)
 		{
-			gotoxy(15 + i, 9); cout << parents[row];
+			gotoxy(15 + i, 9); std::cout << parents[row];
 			row++;
 		}
 		for (int i = 0; i < 8; i += 2)
 		{
-			gotoxy(8, 11 + i); cout << parents[row];
+			gotoxy(8, 11 + i); std::cout << parents[row];
 			row++;
 		}
 		drawPunnettRows(10, 195, 196, 197, 180);
 
 		for (int i = 0; i < 36; i += 7)
 		{
-			gotoxy(5 + i, 11); cout << char(179);
+			gotoxy(5 + i, 11); std::cout << char(179);
 		}
 
 		drawPunnettRows(12, 195, 196, 197, 180);
 
 		for (int i = 0; i < 36; i += 7)
 		{
-			gotoxy(5 + i, 13); cout << char(179);
+			gotoxy(5 + i, 13); std::cout << char(179);
 		}
 
 		drawPunnettRows(14, 195, 196, 197, 180);
 
 		for (int i = 0; i < 36; i += 7)
 		{
-			gotoxy(5 + i, 15); cout << char(179);
+			gotoxy(5 + i, 15); std::cout << char(179);
 		}
 
 		drawPunnettRows(16, 195, 196, 197, 180);
 
 		for (int i = 0; i < 36; i += 7)
 		{
-			gotoxy(5 + i, 17); cout << char(179);
+			gotoxy(5 + i, 17); std::cout << char(179);
 		}
 
 		drawPunnettRows(18, 192, 196, 193, 217);
@@ -1737,7 +1767,7 @@ void navigationBar() //Main menu with three options
 	while (true)
 	{
 		// Button for history notebook section
-		gotoxy(0, 1); cout << "     Kuddlemuddle  ";
+		gotoxy(0, 1); std::cout << "     Kuddlemuddle  ";
 
 		color(SetColor[0]);
 		createButton(1, "       MY PROFILE       ", 24, 5, SetColor[0]);
@@ -1755,7 +1785,7 @@ void navigationBar() //Main menu with three options
 
 		for (int i = 0; i < 130; i++)
 		{
-			gotoxy(i, 4); cout << char(205);
+			gotoxy(i, 4); std::cout << char(205);
 		}
 
 		key = _getch();
@@ -1822,5 +1852,5 @@ void navigationBar() //Main menu with three options
 
 int main()
 {
-	navigationBar();
+	registerPage();
 }

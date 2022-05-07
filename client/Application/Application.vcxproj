@@ -135,7 +135,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)include;$(SolutionDir)logs\include;$(SolutionDir)Utils\include;$(SolutionDir)ErrorHandaling\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;$(SolutionDir)logs\include;$(SolutionDir)Utils\include;$(SolutionDir)ErrorHandaling\include;$(SolutionDir)SceneManager\include;$(SolutionDir)APIHandler\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -144,6 +144,8 @@
     </Link>
     <Lib>
       <OutputFile>$(SolutionDir)Client\lib\$(TargetName)$(TargetExt)</OutputFile>
+      <AdditionalDependencies>ErrorHandaling.lib;logs.lib;Utils.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)client\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -157,7 +159,8 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)include;$(SolutionDir)logs\include;$(SolutionDir)Utils\include;$(SolutionDir)ErrorHandaling\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;$(SolutionDir)logs\include;$(SolutionDir)Utils\include;$(SolutionDir)ErrorHandaling\include;$(SolutionDir)SceneManager\include;$(SolutionDir)APIHandler\include</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>

@@ -1,3 +1,7 @@
+/*! @file windowsAPI.cpp
+*   @brief A source file for communicating with the windows API
+*/
+
 #include <windowsAPI.h>
 
 /**

@@ -13,11 +13,7 @@
 #include <vector>
 #include <string>
 #include <iostream>
-
-struct SceneManager
-{
-
-};
+#include <SceneManager.h>
 
 /**
  * @brief Main struct for the applications
