@@ -93,6 +93,7 @@ void printLogo(int posx) {
 	gotoxy(posx, 3); cout << "| (_| | (_| \\__ \\ | . \\ |_| | (_| | (_| | |  __/ | | | | | |_| | (_| | (_| | |  __/" << endl;
 	gotoxy(posx, 4); cout << " \\__,_|\\__,_|___/ |_|\\_\\__,_|\\__,_|\\__,_|_|\\___|_| |_| |_|\\__,_|\\__,_|\\__,_|_|\\___|" << endl;
 }
+
 LoginData loginPage()
 {
 	system("cls");
@@ -607,31 +608,37 @@ void updateOrganisation(string orgName, string orgPass)
 
 void manageUserRoles(string acc[], int orgSize)
 {
-	/*APIHandler apiHandler;
-	apiHandler.getAllOrgs("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJleHAiOjE2NTEzOTQ4MTMsImlhdCI6MTY1MTMwODQxMywiaXNBZG1pbiI6MCwic3ViIjoiMSJ9.lFWn7AUKArrNMiqggBmnkOEHMt7sJFdshvN2JeCCtjw"); */
 	system("cls");
 	char key; // Key to be entered
 	int counter = 0, counter2 = 0;
-	int ckey = 0;
 
 	while (true)
 	{
 		// Button for history notebook section
 		int posy = 5;
 		gotoxy(2, 3); color(6); cout << "O R G A N I Z A T I O N   U S E R S"; color(7);
-		for (int i = 0; i < orgSize; i++) {
+		for (int i = 0; i < orgSize; i++) 
+		{
 			gotoxy(4, posy); cout << "-->";
-			if (i == counter) {
+
+			if (i == counter) 
+			{
 				color(6); gotoxy(9, posy); cout << acc[i];
 				gotoxy(60, posy);
-				if (counter2 == 0) {
+
+				if (counter2 == 0) 
+				{
 					color(3); cout << "Teacher"; color(7); cout << " | Admin";
 				}
-				else {
+
+				else 
+				{
 					color(7); cout << "Teacher | "; color(3); cout << "Admin";
 				}
 			}
-			else {
+
+			else 
+			{
 				gotoxy(9, posy); cout << acc[i];
 				gotoxy(60, posy); color(8); cout << "Teacher | Admin";
 			}
@@ -663,8 +670,124 @@ void manageUserRoles(string acc[], int orgSize)
 			counter2++;
 		}
 
+	}
+}
+
+void viewCoursesInOrganisation(string acc[], int orgSize)
+{
+	system("cls");
+	char key; // Key to be entered
+	int counter = 0, counter2 = 0;
+
+
+	while (true)
+	{
+		int posy = 5;
+		gotoxy(2, 3); color(6); cout << "O R G A N I S A T I O N   C O U R S E S"; color(7);
+		for (int i = 0; i < orgSize; i++) 
+		{
+			gotoxy(4, posy); cout << "-->";
+			if (i == counter) 
+			{
+				color(6); gotoxy(9, posy); cout << acc[i];
+				gotoxy(60, posy);
+				if (counter2 == 0) 
+				{
+					color(2); cout << "Settings"; color(7); cout << " | Delete";
+				}
+				else 
+				{
+					color(7); cout << "Settings | "; color(4); cout << "Delete";
+				}
+			}
+			else 
+			{
+				gotoxy(9, posy); cout << acc[i];
+				gotoxy(60, posy); color(8); cout << "Settings | Delete";
+			}
+
+
+			posy += 2;
+			color(7);
+		}
+
+		key = _getch();
+
+		if (key == 72 && (counter >= 1 && counter <= orgSize)) // 72/75 is the ASCII code for the up arrow
+		{
+			counter--;
+		}
+
+		if (key == 80 && (counter >= 0 && counter < orgSize - 1)) // 80/77 is the ASCII code for the up arrow
+		{
+			counter++;
+		}
+
+		if (key == 75 && (counter2 == 1)) // 72/75 is the ASCII code for the up arrow
+		{
+			counter2--;
+		}
+
+		if (key == 77 && (counter2 == 0)) // 80/77 is the ASCII code for the up arrow
+		{
+			counter2++;
+		}
+
 
 	}
+}
+void createCourse()
+{
+	string question = "", answer;
+	char key;
+	gotoxy(5, 4); cout << "C R E A T E   C O U R S E ";
+	do 
+	{
+		createInputField(6, " Course name", 40, 5, 6, question);
+		createInputField(10, " Password   ", 40, 5, 7, " ");
+		createInputField(14, " Add Teacher", 40, 5, 7, " ");
+
+		key = _getch();
+
+		if (key == '\b')
+		{
+			question = question.substr(0, question.size() - 1);
+		}
+
+		else if (key == '\r')
+		{
+			break;
+		}
+		else
+		{
+			question += key;
+		}
+
+
+
+	} while (key != '\r');
+
+	int subcol = 7;
+	do 
+	{
+		createInputField(6, " Course name", 40, 5, 7, question);
+		createInputField(10, " Password   ", 40, 5, 6, answer);
+		createButton(19, "    SUBMIT    ", 14, 5, 2);
+		key = _getch();
+
+		if (key == '\b')
+		{
+			answer = answer.substr(0, answer.size() - 1);
+		}
+
+		else
+		{
+			answer += key;
+		}
+
+		answer.size() > 0 ? subcol = 2 : subcol = 7;
+
+	} while (key != '\r');
 }
 void displayQuestion()
 {
@@ -1078,7 +1201,6 @@ int main()
 	string acc[5] = { "Vocational school of Programing", "United states of America",
 		"Kethering und scisorss", "Code block for Specialists", "Cooking restaurnat um France" };
 	string users[5] = { "Vesko Stoyanov", "Tereza Opanska", "KOstadin Tlg", "MC Stojan", "Yoana Smn" };
-
-	manageUserRoles(users, 5);
+	createCourse();
 
 }
