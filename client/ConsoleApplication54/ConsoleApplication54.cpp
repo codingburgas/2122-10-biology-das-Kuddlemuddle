@@ -4,7 +4,6 @@
 #include <windows.h>
 using namespace std;
 
-
 void color(int color) //Sets color of the text
 {
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
@@ -25,22 +24,32 @@ void createInputField(int posy, string text, int size, int posx, int col, string
 	{
 		cout << char(205);
 	}
+
 	cout << char(203);
+
 	for (int i = 0; i < size - 14; i++)
 	{
 		cout << char(205);
 	}
+
 	cout << char(187);
 
-	gotoxy(posx, posy + 1); cout << char(186); color(col2);
+	gotoxy(posx, posy + 1); cout << char(186); 
+	color(col2);
+
 	cout << text << "  "; color(col); cout << char(186) << " ";
 	color(col2);
+
 	size_t inputLength = 0;
-	if (input.size() > 24) {
+
+	if (input.size() > 24) 
+	{
 		cout << input.substr(input.size() - 24, input.size());
 		inputLength = 24;
 	}
-	else {
+
+	else 
+	{
 		cout << input;
 		inputLength = input.size();
 	}
@@ -49,6 +58,7 @@ void createInputField(int posy, string text, int size, int posx, int col, string
 	{
 		cout << " ";
 	}
+
 	color(col); cout << char(186) << endl;
 	gotoxy(posx, posy + 2); cout << char(200);
 
@@ -56,7 +66,9 @@ void createInputField(int posy, string text, int size, int posx, int col, string
 	{
 		cout << char(205);
 	}
+
 	cout << char(202);
+
 	for (int i = 0; i < size - 14; i++)
 	{
 		cout << char(205);
@@ -73,8 +85,8 @@ void createButton(int posy, string text, int size, int posx, int col, int col2 =
 	{
 		cout << char(205);
 	}
-
 	cout << char(187);
+
 	gotoxy(posx, posy + 1); cout << char(186); color(col2); cout << text; color(col); cout << char(186) << endl;
 	gotoxy(posx, posy + 2); cout << char(200);
 
@@ -84,7 +96,6 @@ void createButton(int posy, string text, int size, int posx, int col, int col2 =
 	}
 
 	cout << char(188); color(7);
-
 }
 void printLogo(int posx) {
 	gotoxy(posx, 0); cout << "     _             _  __         _     _ _                          _     _ _      " << endl;
@@ -99,7 +110,7 @@ LoginData loginPage()
 	system("cls");
 	char key = ' ';
 	int iPut = 0;
-	string info[5] = { "", "" };
+	string info[2] = { "", "" };
 
 	color(6);
 	do {
@@ -134,19 +145,22 @@ LoginData loginPage()
 
 		key = _getch();
 
-		if (key == '\r') {
+		if (key == '\r') 
+		{
 			iPut++;
 			key = ' ';
 		}
 
-		else {
-			if (key == '\b') {
+		else 
+		{
+			if (key == '\b') 
+			{
 				info[iPut] = info[iPut].substr(0, info[iPut].size() - 1);
 			}
-			else {
+			else 
+			{
 				info[iPut] += key;
 			}
-
 		}
 
 	} while (key != '\r' && iPut <= 1);
@@ -202,14 +216,17 @@ RegisterData registerPage()
 			key = ' ';
 		}
 
-		else {
-			if (key == '\b') {
+		else 
+		{
+			if (key == '\b') 
+			{
 				info[iPut] = info[iPut].substr(0, info[iPut].size() - 1);
 			}
-			else {
+
+			else 
+			{
 				info[iPut] += key;
 			}
-
 		}
 
 	} while (key != '\r' && iPut <= 4);
@@ -245,13 +262,16 @@ void accountPage(RegisterData acc)
 		// Button for history notebook section
 
 		gotoxy(42, 18); color(SetColor[0]); cout << "U P D A T E";
-		if (counter == 0) {
+		if (counter == 0) 
+		{
 			gotoxy(54, 18); color(7); cout << "<--";
 		}
-		if (counter == 1) {
+		if (counter == 1) 
+		{
 			gotoxy(54, 18); color(7); cout << "-->";
 		}
 		gotoxy(58, 18); color(SetColor[1]); cout << "D E L E T E";
+
 		key = _getch();
 
 		if (key == 75 && (counter == 1)) // 72 is the ASCII code for the up arrow
@@ -1609,6 +1629,7 @@ void displayGrade(int points)
 	gotoxy(91, 26); cout << char(217);
 
 }
+
 void drawPunnettRows(int y, int start, int middSymb, int middSymb2, int end)
 {
 	gotoxy(5, y); cout << char(start);
@@ -1705,7 +1726,8 @@ void drawPunnettSquare()
 
 	} while (key != '\r');
 }
-int Menu() //Main menu with three options
+
+int navigationBar() //Main menu with three options
 {
 	char key; // Key to be entered
 	int SetColor[5] = { 2, 7, 7, 7, 7 };
@@ -1800,9 +1822,5 @@ int Menu() //Main menu with three options
 
 int main()
 {
-	string acc[10] = { "Vocational school of Programing", "United states of America",
-		"Kethering und scisorss", "Code block for Specialists", "Cooking restaurnat um France" };
-	string users[5] = { "Vesko Stoyanov", "Tereza Opanska", "KOstadin Tlg", "MC Stojan", "Yoana Smn" };
-
-	addTopicsInCourse(acc, 5);
+	//Hello
 }
