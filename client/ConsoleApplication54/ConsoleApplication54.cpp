@@ -165,7 +165,7 @@ RegisterData registerPage()
 
 		int colors[5] = { 7,7,7,7,7 };
 		colors[iPut] = 6;
-		printLogo(30); 
+		printLogo(30);
 		gotoxy(15, 7); cout << "MMMMMMMMMMMMMNX0kXXXXXXk0XNMMMMMMMMMMMMMMM" << endl;
 		gotoxy(15, 8); cout << "MMMMMMMMMMMMMNX0kXXXXXXk0XNMMMMMMMMMMMMMMM" << endl;
 		createInputField(8, " First name ", 40, 65, colors[0], info[0]);
@@ -329,7 +329,7 @@ void adminPage(vector<string> systemOrg, vector<string> systemUser)
 	}
 }
 
-void drawOrganisationLogo() 
+void drawOrganisationLogo()
 {
 	gotoxy(15, 7); cout << "WWWWWWWWWWWWWWWWWWWWWWMWWMMWMMWWWWWWWWWWWWWWWWWWWWW";
 	gotoxy(15, 8); cout << "WWWWWWWWWWWWWWWWWWWWWNkdddddddKWWWWWWWWWWWWWWWWWWWW";
@@ -467,7 +467,7 @@ void createOrganisation()
 		drawOrganisationLogo();
 		createInputField(8, " Course name", 40, 75, colors[0], info[0]);
 		createInputField(12, " Password   ", 40, 75, colors[1], info[1]);
-		
+
 
 		if (iPut == 2)
 		{
@@ -515,11 +515,11 @@ void joinOrganisation()
 		int colors[3] = { 7, 7 };
 		colors[iPut] = 6;
 		color(6);
-		printLogo(26); 
+		printLogo(26);
 		drawOrganisationLogo();
 		createInputField(8, " Course name", 40, 75, colors[0], info[0]);
 		createInputField(12, " Password   ", 40, 75, colors[1], info[1]);
-		
+
 		if (iPut == 2)
 		{
 			createButton(16, "   Join now   ", 14, 75, 2);
@@ -617,27 +617,27 @@ void manageUserRoles(string acc[], int orgSize)
 		// Button for history notebook section
 		int posy = 5;
 		gotoxy(2, 3); color(6); cout << "O R G A N I Z A T I O N   U S E R S"; color(7);
-		for (int i = 0; i < orgSize; i++) 
+		for (int i = 0; i < orgSize; i++)
 		{
 			gotoxy(4, posy); cout << "-->";
 
-			if (i == counter) 
+			if (i == counter)
 			{
 				color(6); gotoxy(9, posy); cout << acc[i];
 				gotoxy(60, posy);
 
-				if (counter2 == 0) 
+				if (counter2 == 0)
 				{
 					color(3); cout << "Teacher"; color(7); cout << " | Admin";
 				}
 
-				else 
+				else
 				{
 					color(7); cout << "Teacher | "; color(3); cout << "Admin";
 				}
 			}
 
-			else 
+			else
 			{
 				gotoxy(9, posy); cout << acc[i];
 				gotoxy(60, posy); color(8); cout << "Teacher | Admin";
@@ -684,23 +684,23 @@ void viewCoursesInOrganisation(string acc[], int orgSize)
 	{
 		int posy = 5;
 		gotoxy(2, 3); color(6); cout << "O R G A N I S A T I O N   C O U R S E S"; color(7);
-		for (int i = 0; i < orgSize; i++) 
+		for (int i = 0; i < orgSize; i++)
 		{
 			gotoxy(4, posy); cout << "-->";
-			if (i == counter) 
+			if (i == counter)
 			{
 				color(6); gotoxy(9, posy); cout << acc[i];
 				gotoxy(60, posy);
-				if (counter2 == 0) 
+				if (counter2 == 0)
 				{
 					color(2); cout << "Settings"; color(7); cout << " | Delete";
 				}
-				else 
+				else
 				{
 					color(7); cout << "Settings | "; color(4); cout << "Delete";
 				}
 			}
-			else 
+			else
 			{
 				gotoxy(9, posy); cout << acc[i];
 				gotoxy(60, posy); color(8); cout << "Settings | Delete";
@@ -738,57 +738,180 @@ void viewCoursesInOrganisation(string acc[], int orgSize)
 }
 void createCourse()
 {
-	string question = "", answer;
+	string question = "", answer, teacher;
 	char key;
 	gotoxy(5, 4); cout << "C R E A T E   C O U R S E ";
-	do 
+	do
 	{
 		createInputField(6, " Course name", 40, 5, 6, question);
 		createInputField(10, " Password   ", 40, 5, 7, " ");
 		createInputField(14, " Add Teacher", 40, 5, 7, " ");
+		createButton(18, "    SUBMIT    ", 14, 5, 2);
 
 		key = _getch();
 
-		if (key == '\b')
-		{
-			question = question.substr(0, question.size() - 1);
-		}
-
-		else if (key == '\r')
+		if (key == '\r')
 		{
 			break;
 		}
-		else
-		{
-			question += key;
-		}
 
+		key == '\b' ? question = question.substr(0, question.size() - 1) : question += key;
 
-
-	} while (key != '\r');
+	} while (true);
 
 	int subcol = 7;
-	do 
+	do
 	{
 		createInputField(6, " Course name", 40, 5, 7, question);
 		createInputField(10, " Password   ", 40, 5, 6, answer);
-		createButton(19, "    SUBMIT    ", 14, 5, 2);
+		createInputField(14, " Add Teacher", 40, 5, 7, " ");
+		createButton(18, "    SUBMIT    ", 14, 5, 2);
+
 		key = _getch();
 
-		if (key == '\b')
+		if (key == '\r')
 		{
-			answer = answer.substr(0, answer.size() - 1);
+			break;
 		}
 
-		else
-		{
-			answer += key;
-		}
+		key == '\b' ? answer = answer.substr(0, answer.size() - 1) : answer += key;
 
 		answer.size() > 0 ? subcol = 2 : subcol = 7;
 
-	} while (key != '\r');
+	} while (true);
+
+	do
+	{
+		createInputField(6, " Course name", 40, 5, 7, question);
+		createInputField(10, " Password   ", 40, 5, 7, answer);
+		createInputField(14, " Add Teacher", 40, 5, 6, teacher);
+		createButton(18, "    SUBMIT    ", 14, 5, 2);
+
+		key = _getch();
+
+		if (key == '\r')
+		{
+			break;
+		}
+
+		key == '\b' ? teacher = teacher.substr(0, teacher.size() - 1) : teacher += key;
+
+		answer.size() > 0 ? subcol = 2 : subcol = 7;
+
+	} while (true);
+
 }
+void manageCourse(string question, string answer, string teacher)
+{
+	char key;
+	gotoxy(5, 4); cout << "M A N A G E   C O U R S E ";
+
+	while (true)
+	{
+		createInputField(6, " Course name", 40, 5, 6, question);
+		createInputField(10, " Password   ", 40, 5, 7, answer);
+		createInputField(14, " Add Teacher", 40, 5, 7, teacher);
+		createButton(18, "    SUBMIT    ", 14, 5, 2);
+
+		key = _getch();
+
+		if (key == '\r')
+		{
+			break;
+		}
+
+		key == '\b' ? question = question.substr(0, question.size() - 1) : question += key;
+	}
+
+	while (true)
+	{
+		createInputField(6, " Course name", 40, 5, 7, question);
+		createInputField(10, " Password   ", 40, 5, 6, answer);
+		createInputField(14, " Add Teacher", 40, 5, 7, teacher);
+		createButton(18, "    SUBMIT    ", 14, 5, 2);
+
+		key = _getch();
+
+		if (key == '\r')
+		{
+			break;
+		}
+
+		key == '\b' ? answer = answer.substr(0, answer.size() - 1) : answer += key;
+	} 
+
+	while (true)
+	{
+		createInputField(6, " Course name", 40, 5, 7, question);
+		createInputField(10, " Password   ", 40, 5, 7, answer);
+		createInputField(14, " Add Teacher", 40, 5, 6, teacher);
+		createButton(18, "    SUBMIT    ", 14, 5, 2);
+
+		key = _getch();
+
+		if (key == '\r')
+		{
+			break;
+		}
+
+		key == '\b' ? teacher = teacher.substr(0, teacher.size() - 1) : teacher += key;
+	} 
+
+}
+
+void viewTopicsInCourse(string acc[], int orgSize)
+{
+	system("cls");
+	char key; // Key to be entered
+	int counter = 0, counter2 = 0;
+
+
+	while (true)
+	{
+		int posy = 5;
+		gotoxy(2, 3); color(6); cout << "C O U R S E ' S   T O P I C S"; color(7);
+		for (int i = 0; i < orgSize; i++)
+		{
+			gotoxy(4, posy); cout << "-->";
+			if (i == counter)
+			{
+				color(6); gotoxy(9, posy); cout << acc[i];
+			}
+			else
+			{
+				gotoxy(9, posy); cout << acc[i];
+			}
+
+			posy += 2;
+			color(7);
+		}
+
+		key = _getch();
+
+		if (key == 72 && (counter >= 1 && counter <= orgSize)) // 72/75 is the ASCII code for the up arrow
+		{
+			counter--;
+		}
+
+		if (key == 80 && (counter >= 0 && counter < orgSize - 1)) // 80/77 is the ASCII code for the up arrow
+		{
+			counter++;
+		}
+
+		if (key == 75 && (counter2 == 1)) // 72/75 is the ASCII code for the up arrow
+		{
+			counter2--;
+		}
+
+		if (key == 77 && (counter2 == 0)) // 80/77 is the ASCII code for the up arrow
+		{
+			counter2++;
+		}
+
+
+	}
+}
+
 void displayQuestion()
 {
 	string info = "", question = "Who is the person who loves vscpi the most";
@@ -1099,10 +1222,6 @@ void drawPunnettSquare()
 
 	} while (key != '\r');
 }
-void tr(string st)
-{
-	gotoxy(80, 10);  cout << "this is page bout " << st;
-}
 int Menu() //Main menu with three options
 {
 	char key; // Key to be entered
@@ -1164,8 +1283,8 @@ int Menu() //Main menu with three options
 			if (counter == 3)
 			{
 				system("CLS");
-				tr("Sells");
 			}
+
 			if (counter == 4)
 			{
 				break;
@@ -1201,6 +1320,6 @@ int main()
 	string acc[5] = { "Vocational school of Programing", "United states of America",
 		"Kethering und scisorss", "Code block for Specialists", "Cooking restaurnat um France" };
 	string users[5] = { "Vesko Stoyanov", "Tereza Opanska", "KOstadin Tlg", "MC Stojan", "Yoana Smn" };
-	createCourse();
 
+	viewTopicsInCourse(acc, 5);
 }
