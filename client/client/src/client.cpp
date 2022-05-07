@@ -47,9 +47,14 @@ int main()
 		std::cout << error.errorMsg + "\nThe program is going to close itself!\n"
 			"See the log file for more information";
 	}
+	catch (std::exception& ex)
+	{
+		std::cout << "There was a problem with the program and it is going to close "
+			"itself!\nError: " + std::string(ex.what());
+	}
 	catch (...)
 	{
-		std::cout << "There was a problem with the program and it is going to close"
+		std::cout << "There was a problem with the program and it is going to close "
 			"itself!\nSee the log file for more information";
 	}
 

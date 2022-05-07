@@ -86,17 +86,17 @@ std::string APIHandler::loginHandler(LoginData logData, SceneContex* ctx)
     return JSONRes["fields"][0];
 }
 
-std::string APIHandler::getUserInfo(std::string userId, SceneContex* ctx, User &user)
+std::string APIHandler::getUserInfo(std::string username, SceneContex* ctx, User &user)
 {
     cpr::Response r;
     if (!ctx->JWTToken.empty())
     {
-        r = cpr::Get(cpr::Url{ "http://localhost:18080/api/users/" + userId },
+        r = cpr::Get(cpr::Url{ "http://localhost:18080/api/users/" + username },
             cpr::Bearer({ ctx->JWTToken }));
     }
     else
     {
-        r = cpr::Get(cpr::Url{ "http://localhost:18080/api/users/" + userId });
+        r = cpr::Get(cpr::Url{ "http://localhost:18080/api/users/" + username });
     }
 
     nlohmann::json JSONRes;
@@ -124,6 +124,30 @@ std::string APIHandler::getUserInfo(std::string userId, SceneContex* ctx, User &
     return "The user wasn't found";
 }
 
+std::string APIHandler::deleteUser(std::string username, std::string JWTToken)
+{
+    auto r = cpr::Delete(cpr::Url{ "http://localhost:18080/api/users/" + username },
+        cpr::Bearer({ JWTToken }));
+
+    nlohmann::json JSONRes;
+
+    try
+    {
+        JSONRes = nlohmann::json::parse(r.text);
+    }
+    catch (nlohmann::json::parse_error& ex)
+    {
+        return "There is a problem with the server! Please try again later!";
+    }
+
+    if (r.status_code != 200)
+    {
+        return "There is a problem with the server! Please try again later!";
+    }
+
+    return "";
+}
+
 std::vector<OrgInfo> APIHandler::getAllOrgs(std::string JWTToken)
 {
     cpr::Response r;
@@ -139,27 +163,61 @@ std::vector<OrgInfo> APIHandler::getAllOrgs(std::string JWTToken)
     catch (nlohmann::json::parse_error& ex)
     {
         // Send error
-        return {};
-        // return "There is a problem with the server! Please try again later!";
+        OrgInfo error;
+        error.errors = "There is a problem with the server! Please try again later!";
+        return { error };
     }
 
+    std::vector<OrgInfo> orgsInfo;
+    
     if (JSONRes["type"] == "get-organisation-success")
     {
         for (auto it = JSONRes["orgs"].begin(); it != JSONRes["orgs"].end(); ++it)
         {
-            std::cout << it.value()["org-name"].get<std::string>();
+            orgsInfo.push_back({ it.value()["org-id"].get<int>(),it.value()["org-name"].get<std::string>() });
         }
     }
 
-    //return All orgs;
-    return {};
+    return orgsInfo;
 }
 
-void APIHandler::getImage(std::string& url, std::string fileExtension)
+std::vector<User> APIHandler::getAllUsers(std::string JWTToken)
 {
-    auto ofstream = std::ofstream( "tmp." + fileExtension, std::ofstream::binary);
-    auto session = cpr::Session();
-    session.SetUrl(cpr::Url{ url });
-    auto response = session.Download(ofstream);
-    ofstream.close();
+    cpr::Response r;
+    r = cpr::Get(cpr::Url{ "http://localhost:18080/api/users/all" },
+        cpr::Bearer({ JWTToken }));
+
+    nlohmann::json JSONRes;
+
+    try
+    {
+        JSONRes = nlohmann::json::parse(r.text);
+    }
+    catch (nlohmann::json::parse_error& ex)
+    {
+        // Send error
+        User error;
+        error.errors = "There is a problem with the server! Please try again later!";
+        return { error };
+    }
+
+    std::vector<User> usersInfo;
+
+    if (JSONRes["type"] == "user-success")
+    {
+        for (size_t i = 0; i < JSONRes["data"].size(); i += 7)
+        {
+            usersInfo.push_back({ 
+                JSONRes["data"][0 + i],
+                JSONRes["data"][1 + i],
+                JSONRes["data"][2 + i],
+                JSONRes["data"][3 + i],
+                JSONRes["data"][4 + i],
+                JSONRes["data"][5 + i],
+                JSONRes["data"][6 + i]
+            });
+        }
+    }
+
+    return usersInfo;
 }

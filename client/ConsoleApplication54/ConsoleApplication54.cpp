@@ -1852,5 +1852,6 @@ void navigationBar() //Main menu with three options
 
 int main()
 {
-	registerPage();
+	//registerPage();
+	navigationBar();
 }

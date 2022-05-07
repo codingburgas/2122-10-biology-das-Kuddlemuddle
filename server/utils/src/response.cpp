@@ -62,12 +62,12 @@ crow::json::wvalue ResponseJSONManager::createOrgJSONResponse(OrgInfo data)
 
 	for (size_t i = 0; i < data.users.size(); i++)
 	{
-		resBody["org-users"][i] = { {"user-id:", data.users[i].id} , {"role-id", data.users[i].role} };
+		resBody["org-users"][i] = { {"user-id", data.users[i].id} , {"role-id", data.users[i].role} };
 	}
 
 	for (size_t i = 0; i < data.courses.size(); i++)
 	{
-		resBody["org-courses"][i] = { {"course-id:", data.courses[i].id} , {"course-name", data.courses[i].name} };
+		resBody["org-courses"][i] = { {"course-id", data.courses[i].id} , {"course-name", data.courses[i].name} };
 	}
 
 	return resBody;
@@ -81,7 +81,7 @@ crow::json::wvalue ResponseJSONManager::createOrgsJSONResponse(std::vector<OrgIn
 	
 	for (size_t i = 0; i < data.size(); i++)
 	{
-		resBody["orgs"][i] = { {"org-id:", data[i].id} , {"org-name", data[i].name} };
+		resBody["orgs"][i] = { {"org-id", data[i].id} , {"org-name", data[i].name} };
 	}
 
 	return resBody;
@@ -98,12 +98,12 @@ crow::json::wvalue ResponseJSONManager::createCourseJSONResponse(CourseInfo data
 
 	for (size_t i = 0; i < data.users.size(); i++)
 	{
-		resBody["course-users"][i] = { {"user-id:", data.users[i].id} , {"role-id", data.users[i].role} };
+		resBody["course-users"][i] = { {"user-id", data.users[i].id} , {"role-id", data.users[i].role} };
 	}
 
 	for (size_t i = 0; i < data.topics.size(); i++)
 	{
-		resBody["course-topics"][i] = { {"topic-id:", data.topics[i].id} , {"topic-name", data.topics[i].name} };
+		resBody["course-topics"][i] = { {"topic-id", data.topics[i].id} , {"topic-name", data.topics[i].name} };
 	}
 
 	return resBody;
@@ -120,12 +120,12 @@ crow::json::wvalue ResponseJSONManager::createTopicJSONResponse(TopicInfo data)
 
 	for (size_t i = 0; i < data.lessons.size(); i++)
 	{
-		resBody["topic-lessons"][i] = { {"lesson-id:", data.lessons[i].id} , {"lesson-name", data.lessons[i].name} };
+		resBody["topic-lessons"][i] = { {"lesson-id", data.lessons[i].id} , {"lesson-name", data.lessons[i].name} };
 	}
 
 	for (size_t i = 0; i < data.quizzes.size(); i++)
 	{
-		resBody["topic-quizzes"][i] = { {"quiz-id:", data.quizzes[i].id} , {"quiz-name", data.quizzes[i].name} };
+		resBody["topic-quizzes"][i] = { {"quiz-id", data.quizzes[i].id} , {"quiz-name", data.quizzes[i].name} };
 	}
 
 	return resBody;
@@ -157,12 +157,12 @@ crow::json::wvalue ResponseJSONManager::createQuizJSONResponse(QuizInfo data, bo
 	{
 		for (size_t i = 0; i < data.questions.size(); i++)
 		{
-			resBody["quiz-questions"][i] = { {"question-id:", data.questions[i].id} };
+			resBody["quiz-questions"][i] = { {"question-id", data.questions[i].id} };
 		}
 
 		for (size_t i = 0; i < data.attempts.size(); i++)
 		{
-			resBody["quiz-attempts"][i] = { {"attempt-id:", data.attempts[i].id} };
+			resBody["quiz-attempts"][i] = { {"attempt-id", data.attempts[i].id} };
 		}
 	}
 
@@ -210,7 +210,7 @@ crow::json::wvalue ResponseJSONManager::createAttemptJSONResponse(AttemptInfo da
 		
 		for (size_t i = 0; i < data.answers.size(); i++)
 		{
-			resBody["attempt-answers"][i] = { {"answer-id:", data.answers[i].id} };
+			resBody["attempt-answers"][i] = { {"answer-id", data.answers[i].id} };
 		}
 	}
 

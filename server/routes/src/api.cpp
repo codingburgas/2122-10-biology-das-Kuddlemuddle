@@ -272,6 +272,47 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					}
 				}
 
+				if (username == "all")
+				{
+					auto verifier = jwt::verify<jwt::traits::nlohmann_json>()
+						.allow_algorithm(jwt::algorithm::hs256(envManager.getEnv("JWT_SECRET")));
+
+					std::string myauth = req.get_header_value("Authorization");
+
+					// If values is missing
+					if (myauth == "")
+					{
+						res = crow::response(crow::status::UNAUTHORIZED);
+						res.end();
+						return;
+					}
+
+					// Remove "Bearer "
+					std::string mycreds = myauth.substr(7);
+
+					// Try to decode and verify token
+					try
+					{
+						auto decoded = jwt::decode<jwt::traits::nlohmann_json>(mycreds);
+						verifier.verify(decoded);
+						id = std::stoi(decoded.get_payload_claim("sub").as_string());
+						int isAdmin = decoded.get_payload_claim("isAdmin").as_int();
+
+						if (isAdmin == 0)
+						{
+							res = crow::response(crow::status::FORBIDDEN);
+							res.end();
+							return;
+						}
+					}
+					catch (...)
+					{
+						res = crow::response(crow::status::FORBIDDEN);
+						res.end();
+						return;
+					}
+				}
+
 				std::vector<std::string> recordSet = dbManager.getUserInfo(username, id);
 
 				// Error happend

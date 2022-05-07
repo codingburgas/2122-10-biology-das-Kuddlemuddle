@@ -19,7 +19,7 @@ void Application::run(
 	SceneManager& sceneManager
 )
 {
-	std::string nextSceneName = "Register";
+	std::string nextSceneName = "NavigationBar";
 	
 	while (true)
 	{

@@ -198,6 +198,22 @@ std::vector<std::string> DBManager::getUserInfo(std::string username, int userId
 		return recordSet;
 	}
 
+	if (username == "all")
+	{
+		for (auto it = userJSON.begin(); it != userJSON.end(); ++it)
+		{
+			recordSet.push_back(std::to_string(int(it.value()["ID"])));
+			recordSet.push_back(it.value()["FirstName"]);
+			recordSet.push_back(it.value()["LastName"]);
+			recordSet.push_back(it.value()["Username"]);
+			recordSet.push_back(it.value()["Email"]);
+			recordSet.push_back(std::to_string(int(it.value()["RoleID"])));
+			recordSet.push_back(it.value()["AvatarURL"]);
+		}
+
+		return recordSet;
+	}
+
 	for (auto it = userJSON.begin(); it != userJSON.end(); ++it)
 	{
 		// Authtenticate user
