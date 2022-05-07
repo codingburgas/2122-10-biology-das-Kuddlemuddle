@@ -33,6 +33,11 @@ struct OrgInfo
     std::string errors;
 };
 
+struct OrgData
+{
+    std::string name;
+    std::string password;
+};
 
 struct RegisterData
 {
@@ -57,6 +62,7 @@ public:
 	std::string loginHandler(LoginData logData, SceneContex* ctx);
 	std::string getUserInfo(std::string userId, SceneContex* ctx, User& user);
     std::string deleteUser(std::string username, std::string JWTToken);
+    std::string createOrg(OrgData orgData, std::string JWTToken);
     std::vector<User> getAllUsers(std::string JWTToken);
     std::vector<OrgInfo> getAllOrgs(std::string JWTToken);
 private:

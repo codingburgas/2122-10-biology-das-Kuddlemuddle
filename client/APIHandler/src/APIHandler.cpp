@@ -181,6 +181,47 @@ std::vector<OrgInfo> APIHandler::getAllOrgs(std::string JWTToken)
     return orgsInfo;
 }
 
+std::string APIHandler::createOrg(OrgData orgData, std::string JWTToken)
+{
+    cpr::Response r = cpr::Post(cpr::Url{ "http://localhost:18080/api/createNewOrg" },
+        cpr::Bearer({ JWTToken }),
+        cpr::Payload{
+            {"orgName", orgData.name},
+            {"password", orgData.password}
+        });
+
+    nlohmann::json JSONRes;
+
+    try
+    {
+        JSONRes = nlohmann::json::parse(r.text);
+    }
+    catch (nlohmann::json::parse_error& ex)
+    {
+        return "There is a problem with the server! Please try again later!";
+    }
+
+    if (JSONRes["type"] == "organisation-register-success")
+    {
+        return "";
+    }
+
+    std::string returnVal;
+
+    if (JSONRes["fields"].size() != 1)
+    {
+        returnVal = "The following fileds are incorrect: ";
+
+        for (auto& el : JSONRes["fields"].items())
+        {
+            returnVal += el.value();
+            returnVal += " ";
+        }
+    }
+
+    return JSONRes["fields"][0];
+}
+
 std::vector<User> APIHandler::getAllUsers(std::string JWTToken)
 {
     cpr::Response r;

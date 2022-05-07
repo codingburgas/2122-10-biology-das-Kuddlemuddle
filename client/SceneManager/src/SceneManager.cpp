@@ -201,10 +201,84 @@ void viewOrganisationAdmin(std::string JWTToken)
 	}
 }
 
-void viewOrganisationUser(std::string JWTToken)
+void createOrganisation(std::string JWTToken)
 {
 	clearConsole();
+	char key = ' ';
+	int iPut = 0;
+	std::string info[5] = { "", "" };
 
+	do
+	{
+		int colors[3] = { 7, 7 };
+		colors[iPut] = 6;
+		setConsoleColorTo(6);
+		printLogo(26);
+		drawOrganisationLogo();
+		createInputField(8, " Organisation name", 46, 75, colors[0], info[0], 7, 20);
+		createInputField(12, " Password         ", 46, 75, colors[1], info[1], 7, 20);
+
+
+		if (iPut == 2)
+		{
+			createButton(16, "  Create now  ", 14, 75, 2);
+		}
+		else {
+			createButton(16, "  Create now  ", 14, 75, 7);
+		}
+
+		key = _getch();
+
+		if (key == 27)
+		{
+			return;
+		}
+
+		if (key == '\r')
+		{
+			iPut++;
+			key = ' ';
+		}
+		else
+		{
+			if (iPut < 2)
+			{
+				if (key == '\b')
+				{
+					info[iPut] = info[iPut].substr(0, info[iPut].size() - 1);
+				}
+
+				else
+				{
+					info[iPut] += key;
+				}
+			}
+		}
+
+	} while (key != '\r' && iPut <= 2);
+
+	APIHandler apiHandler;
+
+	std::string recordSet = apiHandler.createOrg({ info[0], info[1] }, JWTToken);
+
+	if (recordSet.empty())
+	{
+		outputPosition(15, 31); std::cout << "The organisation was created successfully! Press any key to continue!";
+
+		(void)_getch();
+
+		return;
+	}
+
+	outputPosition(15, 31); std::cout << recordSet;
+
+	(void)_getch();
+
+	return;
+}
+
+std::string viewOrganisationUser(std::string JWTToken)
+{
 	char key; // Key to be entered
 	int counter = 0, posy;
 
@@ -219,17 +293,23 @@ void viewOrganisationUser(std::string JWTToken)
 
 	while (true)
 	{
-		outputPosition(2, 3); setConsoleColorTo(6); std::cout << "O R G A N I S A T I O N S"; setConsoleColorTo(7);
-		posy = 5;
+		outputPosition(6, 6); setConsoleColorTo(6); std::cout << "O R G A N I S A T I O N S"; setConsoleColorTo(7);
+		posy = 8;
 
 		for (int i = 0; i < orgsInfo.size(); i++)
 		{
-			outputPosition(4, posy); std::cout << "-->";
+			outputPosition(8, posy); std::cout << "-->";
 			i == counter ? setConsoleColorTo(6) : setConsoleColorTo(7);
-			outputPosition(9, posy); std::cout << orgsInfo[i].name;
+			outputPosition(13, posy); std::cout << orgsInfo[i].name;
+			setConsoleColorTo(7);
 
 			posy += 2;
 		}
+
+		outputPosition(8, posy); std::cout << "-->";
+		orgsInfo.size() == counter ? setConsoleColorTo(6) : setConsoleColorTo(7);
+		outputPosition(13, posy); std::cout << "Create Organisation";
+		setConsoleColorTo(7);
 
 		key = _getch();
 
@@ -238,11 +318,23 @@ void viewOrganisationUser(std::string JWTToken)
 			counter--;
 		}
 
-		if (key == 80 && (counter >= 0 && counter < orgsInfo.size() - 1)) // 80 is the ASCII code for the down arrow
+		if (key == 80 && (counter >= 0 && counter < orgsInfo.size())) // 80 is the ASCII code for the down arrow
 		{
 			counter++;
 		}
 
+		if (key == 27)
+		{
+			clearConsole();
+			return "";
+		}
+
+		if (key == '\r' && counter == orgsInfo.size())
+		{
+			createOrganisation(JWTToken);
+			clearConsole();
+			return "";
+		}
 	}
 }
 
@@ -279,6 +371,7 @@ std::string accountPage(User user, std::string JWTToken)
 		// Button for history notebook section
 
 		outputPosition(42, 18); setConsoleColorTo(SetColor[0]); std::cout << "U P D A T E";
+		
 		if (counter == 0)
 		{
 			outputPosition(54, 18); setConsoleColorTo(7); std::cout << "<--";
@@ -287,6 +380,7 @@ std::string accountPage(User user, std::string JWTToken)
 		{
 			outputPosition(54, 18); setConsoleColorTo(7); std::cout << "-->";
 		}
+
 		outputPosition(58, 18); setConsoleColorTo(SetColor[1]); std::cout << "D E L E T E";
 
 		key = _getch();
@@ -759,7 +853,18 @@ void SceneManager::LoadScenes()
 							}
 							else
 							{
-								viewOrganisationUser(sceneContext->JWTToken);
+								recordSet = viewOrganisationUser(sceneContext->JWTToken);
+
+								if (!recordSet.empty())
+								{
+									if (recordSet == "Login")
+									{
+										sceneContext->isAuth = false;
+										sceneContext->JWTToken = "";
+									}
+
+									return recordSet;
+								}
 							}
 						}
 
