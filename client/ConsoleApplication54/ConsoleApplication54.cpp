@@ -86,7 +86,13 @@ void createButton(int posy, string text, int size, int posx, int col, int col2 =
 	cout << char(188); color(7);
 
 }
-
+void printLogo(int posx) {
+	gotoxy(posx, 0); cout << "     _             _  __         _     _ _                          _     _ _      " << endl;
+	gotoxy(posx, 1); cout << "  __| | __ _ ___  | |/ /   _  __| | __| | | ___ _ __ ___  _   _  __| | __| | | ___ " << endl;
+	gotoxy(posx, 2); cout << " / _` |/ _` / __| | ' / | | |/ _` |/ _` | |/ _ \\ '_ ` _ \\| | | |/ _` |/ _` | |/ _ \\" << endl;
+	gotoxy(posx, 3); cout << "| (_| | (_| \\__ \\ | . \\ |_| | (_| | (_| | |  __/ | | | | | |_| | (_| | (_| | |  __/" << endl;
+	gotoxy(posx, 4); cout << " \\__,_|\\__,_|___/ |_|\\_\\__,_|\\__,_|\\__,_|_|\\___|_| |_| |_|\\__,_|\\__,_|\\__,_|_|\\___|" << endl;
+}
 LoginData loginPage()
 {
 	system("cls");
@@ -96,14 +102,9 @@ LoginData loginPage()
 
 	color(6);
 	do {
-
+		printLogo(30);
 		int colors[2] = { 7,7 };
 		colors[iPut] = 6;
-		gotoxy(30, 0); cout << "     _             _  __         _     _ _                          _     _ _      " << endl;
-		gotoxy(30, 1); cout << "  __| | __ _ ___  | |/ /   _  __| | __| | | ___ _ __ ___  _   _  __| | __| | | ___ " << endl;
-		gotoxy(30, 2); cout << " / _` |/ _` / __| | ' / | | |/ _` |/ _` | |/ _ \\ '_ ` _ \\| | | |/ _` |/ _` | |/ _ \\" << endl;
-		gotoxy(30, 3); cout << "| (_| | (_| \\__ \\ | . \\ |_| | (_| | (_| | |  __/ | | | | | |_| | (_| | (_| | |  __/" << endl;
-		gotoxy(30, 4); cout << " \\__,_|\\__,_|___/ |_|\\_\\__,_|\\__,_|\\__,_|_|\\___|_| |_| |_|\\__,_|\\__,_|\\__,_|_|\\___|" << endl;
 		gotoxy(15, 7); cout << "MMMMMMMMMMMMMNX0kXXXXXXk0XNMMMMMMMMMMMMMMM" << endl;
 		gotoxy(15, 8); cout << "MMMMMMMMMMMMMNX0kXXXXXXk0XNMMMMMMMMMMMMMMM" << endl;
 		createInputField(8, " Email      ", 40, 65, colors[0], info[0]);
@@ -163,11 +164,7 @@ RegisterData registerPage()
 
 		int colors[5] = { 7,7,7,7,7 };
 		colors[iPut] = 6;
-		gotoxy(30, 0); cout << "     _             _  __         _     _ _                          _     _ _      " << endl;
-		gotoxy(30, 1); cout << "  __| | __ _ ___  | |/ /   _  __| | __| | | ___ _ __ ___  _   _  __| | __| | | ___ " << endl;
-		gotoxy(30, 2); cout << " / _` |/ _` / __| | ' / | | |/ _` |/ _` | |/ _ \\ '_ ` _ \\| | | |/ _` |/ _` | |/ _ \\" << endl;
-		gotoxy(30, 3); cout << "| (_| | (_| \\__ \\ | . \\ |_| | (_| | (_| | |  __/ | | | | | |_| | (_| | (_| | |  __/" << endl;
-		gotoxy(30, 4); cout << " \\__,_|\\__,_|___/ |_|\\_\\__,_|\\__,_|\\__,_|_|\\___|_| |_| |_|\\__,_|\\__,_|\\__,_|_|\\___|" << endl;
+		printLogo(30); 
 		gotoxy(15, 7); cout << "MMMMMMMMMMMMMNX0kXXXXXXk0XNMMMMMMMMMMMMMMM" << endl;
 		gotoxy(15, 8); cout << "MMMMMMMMMMMMMNX0kXXXXXXk0XNMMMMMMMMMMMMMMM" << endl;
 		createInputField(8, " First name ", 40, 65, colors[0], info[0]);
@@ -430,7 +427,6 @@ void viewOrganisationUser(string acc[], int orgSize)
 
 	}
 }
-
 void createOrganisation()
 {
 	system("cls");
@@ -438,15 +434,12 @@ void createOrganisation()
 	int iPut = 0;
 	string info[5] = { "", "" };
 
-	do {
+	do
+	{
 		int colors[3] = { 7, 7 };
 		colors[iPut] = 6;
 		color(6);
-		gotoxy(26, 0); cout << "     _             _  __         _     _ _                          _     _ _      " << endl;
-		gotoxy(26, 1); cout << "  __| | __ _ ___  | |/ /   _  __| | __| | | ___ _ __ ___  _   _  __| | __| | | ___ " << endl;
-		gotoxy(26, 2); cout << " / _` |/ _` / __| | ' / | | |/ _` |/ _` | |/ _ \\ '_ ` _ \\| | | |/ _` |/ _` | |/ _ \\" << endl;
-		gotoxy(26, 3); cout << "| (_| | (_| \\__ \\ | . \\ |_| | (_| | (_| | |  __/ | | | | | |_| | (_| | (_| | |  __/" << endl;
-		gotoxy(26, 4); cout << " \\__,_|\\__,_|___/ |_|\\_\\__,_|\\__,_|\\__,_|_|\\___|_| |_| |_|\\__,_|\\__,_|\\__,_|_|\\___|" << endl;
+		printLogo(26);
 		gotoxy(15, 7); cout << "WWWWWWWWWWWWWWWWWWWWWWMWWMMWMMWWWWWWWWWWWWWWWWWWWWW";
 		gotoxy(15, 8); cout << "WWWWWWWWWWWWWWWWWWWWWNkdddddddKWWWWWWWWWWWWWWWWWWWW";
 		createInputField(8, " Course name", 40, 75, colors[0], info[0]);
@@ -473,25 +466,25 @@ void createOrganisation()
 		gotoxy(15, 28); cout << "WWWWXxodoododoodoodoooodooodoodoooodoodoododxXWWWWW";
 		gotoxy(15, 29); cout << "WWWWWWMWMWWMWWMWMMWMWWMWWMMWMWWMWWMWWMWMWWMWWWWWWWW";
 
-		if (iPut == 2) 
+		if (iPut == 2)
 		{
 			createButton(16, "  Create now  ", 14, 75, 2);
 		}
 		else {
 			createButton(16, "  Create now  ", 14, 75, 7);
 		}
-		
+
 		key = _getch();
 
-		if (key == '\r') 
+		if (key == '\r')
 		{
 			iPut++;
 			key = ' ';
 		}
 
-		else 
+		else
 		{
-			if (iPut < 2) 
+			if (iPut < 2)
 			{
 				if (key == '\b')
 				{
@@ -503,9 +496,84 @@ void createOrganisation()
 					info[iPut] += key;
 				}
 			}
-		} 
+		}
+
 	} while (key != '\r' && iPut <= 2);
 }
+void joinOrganisation()
+{
+	system("cls");
+	char key = ' ';
+	int iPut = 0;
+	string info[5] = { "", "" };
+
+	do
+	{
+		int colors[3] = { 7, 7 };
+		colors[iPut] = 6;
+		color(6);
+		printLogo(26); 
+		gotoxy(15, 7); cout << "WWWWWWWWWWWWWWWWWWWWWWMWWMMWMMWWWWWWWWWWWWWWWWWWWWW";
+		gotoxy(15, 8); cout << "WWWWWWWWWWWWWWWWWWWWWNkdddddddKWWWWWWWWWWWWWWWWWWWW";
+		createInputField(8, " Course name", 40, 75, colors[0], info[0]);
+		gotoxy(15, 9); cout << "WWWWWWWWWWWWWWWWWWWWW0'       :OKNWWWWWWWWWWWWWWWWW";
+		gotoxy(15, 10); cout << "WWWWWWWWWWWWWWWWWWWWW0'         ;KWWWWWWWWWWWWWWWWW";
+		gotoxy(15, 11); cout << "WWWWWWWWWWWWWWWWWWWWW0' ;kOo.   ,KWWWWWWWWWWWWWWWWW";
+		gotoxy(15, 12); cout << "WWWWWWWWWWWWWWWWWWWWWO. .cokddddkNWWWWWWWWWWWWWWWWW";
+		createInputField(12, " Password   ", 40, 75, colors[1], info[1]);
+		gotoxy(15, 13); cout << "WWWWWWWWWWWWWWWWWWXkl'     .,lkXWWWWWWWWWWWWWWWWWWW";
+		gotoxy(15, 14); cout << "WWWWWWWWWWWWWWN0d:.            .:d0NWWWWWWWWWWWWWWW";
+		gotoxy(15, 15); cout << "WWWWWWWWWWWXkl,.                  .,lkXWWWWWWWWWWWW";
+		gotoxy(15, 16); cout << "WWWWWWWN0d:.                          .:d0NWWWWWWWW";
+		gotoxy(15, 17); cout << "WWWWWWNo.                                .oNWWWWWWW";
+		gotoxy(15, 18); cout << "WWWWWWNkl,    .c:.    ;lcll;    .:c.    ,lkNWWWWWWW";
+		gotoxy(15, 19); cout << "WWWWWWWWWx.   ;XK,   .OWWWMO.   ,KX;   .xWWWWWWWWWW";
+		gotoxy(15, 20); cout << "WWWWWWWWWx.   ;XK,   .OWWWWO.   ,KX;   .xWWWWWWWWWW";
+		gotoxy(15, 21); cout << "WWWWWWWWWx.   ;XK,   .OWWWWO.   ,KX;   .xWWWWWWWWWW";
+		gotoxy(15, 22); cout << "WWWWWWWWWx.   ;XK,   .OWWWWO.   ,KX;   .xWWWWWWWWWW";
+		gotoxy(15, 23); cout << "WWWWWWWWWx.   ;XK,   .OWWWWO.   ,KX;   .xWWWWWWWWWW";
+		gotoxy(15, 24); cout << "WWWWWWWWWx.   ;XK,   .OWWWWO.   ,KX;   .xWWWWWWWWWW";
+		gotoxy(15, 25); cout << "WWWWWWWK0l    ,kx.   .o0OO0o.   .xk'    l0KWWWWWWWW";
+		gotoxy(15, 26); cout << "WWWWWNK:               .                  :KNWWWWWW";
+		gotoxy(15, 27); cout << "WWWWO;.                                    .;0WWWWW";
+		gotoxy(15, 28); cout << "WWWWXxodoododoodoodoooodooodoodoooodoodoododxXWWWWW";
+		gotoxy(15, 29); cout << "WWWWWWMWMWWMWWMWMMWMWWMWWMMWMWWMWWMWWMWMWWMWWWWWWWW";
+
+		if (iPut == 2)
+		{
+			createButton(16, "   Join now   ", 14, 75, 2);
+		}
+		else {
+			createButton(16, "   Join now   ", 14, 75, 7);
+		}
+
+		key = _getch();
+
+		if (key == '\r')
+		{
+			iPut++;
+			key = ' ';
+		}
+
+		else
+		{
+			if (iPut < 2)
+			{
+				if (key == '\b')
+				{
+					info[iPut] = info[iPut].substr(0, info[iPut].size() - 1);
+				}
+
+				else
+				{
+					info[iPut] += key;
+				}
+			}
+		}
+
+	} while (key != '\r' && iPut <= 2);
+}
+
 
 void displayQuestion()
 {
@@ -920,6 +988,6 @@ int main()
 		"Kethering und scisorss", "Code block for Specialists", "Cooking restaurnat um France" };
 	vector<string> users = { "Vesko Stoyanov", "Tereza Opanska", "KOstadin Tlg", "MC Stojan", "Yoana Smn" };
 	viewOrganisationUser(acc, 5);*/
-	createOrganisation();
+	joinOrganisation();
 
 }
