@@ -911,6 +911,149 @@ void viewTopicsInCourse(string acc[], int orgSize)
 
 	}
 }
+void updateDeleteTopicsInCourse(string acc[], int orgSize)
+{
+	system("cls");
+	char key; // Key to be entered
+	int counter = 0, counter2 = 0;
+
+	while (true)
+	{
+		int posy = 5;
+		gotoxy(2, 3); color(6); cout << "C O U R S E ' S   T O P I C S"; color(7);
+		for (int i = 0; i < orgSize; i++)
+		{
+			gotoxy(4, posy); cout << "-->";
+			if (i == counter)
+			{
+				color(6); gotoxy(9, posy); cout << acc[i];
+				gotoxy(60, posy);
+				if (counter2 == 0)
+				{
+					color(2); cout << "Settings"; color(7); cout << " | Delete";
+				}
+				else
+				{
+					color(7); cout << "Settings | "; color(4); cout << "Delete";
+				}
+			}
+			else
+			{
+				gotoxy(9, posy); cout << acc[i];
+				gotoxy(60, posy); color(8); cout << "Settings | Delete";
+			}
+
+
+			posy += 2;
+			color(7);
+		}
+
+		key = _getch();
+
+		if (key == 72 && (counter >= 1 && counter <= orgSize)) // 72/75 is the ASCII code for the up arrow
+		{
+			counter--;
+		}
+
+		if (key == 80 && (counter >= 0 && counter < orgSize - 1)) // 80/77 is the ASCII code for the up arrow
+		{
+			counter++;
+		}
+
+		if (key == 75 && (counter2 == 1)) // 72/75 is the ASCII code for the up arrow
+		{
+			counter2--;
+		}
+
+		if (key == 77 && (counter2 == 0)) // 80/77 is the ASCII code for the up arrow
+		{
+			counter2++;
+		}
+
+	}
+}
+void addTopicsInCourse(string acc[], int orgSize)
+{
+	char key; // Key to be entered
+	int counter = 0, counter2 = 0;
+
+
+	while (true)
+	{
+		system("cls");
+		int posy = 5;
+		gotoxy(2, 3); color(6); cout << "C O U R S E ' S   T O P I C S"; color(7);
+		for (int i = 0; i < orgSize; i++)
+		{
+			gotoxy(4, posy); cout << "-->";
+			if (i == counter)
+			{
+				color(6); gotoxy(9, posy); cout << acc[i];
+			}
+			else
+			{
+				gotoxy(9, posy); cout << acc[i];
+			}
+
+			posy += 2;
+			color(7);
+		}
+		createButton(posy, " + NEW TOPIC  ", 14, 4, 2);
+
+		key = _getch();
+
+		if (key == 72 && (counter >= 1 && counter <= orgSize)) // 72/75 is the ASCII code for the up arrow
+		{
+			counter--;
+		}
+
+		if (key == 80 && (counter >= 0 && counter < orgSize - 1)) // 80/77 is the ASCII code for the up arrow
+		{
+			counter++;
+		}
+
+		if (key == 75 && (counter2 == 1)) // 72/75 is the ASCII code for the up arrow
+		{
+			counter2--;
+		}
+
+		if (key == 77 && (counter2 == 0)) // 80/77 is the ASCII code for the up arrow
+		{
+			counter2++;
+		}
+
+		if (key == '+') 
+		{
+			string newTopic = "";
+			while (true) 
+			{
+				createInputField(posy + 3, "  TOPIC NAME", 40, 4, 7, newTopic);
+				key = _getch();
+
+				if (key == '\r') 
+				{
+					break;
+				}
+
+				else 
+				{
+					if (key == '\b') 
+					{
+						newTopic = newTopic.substr(0, newTopic.size() - 1);
+					}
+
+					else 
+					{
+						newTopic += key;
+					}
+					
+				}
+			}
+			acc[orgSize] = newTopic;
+			orgSize++;
+		}
+	}
+}
 
 void displayQuestion()
 {
@@ -1317,9 +1460,9 @@ int Menu() //Main menu with three options
 
 int main()
 {
-	string acc[5] = { "Vocational school of Programing", "United states of America",
+	string acc[10] = { "Vocational school of Programing", "United states of America",
 		"Kethering und scisorss", "Code block for Specialists", "Cooking restaurnat um France" };
 	string users[5] = { "Vesko Stoyanov", "Tereza Opanska", "KOstadin Tlg", "MC Stojan", "Yoana Smn" };
 
-	viewTopicsInCourse(acc, 5);
+	addTopicsInCourse(acc, 5);
 }
