@@ -13,6 +13,9 @@
 #include <nlohmann/json.hpp>
 #include <jwt-cpp/traits/nlohmann-json/traits.h>
 
+/**
+ * @brief Class for interacting with the database
+*/
 class DBManager
 {
 public:

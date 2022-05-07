@@ -3812,7 +3812,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					return;
 				}
 
-				std::vector<std::string> recordSet = dbManager.canUserAccessCourse(topicInfo.courseId, ctx.userId);
+				recordSet = dbManager.canUserAccessCourse(topicInfo.courseId, ctx.userId);
 
 				if (recordSet[0] != "1")
 				{

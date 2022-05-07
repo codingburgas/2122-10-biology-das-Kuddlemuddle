@@ -1727,7 +1727,7 @@ void drawPunnettSquare()
 	} while (key != '\r');
 }
 
-int navigationBar() //Main menu with three options
+void navigationBar() //Main menu with three options
 {
 	char key; // Key to be entered
 	int SetColor[5] = { 2, 7, 7, 7, 7 };
@@ -1817,10 +1817,10 @@ int navigationBar() //Main menu with three options
 
 	}
 
-	return 0;
+	return;
 }
 
 int main()
 {
-	//Hello
+	navigationBar();
 }
