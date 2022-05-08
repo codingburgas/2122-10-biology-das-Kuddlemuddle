@@ -1964,7 +1964,7 @@ void navigationBar() //Main menu with three options
 void manageAccount(RegisterData userData)
 {
 	char key;
-	gotoxy(5, 4); std::cout << "M A N A G E   C O U R S E ";
+	gotoxy(5, 4); std::cout << "M A N A G E   A C C O U N T ";
 
 	while (true)
 	{

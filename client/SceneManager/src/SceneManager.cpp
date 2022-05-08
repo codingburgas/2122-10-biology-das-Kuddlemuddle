@@ -124,6 +124,129 @@ void drawOrganisationLogo()
 	outputPosition(15, 29); std::cout << "WWWWWWMWMWWMWWMWMMWMWWMWWMMWMWWMWWMWWMWMWWMWWWWWWWW";
 }
 
+void manageAccount(RegisterData userData, std::string JWTToken, SceneContex* ctx)
+{
+	clearConsole();
+	char key;
+	outputPosition(5, 4); std::cout << "M A N A G E   A C C O U N T ";
+
+	while (true)
+	{
+		createInputField(6, " First Name ", 40, 5, 6, userData.fname);
+		createInputField(10, " Last Name  ", 40, 5, 7, userData.lname);
+		createInputField(14, " Username   ", 40, 5, 7, userData.username);
+		createInputField(18, " Email      ", 40, 5, 7, userData.email);
+		createInputField(22, " Password   ", 40, 5, 7, userData.password);
+		createButton(26, "    SUBMIT    ", 14, 5, 2);
+
+		key = _getch();
+
+		if (key == '\r')
+		{
+			break;
+		}
+
+		key == '\b' ? userData.fname = userData.fname.substr(0, userData.fname.size() - 1) : userData.fname += key;
+	}
+
+	while (true)
+	{
+		createInputField(6, " First Name ", 40, 5, 7, userData.fname);
+		createInputField(10, " Last Name  ", 40, 5, 6, userData.lname);
+		createInputField(14, " Username   ", 40, 5, 7, userData.username);
+		createInputField(18, " Email      ", 40, 5, 7, userData.email);
+		createInputField(22, " Password   ", 40, 5, 7, userData.password);
+		createButton(26, "    SUBMIT    ", 14, 5, 2);
+
+		key = _getch();
+
+		if (key == '\r')
+		{
+			break;
+		}
+
+		key == '\b' ? userData.lname = userData.lname.substr(0, userData.lname.size() - 1) : userData.lname += key;
+	}
+
+	while (true)
+	{
+		createInputField(6, " First Name ", 40, 5, 7, userData.fname);
+		createInputField(10, " Last Name  ", 40, 5, 7, userData.lname);
+		createInputField(14, " Username   ", 40, 5, 6, userData.username);
+		createInputField(18, " Email      ", 40, 5, 7, userData.email);
+		createInputField(22, " Password   ", 40, 5, 7, userData.password);
+		createButton(26, "    SUBMIT    ", 14, 5, 2);
+
+		key = _getch();
+
+		if (key == '\r')
+		{
+			break;
+		}
+
+		key == '\b' ? userData.username = userData.username.substr(0, userData.username.size() - 1) : userData.username += key;
+	}
+
+	while (true)
+	{
+		createInputField(6, " First Name ", 40, 5, 7, userData.fname);
+		createInputField(10, " Last Name  ", 40, 5, 7, userData.lname);
+		createInputField(14, " Username   ", 40, 5, 7, userData.username);
+		createInputField(18, " Email      ", 40, 5, 6, userData.email);
+		createInputField(22, " Password   ", 40, 5, 7, userData.password);
+		createButton(26, "    SUBMIT    ", 14, 5, 2);
+
+		key = _getch();
+
+		if (key == '\r')
+		{
+			break;
+		}
+
+		key == '\b' ? userData.email = userData.email.substr(0, userData.email.size() - 1) : userData.email += key;
+	}
+
+	while (true)
+	{
+		createInputField(6, " First Name ", 40, 5, 7, userData.fname);
+		createInputField(10, " Last Name  ", 40, 5, 7, userData.lname);
+		createInputField(14, " Username   ", 40, 5, 7, userData.username);
+		createInputField(18, " Email      ", 40, 5, 7, userData.email);
+		createInputField(22, " Password   ", 40, 5, 6, userData.password);
+		createButton(26, "    SUBMIT    ", 14, 5, 2);
+
+		key = _getch();
+
+		if (key == '\r')
+		{
+			break;
+		}
+
+		key == '\b' ? userData.password = userData.password.substr(0, userData.password.size() - 1) : userData.password += key;
+	}
+
+	APIHandler apiHandler;
+
+	auto recordSet = apiHandler.updateUser(userData, JWTToken);
+
+	if (recordSet.empty())
+	{
+		outputPosition(40, 28); std::cout << "The user info was updated successfully! Press any key to continue!";
+
+		ctx->user.username = userData.username;
+
+		(void)_getch();
+
+		return;
+	}
+
+	outputPosition(40, 28); std::cout << recordSet;
+
+	(void)_getch();
+
+	return;
+}
+
 void joinOrganisation(int orgId, std::string JWTToken)
 {
 	clearConsole();
@@ -452,7 +575,151 @@ std::string viewOrganisation(std::string JWTToken, SceneContex* sceneContext)
 	}
 }
 
-std::string accountPage(User user, std::string JWTToken)
+void createCourse(std::string JWTToken, int orgId)
+{
+	clearConsole();
+	char key = ' ';
+	int iPut = 0;
+	std::string info[5] = { "", "" };
+
+	do
+	{
+		int colors[3] = { 7, 7 };
+		colors[iPut] = 6;
+		setConsoleColorTo(6);
+		printLogo(26);
+		drawOrganisationLogo();
+		createInputField(8, " Course name", 40, 75, colors[0], info[0]);
+		createInputField(12, " Password   ", 40, 75, colors[1], info[1]);
+
+		if (iPut == 2)
+		{
+			createButton(16, "  Create now  ", 14, 75, 2);
+		}
+		else {
+			createButton(16, "  Create now  ", 14, 75, 7);
+		}
+
+		key = _getch();
+
+		if (key == '\r')
+		{
+			iPut++;
+			key = ' ';
+		}
+
+		else
+		{
+			if (iPut < 2)
+			{
+				if (key == '\b')
+				{
+					info[iPut] = info[iPut].substr(0, info[iPut].size() - 1);
+				}
+
+				else
+				{
+					info[iPut] += key;
+				}
+			}
+		}
+
+	} while (key != '\r' && iPut <= 2);
+	
+	APIHandler apiHandler;
+
+	std::string recordSet = apiHandler.createCourse({ info[0], info[1] }, orgId, JWTToken);
+
+	if (recordSet.empty())
+	{
+		outputPosition(15, 31); std::cout << "The course was created successfully! Press any key to continue!";
+
+		(void)_getch();
+
+		return;
+	}
+
+	outputPosition(15, 31); std::cout << recordSet;
+
+	(void)_getch();
+
+	return;
+
+}
+
+void joinCourse(int courseId, std::string JWTToken)
+{
+	clearConsole();
+	char key = ' ';
+	int iPut = 0;
+	std::string info[5] = { "", "" };
+
+	do
+	{
+		int colors[2] = { 7, 7 };
+		colors[iPut] = 6;
+		setConsoleColorTo(6);
+		printLogo(26);
+		drawOrganisationLogo();
+		outputPosition(75, 9); std::cout << "You are not part of this course.";
+		outputPosition(75, 10); std::cout << "Pleas enter the course password to continue!";
+		createInputField(12, " Password   ", 40, 75, colors[1], info[0]);
+
+		if (iPut == 1)
+		{
+			createButton(16, "   Join now   ", 14, 75, 2);
+		}
+		else {
+			createButton(16, "   Join now   ", 14, 75, 7);
+		}
+
+		key = _getch();
+
+		if (key == '\r')
+		{
+			iPut++;
+			key = ' ';
+		}
+
+		else
+		{
+			if (iPut < 1)
+			{
+				if (key == '\b')
+				{
+					info[iPut] = info[iPut].substr(0, info[iPut].size() - 1);
+				}
+
+				else
+				{
+					info[iPut] += key;
+				}
+			}
+		}
+
+	} while (key != '\r' && iPut <= 1);
+
+	APIHandler apiHandler;
+
+	std::string recordSet = apiHandler.joinCourse(courseId, info[0], JWTToken);
+
+	if (recordSet.empty())
+	{
+		outputPosition(15, 31); std::cout << "You are now part of this course! Press any key to continue!";
+
+		(void)_getch();
+
+		return;
+	}
+
+	outputPosition(15, 31); std::cout << recordSet;
+
+	(void)_getch();
+
+	return;
+}
+
+std::string accountPage(User user, std::string JWTToken, SceneContex* ctx)
 {
 	outputPosition(40, 6); setConsoleColorTo(6); std::cout << "A C C O U N T     S E T T I N G S"; setConsoleColorTo(7);
 	outputPosition(43, 8); std::cout << "First name  ";
@@ -482,8 +749,6 @@ std::string accountPage(User user, std::string JWTToken)
 
 	while (true)
 	{
-		// Button for history notebook section
-
 		outputPosition(42, 18); setConsoleColorTo(SetColor[0]); std::cout << "U P D A T E";
 		
 		if (counter == 0)
@@ -509,12 +774,14 @@ std::string accountPage(User user, std::string JWTToken)
 			counter++;
 		}
 
-		if (key == '\r' && (counter == 1)) // 72 is the ASCII code for the up arrow
+		if (key == '\r' && (counter == 0)) // 72 is the ASCII code for the up arrow
 		{
-			counter--;
+			manageAccount({user.fname, user.lname, user.username, user.email}, JWTToken, ctx);
+			clearConsole();
+			return "NavigationBar";
 		}
 
-		if (key == '\r' && (counter == 0)) // 80 is the ASCII code for the up arrow
+		if (key == '\r' && (counter == 1)) // 80 is the ASCII code for the up arrow
 		{
 			std::string recordSet = apiHandler.deleteUser("@me", JWTToken);
 
@@ -917,7 +1184,7 @@ void SceneManager::LoadScenes()
 				User userData;
 
 				sceneContext->isAuth = true;
-				sceneContext->JWTToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJleHAiOjE2NTIxMTk2MDYsImlhdCI6MTY1MjAzMzIwNiwiaXNBZG1pbiI6MCwic3ViIjoiMyJ9.eGC8e-HftJG157WGHjozJ0J0zg2DQJx1jjnEZGSnuaA";
+				sceneContext->JWTToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJleHAiOjE2NTIxMjcwNDMsImlhdCI6MTY1MjA0MDY0MywiaXNBZG1pbiI6MCwic3ViIjoiNCJ9.pSyXvF5NBmQJ-mCYmgFv94eQTzVb7HweiKc5xEKQufE";
 
 				std::string recordSet = apiHandler.getUserInfo("@me", sceneContext, userData);
 
@@ -977,7 +1244,7 @@ void SceneManager::LoadScenes()
 					{
 						if (counter == 1)
 						{
-							recordSet = accountPage(userData, sceneContext->JWTToken);
+							recordSet = accountPage(userData, sceneContext->JWTToken, sceneContext);
 
 							if (!recordSet.empty())
 							{
@@ -1124,6 +1391,48 @@ void SceneManager::LoadScenes()
 						return "NavigationBar";
 					}
 
+					if (key == '\r')
+					{
+						auto courseInfo = apiHandler.getCourse(orgInfo.courses[orgsCounter].id, sceneContext->JWTToken);
+						// try to get course info
+						if (courseInfo.errors.empty())
+						{
+							sceneContext->courseInfo = courseInfo;
+
+							int userRole = 0;
+
+							apiHandler.getUserInfo("@me", sceneContext, sceneContext->user);
+
+							for (auto& user : courseInfo.users)
+							{
+								if (user.id == std::stoi(sceneContext->user.id))
+								{
+									userRole = user.role;
+								}
+							}
+
+							switch (userRole)
+							{
+							case 1:
+								return "ViewOrgAsTeacher";
+								break;
+							case 2:
+								return "ViewOrgAsAdmin";
+								break;
+							case 0:
+							default:
+								return "ViewOrgAsUser";
+								break;
+							}
+						}
+						else
+						{
+							joinCourse(orgInfo.courses[orgsCounter].id, sceneContext->JWTToken);
+							clearConsole();
+							return "ViewOrgAsUser";
+						}
+					}
+
 					if (key == 72 && (orgsCounter >= 1 && orgsCounter <= orgInfo.courses.size())) // 72/75 is the ASCII code for the up arrow
 					{
 						orgsCounter--;
@@ -1201,6 +1510,11 @@ void SceneManager::LoadScenes()
 						setConsoleColorTo(7);
 					}
 
+					outputPosition(4, posy); std::cout << "-->";
+					orgInfo.courses.size() == counter ? setConsoleColorTo(6) : setConsoleColorTo(7);
+					outputPosition(9, posy); std::cout << "Create Course";
+					setConsoleColorTo(7);
+
 					key = _getch();
 
 					if (key == 27)
@@ -1215,12 +1529,18 @@ void SceneManager::LoadScenes()
 						return "updateOrganisation";
 					}
 
+					if (key == '\r' && counter == orgInfo.courses.size())
+					{
+						createCourse(sceneContext->JWTToken, orgInfo.id);
+						return "ViewOrgAsAdmin";
+					}
+
 					if (key == 72 && (counter >= 1 && counter <= orgInfo.courses.size()))
 					{
 						counter--;
 					}
 
-					if (key == 80 && (counter >= 0 && counter < orgInfo.courses.size() - 1))
+					if (key == 80 && (counter >= 0 && counter < orgInfo.courses.size()))
 					{
 						counter++;
 					}
