@@ -39,6 +39,20 @@ namespace DBUnitTest
 			Assert::AreEqual(result, "Could not find user with id: 1");
 		}
 
+		TEST_METHOD(UpdateUserAvatarUnitTest)
+		{
+			// Arrange
+			DBManager DBManager;
+			std::string image = "img.png", result;
+			int userID = 1;
+
+			// Act
+			result = DBManager.deleteUser(userID, image);
+
+			// Assert
+			Assert::AreEqual(result, "Could not find user with id: 1");
+		}
+
 		
 
 	};
