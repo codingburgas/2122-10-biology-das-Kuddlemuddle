@@ -53,6 +53,19 @@ namespace DBUnitTest
 			Assert::AreEqual(result, "Could not find user with id: 1");
 		}
 
+		TEST_METHOD(getOrgIdByNameUnitTest)
+		{
+			// Arrange
+			DBManager DBManager;
+			std::string orgName = "Org1", result;
+
+			// Act
+			result = DBManager.getOrgIdByName(orgName);
+
+			// Assert
+			Assert::AreEqual(result, "Could not find organisation with name: Org1");
+		}
+
 		
 
 	};
