@@ -1968,5 +1968,5 @@ int main()
 		"Math"
 	};
 	//registerPage();
-	viewCoursesInOrganisationAdmin(courses, 2);
+	updateOrganisation("VSCPI", "Password123");
 }

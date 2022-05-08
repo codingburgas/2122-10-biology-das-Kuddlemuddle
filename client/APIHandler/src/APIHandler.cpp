@@ -264,6 +264,47 @@ std::string APIHandler::joinOrg(int orgId, std::string password, std::string JWT
     return JSONRes["fields"][0];
 }
 
+std::string APIHandler::updateOrg(OrgData orgData, std::string name, std::string JWTToken)
+{
+    cpr::Response r = cpr::Patch(cpr::Url{ "http://localhost:18080/api/orgs/" + name },
+        cpr::Bearer({ JWTToken }),
+        cpr::Payload{
+            {"orgName", orgData.name},
+            {"password", orgData.password}
+        });
+
+    nlohmann::json JSONRes;
+
+    try
+    {
+        JSONRes = nlohmann::json::parse(r.text);
+    }
+    catch (nlohmann::json::parse_error& ex)
+    {
+        return "There is a problem with the server! Please try again later!";
+    }
+
+    if (JSONRes["type"] == "organisation-update-success")
+    {
+        return "";
+    }
+
+    std::string returnVal;
+
+    if (JSONRes["fields"].size() != 1)
+    {
+        returnVal = "The following fileds are incorrect: ";
+
+        for (auto& el : JSONRes["fields"].items())
+        {
+            returnVal += el.value();
+            returnVal += " ";
+        }
+    }
+
+    return JSONRes["fields"][0];
+}
+
 bool APIHandler::doUserHaveAccessToOrg(std::string name, std::string JWTToken)
 {
     auto r = cpr::Get(cpr::Url{ "http://localhost:18080/api/orgs/" + name },

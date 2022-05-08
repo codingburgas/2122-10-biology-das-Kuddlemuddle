@@ -86,6 +86,7 @@ public:
     std::string deleteUser(std::string username, std::string JWTToken);
     std::string createOrg(OrgData orgData, std::string JWTToken);
     std::string joinOrg(int orgId, std::string password, std::string JWTToken);
+    std::string updateOrg(OrgData orgData, std::string name, std::string JWTToken);
     bool doUserHaveAccessToOrg(std::string name, std::string JWTToken);
     std::vector<User> getAllUsers(std::string JWTToken);
     std::vector<OrgInfo> getAllOrgs(std::string JWTToken);
