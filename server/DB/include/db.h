@@ -147,7 +147,7 @@ public:
 	 * @brief Function that gets all of the organisations
 	 * @return All of the organisations
 	*/
-	std::vector<OrgInfo> getAllOrgsInfo();
+	std::vector<OrgInfo> getAllOrgsInfo(int userId);
 
 	/**
 	 * @brief Save Course to the database

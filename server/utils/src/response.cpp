@@ -62,7 +62,19 @@ crow::json::wvalue ResponseJSONManager::createOrgJSONResponse(OrgInfo data)
 
 	for (size_t i = 0; i < data.users.size(); i++)
 	{
-		resBody["org-users"][i] = { {"user-id", data.users[i].id} , {"role-id", data.users[i].role} };
+		if (data.users[i].role != 1)
+		{
+			resBody["org-users"][i] = { {"user-id", data.users[i].id} , {"role-id", data.users[i].role} };
+		}
+		else
+		{
+			resBody["org-users"][i] = { {"user-id", data.users[i].id} , {"role-id", data.users[i].role} };
+
+			for (size_t j = 0; j < data.users[i].userCoursesId.size(); j++)
+			{
+				resBody["org-users"][i]["teacher-courses-id"][j] = data.users[i].userCoursesId[j];
+			}
+		}
 	}
 
 	for (size_t i = 0; i < data.courses.size(); i++)
@@ -81,7 +93,7 @@ crow::json::wvalue ResponseJSONManager::createOrgsJSONResponse(std::vector<OrgIn
 	
 	for (size_t i = 0; i < data.size(); i++)
 	{
-		resBody["orgs"][i] = { {"org-id", data[i].id} , {"org-name", data[i].name} };
+		resBody["orgs"][i] = { {"org-id", data[i].id} , {"org-name", data[i].name}, {"is-admin", bool(data[i].users[0].id == 1)} };
 	}
 
 	return resBody;

@@ -41,6 +41,7 @@ struct OrgInfo
 {
     int id;
     std::string name;
+    bool isAdmin;
     std::vector<OrgUser> users;
     std::vector<CourseInfo> courses;
     std::string errors;
@@ -87,6 +88,7 @@ public:
     std::string createOrg(OrgData orgData, std::string JWTToken);
     std::string joinOrg(int orgId, std::string password, std::string JWTToken);
     std::string updateOrg(OrgData orgData, std::string name, std::string JWTToken);
+    std::string deleteOrg(std::string name, std::string JWTToken);
     bool doUserHaveAccessToOrg(std::string name, std::string JWTToken);
     std::vector<User> getAllUsers(std::string JWTToken);
     std::vector<OrgInfo> getAllOrgs(std::string JWTToken);

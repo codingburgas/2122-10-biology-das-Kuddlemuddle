@@ -183,11 +183,12 @@ std::vector<std::string> DBManager::getUserInfo(std::string username, int userId
 			if (it.value()["ID"] == userId)
 			{
 				return {
+					std::to_string(it.value()["ID"].get<int>()),
 					it.value()["FirstName"],
 					it.value()["LastName"],
 					it.value()["Username"],
 					it.value()["Email"],
-					std::to_string(int(it.value()["RoleID"])),
+					std::to_string(it.value()["RoleID"].get<int>()),
 					it.value()["AvatarURL"]
 				};
 			}
@@ -739,7 +740,7 @@ OrgInfo DBManager::getOrgInfo(std::string orgName)
 	return returnValue;
 }
 
-std::vector<OrgInfo> DBManager::getAllOrgsInfo()
+std::vector<OrgInfo> DBManager::getAllOrgsInfo(int userId)
 {
 	std::vector<OrgInfo> recordSet;
 
@@ -758,7 +759,17 @@ std::vector<OrgInfo> DBManager::getAllOrgsInfo()
 
 	for (auto it = orgsJSON.begin(); it != orgsJSON.end(); ++it)
 	{
-		recordSet.push_back({ it.value()["ID"], it.value()["Name"] });
+		std::vector<std::string> recordSet2 = isUserInOrgAndGetRole(userId, it.value()["ID"]);
+
+		if (recordSet2[0] == "1" && recordSet2[1] == "2")
+		{
+			recordSet.push_back({ it.value()["ID"], it.value()["Name"], { { 1 } } });
+		}
+		else
+		{
+			recordSet.push_back({ it.value()["ID"], it.value()["Name"], { { 0 } } });
+		}
+
 	}
 
 	return recordSet;
@@ -2747,11 +2758,13 @@ std::vector<OrgUser> DBManager::getOrgUsersByOrgId(int orgId)
 	std::vector<OrgUser> recordSet;
 
 	nlohmann::json userOrgRoleJSON;
+	nlohmann::json coursesJSON;
 
 	// Get the JSON from the file
 	try
 	{
 		userOrgRoleJSON = getJSONFromFile("userOrgRole.json");
+		coursesJSON = getJSONFromFile("courses.json");
 	}
 	catch (std::string ex)
 	{
@@ -2762,7 +2775,30 @@ std::vector<OrgUser> DBManager::getOrgUsersByOrgId(int orgId)
 	{
 		if (it.value()["OrganisationID"] == orgId)
 		{
-			recordSet.push_back({ it.value()["UserID"], it.value()["Role"] });
+			OrgUser orgUser = { it.value()["UserID"], it.value()["Role"] };
+
+			if (orgUser.role == 1)
+			{
+				for (auto courseIt = coursesJSON.begin(); courseIt != coursesJSON.end(); ++courseIt)
+				{
+					if (courseIt.value()["OrgID"] == std::to_string(orgId))
+					{
+						std::vector<OrgUser> usersInCourses = getCourseUsersByCourseId(courseIt.value()["ID"].get<int>());
+
+						for (auto &user: usersInCourses)
+						{
+							if (user.id == it.value()["UserID"] && user.role == 1)
+							{
+								orgUser.userCoursesId.push_back(courseIt.value()["ID"].get<int>());
+								break;
+							}
+						}
+					}
+				}
+
+			}
+
+			recordSet.push_back(orgUser);
 		}
 	}
 

@@ -1092,7 +1092,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					CROW_LOG_INFO << "User with id: " << ctx.userId <<
 						" is trying to get information for all organisations.";
 
-					auto orgInfo = dbManager.getAllOrgsInfo();
+					auto orgInfo = dbManager.getAllOrgsInfo(ctx.userId);
 
 					if (!orgInfo[0].errors.empty())
 					{
@@ -1237,10 +1237,10 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					return;
 				}
 
-				recordSet = dbManager.isUserInOrgAndGetRole(ctx.userId, std::stoi(recordSet[0]));
+				std::vector<std::string> recordSet2 = dbManager.isUserInOrgAndGetRole(ctx.userId, std::stoi(recordSet[0]));
 
 				// Error happend
-				if (recordSet[0] != "1" || recordSet[1] != "2")
+				if (!ctx.isAdmin && (recordSet2[0] != "1" || recordSet2[1] != "2"))
 				{
 					std::string log = "Failed to delete organisation with name: " +
 						orgName + ". Reason: User is unauthorised";

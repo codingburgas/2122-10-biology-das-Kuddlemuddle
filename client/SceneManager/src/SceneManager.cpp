@@ -124,86 +124,6 @@ void drawOrganisationLogo()
 	outputPosition(15, 29); std::cout << "WWWWWWMWMWWMWWMWMMWMWWMWWMMWMWWMWWMWWMWMWWMWWWWWWWW";
 }
 
-void viewOrganisationAdmin(std::string JWTToken)
-{
-	clearConsole();
-	char key; // Key to be entered
-	int counter = 0, counter2 = 0;
-	int ckey = 0;
-
-	APIHandler apiHandler;
-
-	auto orgsInfo = apiHandler.getAllOrgs(JWTToken);
-
-	if (!orgsInfo[0].errors.empty())
-	{
-		std::cout << "There was problem with the server. Please try again latter!";
-
-		(void)_getch();
-		return;
-	}
-
-	while (true)
-	{
-		int posy = 5;
-
-		outputPosition(2, 3); setConsoleColorTo(6); std::cout << "O R G A N I S A T I O N S"; setConsoleColorTo(7);
-
-		for (size_t i = 0; i < orgsInfo.size(); i++)
-		{
-			outputPosition(4, posy); std::cout << "-->";
-
-			if (i == counter) 
-			{
-				setConsoleColorTo(6); outputPosition(9, posy); std::cout << orgsInfo[i].name;
-				outputPosition(60, posy);
-
-				if (counter2 == 0) 
-				{
-					setConsoleColorTo(2); std::cout << "Update"; setConsoleColorTo(7); std::cout << " | Delete";
-				}
-				else 
-				{
-					setConsoleColorTo(7); std::cout << "Update | "; setConsoleColorTo(4); std::cout << "Delete";
-				}
-			}
-			else 
-			{
-				outputPosition(9, posy); std::cout << orgsInfo[i].name;
-				outputPosition(60, posy); setConsoleColorTo(8); std::cout << "Update | Delete";
-			}
-
-
-			posy += 2;
-			setConsoleColorTo(7);
-		}
-
-		key = _getch();
-
-		if (key == 72 && (counter >= 1 && counter <= orgsInfo.size())) // 72/75 is the ASCII code for the up arrow
-		{
-			counter--;
-		}
-
-		if (key == 80 && (counter >= 0 && counter < orgsInfo.size() - 1)) // 80/77 is the ASCII code for the up arrow
-		{
-			counter++;
-		}
-
-		if (key == 75 && (counter2 == 1)) // 72/75 is the ASCII code for the up arrow
-		{
-			counter2--;
-		}
-
-		if (key == 77 && (counter2 == 0)) // 80/77 is the ASCII code for the up arrow
-		{
-			counter2++;
-		}
-
-
-	}
-}
-
 void joinOrganisation(int orgId, std::string JWTToken)
 {
 	clearConsole();
@@ -358,10 +278,10 @@ void createOrganisation(std::string JWTToken)
 	return;
 }
 
-std::string viewOrganisationUser(std::string JWTToken, SceneContex* sceneContext)
+std::string viewOrganisation(std::string JWTToken, SceneContex* sceneContext)
 {
 	char key; // Key to be entered
-	int counter = 0, posy;
+	int counter = 0, posy, counter2 = 0;
 
 	APIHandler apiHandler;
 
@@ -379,17 +299,45 @@ std::string viewOrganisationUser(std::string JWTToken, SceneContex* sceneContext
 
 		for (int i = 0; i < orgsInfo.size(); i++)
 		{
-			outputPosition(8, posy); std::cout << "-->";
-			i == counter ? setConsoleColorTo(6) : setConsoleColorTo(7);
-			outputPosition(13, posy); std::cout << orgsInfo[i].name;
-			setConsoleColorTo(7);
+			if (orgsInfo[i].isAdmin)
+			{
+				outputPosition(4, posy); std::cout << "-->";
+
+				if (i == counter)
+				{
+					setConsoleColorTo(6); outputPosition(9, posy); std::cout << orgsInfo[i].name;
+					outputPosition(60, posy);
+
+					if (counter2 == 0)
+					{
+						setConsoleColorTo(2); std::cout << "Enter"; setConsoleColorTo(7); std::cout << " | Delete";
+					}
+					else
+					{
+						setConsoleColorTo(7); std::cout << "Enter | "; setConsoleColorTo(4); std::cout << "Delete";
+					}
+				}
+				else
+				{
+					outputPosition(9, posy); std::cout << orgsInfo[i].name;
+					outputPosition(60, posy); setConsoleColorTo(8); std::cout << "Enter | Delete";
+				}
+				setConsoleColorTo(7);
+			}
+			else
+			{
+				outputPosition(4, posy); std::cout << "-->";
+				i == counter ? setConsoleColorTo(6) : setConsoleColorTo(7);
+				outputPosition(9, posy); std::cout << orgsInfo[i].name;
+				setConsoleColorTo(7);
+			}
 
 			posy += 2;
 		}
 
-		outputPosition(8, posy); std::cout << "-->";
+		outputPosition(4, posy); std::cout << "-->";
 		orgsInfo.size() == counter ? setConsoleColorTo(6) : setConsoleColorTo(7);
-		outputPosition(13, posy); std::cout << "Create Organisation";
+		outputPosition(9, posy); std::cout << "Create Organisation";
 		setConsoleColorTo(7);
 
 		key = _getch();
@@ -397,11 +345,37 @@ std::string viewOrganisationUser(std::string JWTToken, SceneContex* sceneContext
 		if (key == 72 && (counter >= 1 && counter <= orgsInfo.size())) // 72 is the ASCII code for the up arrow
 		{
 			counter--;
+			if (!orgsInfo[counter].isAdmin)
+			{
+				counter2 = 0;
+			}
 		}
 
 		if (key == 80 && (counter >= 0 && counter < orgsInfo.size())) // 80 is the ASCII code for the down arrow
 		{
 			counter++;
+			if (!orgsInfo[counter].isAdmin)
+			{
+				counter2 = 0;
+			}
+		}
+
+		if (key == 75 && (counter2 == 1)) // 72/75 is the ASCII code for the up arrow
+		{
+			counter2--;
+			if (!orgsInfo[counter].isAdmin)
+			{
+				counter2 = 0;
+			}
+		}
+
+		if (key == 77 && (counter2 == 0)) // 80/77 is the ASCII code for the up arrow
+		{
+			counter2++;
+			if (!orgsInfo[counter].isAdmin)
+			{
+				counter2 = 0;
+			}
 		}
 
 		if (key == 27)
@@ -417,7 +391,7 @@ std::string viewOrganisationUser(std::string JWTToken, SceneContex* sceneContext
 			return "";
 		}
 		
-		if (key == '\r')
+		if (key == '\r' && counter2 == 0)
 		{
 			auto orgInfo = apiHandler.getOrg(orgsInfo[counter].name, JWTToken);
 			// try to get org info
@@ -457,6 +431,23 @@ std::string viewOrganisationUser(std::string JWTToken, SceneContex* sceneContext
 				clearConsole();
 				return "";
 			}
+		}
+
+		if (key == '\r' && counter2 == 1)
+		{
+			auto recordSet = apiHandler.deleteOrg(orgsInfo[counter].name, JWTToken);
+
+			outputPosition(4, posy + 2);
+
+			if (recordSet.empty())
+			{
+				std::cout << "Organisation deleted successfully! Press any key to continue...";
+				(void)_getch();
+				clearConsole();
+				return "";
+			}
+
+			std::cout << recordSet;
 		}
 	}
 }
@@ -630,8 +621,29 @@ std::string adminPage(std::string JWTToken)
 		{
 			std::string recordSet = apiHandler.deleteUser(usersInfo[indexCounter].username, JWTToken);
 
+			outputPosition(15, orgsInfo.size() + 10);
+			
 			if (recordSet.empty())
 			{
+				std::cout << "User deleted successfully! Press any key to continue...";
+				(void)_getch();
+				clearConsole();
+				return "";
+			}
+
+			std::cout << recordSet;
+		}
+
+		if (key == '\r' && (selectedCounter == 0))
+		{
+			std::string recordSet = apiHandler.deleteOrg(orgsInfo[indexCounter].name, JWTToken);
+
+			outputPosition(15, orgsInfo.size() + 10);
+
+			if (recordSet.empty())
+			{
+				std::cout << "Organisation deleted successfully! Press any key to continue...";
+				(void)_getch();
 				clearConsole();
 				return "";
 			}
@@ -905,7 +917,7 @@ void SceneManager::LoadScenes()
 				User userData;
 
 				sceneContext->isAuth = true;
-				sceneContext->JWTToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJleHAiOjE2NTIwOTYwMDksImlhdCI6MTY1MjAwOTYwOSwiaXNBZG1pbiI6MCwic3ViIjoiMyJ9.yaI5FaYvgljj0VFSIC582LlG_G1lGrAyRB3sbd5zOU0";
+				sceneContext->JWTToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJleHAiOjE2NTIxMTk2MDYsImlhdCI6MTY1MjAzMzIwNiwiaXNBZG1pbiI6MCwic3ViIjoiMyJ9.eGC8e-HftJG157WGHjozJ0J0zg2DQJx1jjnEZGSnuaA";
 
 				std::string recordSet = apiHandler.getUserInfo("@me", sceneContext, userData);
 
@@ -998,7 +1010,7 @@ void SceneManager::LoadScenes()
 							}
 							else
 							{
-								recordSet = viewOrganisationUser(sceneContext->JWTToken, sceneContext);
+								recordSet = viewOrganisation(sceneContext->JWTToken, sceneContext);
 
 								if (!recordSet.empty())
 								{

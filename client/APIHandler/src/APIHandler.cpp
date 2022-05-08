@@ -175,7 +175,7 @@ std::vector<OrgInfo> APIHandler::getAllOrgs(std::string JWTToken)
     {
         for (auto it = JSONRes["orgs"].begin(); it != JSONRes["orgs"].end(); ++it)
         {
-            orgsInfo.push_back({ it.value()["org-id"].get<int>(),it.value()["org-name"].get<std::string>() });
+            orgsInfo.push_back({ it.value()["org-id"].get<int>(),it.value()["org-name"].get<std::string>(), it.value()["is-admin"].get<bool>()});
         }
     }
 
@@ -262,6 +262,30 @@ std::string APIHandler::joinOrg(int orgId, std::string password, std::string JWT
     }
 
     return JSONRes["fields"][0];
+}
+
+std::string APIHandler::deleteOrg(std::string name, std::string JWTToken)
+{
+    auto r = cpr::Delete(cpr::Url{ "http://localhost:18080/api/orgs/" + name },
+        cpr::Bearer({ JWTToken }));
+
+    nlohmann::json JSONRes;
+
+    try
+    {
+        JSONRes = nlohmann::json::parse(r.text);
+    }
+    catch (nlohmann::json::parse_error& ex)
+    {
+        return "There is a problem with the server! Please try again later!";
+    }
+
+    if (r.status_code != 200)
+    {
+        return "There is a problem with the server! Please try again later!";
+    }
+
+    return "";
 }
 
 std::string APIHandler::updateOrg(OrgData orgData, std::string name, std::string JWTToken)

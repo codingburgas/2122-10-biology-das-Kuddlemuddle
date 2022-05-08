@@ -425,15 +425,15 @@ void viewOrganisationAdmin(string acc[], int orgSize)
 				color(6); gotoxy(9, posy); std::cout << acc[i];
 				gotoxy(60, posy);
 				if (counter2 == 0) {
-					color(2); std::cout << "Update"; color(7); std::cout << " | Delete";
+					color(2); std::cout << "Enter"; color(7); std::cout << " | Delete";
 				}
 				else {
-					color(7); std::cout << "Update | "; color(4); std::cout << "Delete";
+					color(7); std::cout << "Enter | "; color(4); std::cout << "Delete";
 				}
 			}
 			else {
 				gotoxy(9, posy); std::cout << acc[i];
-				gotoxy(60, posy); color(8); std::cout << "Update | Delete";
+				gotoxy(60, posy); color(8); std::cout << "Enter | Delete";
 			}
 
 
@@ -466,7 +466,7 @@ void viewOrganisationAdmin(string acc[], int orgSize)
 
 	}
 }
-void viewOrganisationUser(string acc[], int orgSize)
+void viewOrganisation(string acc[], int orgSize)
 {
 	system("cls");
 

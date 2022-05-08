@@ -21,6 +21,7 @@ struct OrgUser
 {
 	int id; /*!< ID of the user */
 	int role; /*!< Role of the user */
+	std::vector<int> userCoursesId; /* ID of the courses in which this user is part of */
 };
 
 /**
