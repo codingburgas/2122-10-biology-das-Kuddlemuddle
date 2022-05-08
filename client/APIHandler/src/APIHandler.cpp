@@ -222,6 +222,55 @@ std::string APIHandler::createOrg(OrgData orgData, std::string JWTToken)
     return JSONRes["fields"][0];
 }
 
+std::string APIHandler::joinOrg(int orgId, std::string password, std::string JWTToken)
+{
+    cpr::Response r = cpr::Post(cpr::Url{ "http://localhost:18080/api/joinOrg" },
+        cpr::Bearer({ JWTToken }),
+        cpr::Payload{
+            {"orgId", std::to_string(orgId)},
+            {"password", password}
+        });
+
+    nlohmann::json JSONRes;
+
+    try
+    {
+        JSONRes = nlohmann::json::parse(r.text);
+    }
+    catch (nlohmann::json::parse_error& ex)
+    {
+        return "There is a problem with the server! Please try again later!";
+    }
+
+    if (JSONRes["type"] == "join-org-success")
+    {
+        return "";
+    }
+
+    std::string returnVal;
+
+    if (JSONRes["fields"].size() != 1)
+    {
+        returnVal = "The following fileds are incorrect: ";
+
+        for (auto& el : JSONRes["fields"].items())
+        {
+            returnVal += el.value();
+            returnVal += " ";
+        }
+    }
+
+    return JSONRes["fields"][0];
+}
+
+bool APIHandler::doUserHaveAccessToOrg(std::string name, std::string JWTToken)
+{
+    auto r = cpr::Get(cpr::Url{ "http://localhost:18080/api/orgs/" + name },
+        cpr::Bearer({ JWTToken }));
+
+    return (r.status_code == 200);
+}
+
 std::vector<User> APIHandler::getAllUsers(std::string JWTToken)
 {
     cpr::Response r;

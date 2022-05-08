@@ -562,15 +562,16 @@ void joinOrganisation()
 
 	do
 	{
-		int colors[3] = { 7, 7 };
+		int colors[2] = { 7, 7 };
 		colors[iPut] = 6;
 		color(6);
 		printLogo(26);
 		drawOrganisationLogo();
-		createInputField(8, " Course name", 40, 75, colors[0], info[0]);
-		createInputField(12, " Password   ", 40, 75, colors[1], info[1]);
+		gotoxy(75, 9); cout << "You are not part of this organisation.";
+		gotoxy(75, 10); cout << "Pleas enter the organisation password to continue!";
+		createInputField(12, " Password   ", 40, 75, colors[1], info[0]);
 
-		if (iPut == 2)
+		if (iPut == 1)
 		{
 			createButton(16, "   Join now   ", 14, 75, 2);
 		}
@@ -604,6 +605,7 @@ void joinOrganisation()
 
 	} while (key != '\r' && iPut <= 2);
 }
+
 void updateOrganisation(string orgName, string orgPass)
 {
 	system("cls");
@@ -1852,6 +1854,10 @@ void navigationBar() //Main menu with three options
 
 int main()
 {
+	string courses[2] = {
+		"Biology",
+		"Math"
+	};
 	//registerPage();
-	joinOrganisation();
+	manageUserRoles(courses, 2);
 }

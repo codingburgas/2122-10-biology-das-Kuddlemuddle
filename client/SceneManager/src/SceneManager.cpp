@@ -201,6 +201,78 @@ void viewOrganisationAdmin(std::string JWTToken)
 	}
 }
 
+void joinOrganisation(int orgId, std::string JWTToken)
+{
+	clearConsole();
+	char key = ' ';
+	int iPut = 0;
+	std::string info[5] = { "", "" };
+
+	do
+	{
+		int colors[2] = { 7, 7 };
+		colors[iPut] = 6;
+		setConsoleColorTo(6);
+		printLogo(26);
+		drawOrganisationLogo();
+		outputPosition(75, 9); std::cout << "You are not part of this organisation.";
+		outputPosition(75, 10); std::cout << "Pleas enter the organisation password to continue!";
+		createInputField(12, " Password   ", 40, 75, colors[1], info[0]);
+
+		if (iPut == 1)
+		{
+			createButton(16, "   Join now   ", 14, 75, 2);
+		}
+		else {
+			createButton(16, "   Join now   ", 14, 75, 7);
+		}
+
+		key = _getch();
+
+		if (key == '\r')
+		{
+			iPut++;
+			key = ' ';
+		}
+
+		else
+		{
+			if (iPut < 1)
+			{
+				if (key == '\b')
+				{
+					info[iPut] = info[iPut].substr(0, info[iPut].size() - 1);
+				}
+
+				else
+				{
+					info[iPut] += key;
+				}
+			}
+		}
+
+	} while (key != '\r' && iPut <= 1);
+
+	APIHandler apiHandler;
+
+	std::string recordSet = apiHandler.joinOrg(orgId, info[0], JWTToken);
+
+	if (recordSet.empty())
+	{
+		outputPosition(15, 31); std::cout << "You are now part of this oraganisation! Press any key to continue!";
+
+		(void)_getch();
+
+		return;
+	}
+
+	outputPosition(15, 31); std::cout << recordSet;
+
+	(void)_getch();
+
+	return;
+}
+
 void createOrganisation(std::string JWTToken)
 {
 	clearConsole();
@@ -334,6 +406,21 @@ std::string viewOrganisationUser(std::string JWTToken)
 			createOrganisation(JWTToken);
 			clearConsole();
 			return "";
+		}
+		
+		if (key == '\r')
+		{
+			// try to get org info
+			if (apiHandler.doUserHaveAccessToOrg(orgsInfo[counter].name, JWTToken))
+			{
+				return "NavigationBar";
+			}
+			else
+			{
+				joinOrganisation(orgsInfo[counter].id, JWTToken);
+				clearConsole();
+				return "";
+			}
 		}
 	}
 }
