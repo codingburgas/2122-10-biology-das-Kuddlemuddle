@@ -100,6 +100,7 @@ public:
 	std::string getUserInfo(std::string username, SceneContex* ctx, User& user);
 	std::string getUserInfoById(std::string userId, SceneContex* ctx, User& user);
     std::string deleteUser(std::string username, std::string JWTToken);
+    std::string updateUser(RegisterData userData, std::string JWTToken);
     std::string createOrg(OrgData orgData, std::string JWTToken);
     std::string joinOrg(int orgId, std::string password, std::string JWTToken);
     std::string updateOrg(OrgData orgData, std::string name, std::string JWTToken);

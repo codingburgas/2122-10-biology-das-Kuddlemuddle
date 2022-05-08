@@ -188,6 +188,50 @@ std::string APIHandler::deleteUser(std::string username, std::string JWTToken)
     return "";
 }
 
+std::string APIHandler::updateUser(RegisterData userData, std::string JWTToken)
+{
+    cpr::Response r = cpr::Patch(cpr::Url{ "http://localhost:18080/api/users/@me" },
+        cpr::Bearer({ JWTToken }),
+        cpr::Payload{
+            {"firstName", userData.fname},
+            {"lastName", userData.lname},
+            {"username", userData.username},
+            {"email", userData.email},
+            {"password", userData.password}
+        });
+
+    nlohmann::json JSONRes;
+
+    try
+    {
+        JSONRes = nlohmann::json::parse(r.text);
+    }
+    catch (nlohmann::json::parse_error& ex)
+    {
+        return "There is a problem with the server! Please try again later!";
+    }
+
+    if (JSONRes["type"] == "user-update-success")
+    {
+        return "";
+    }
+
+    std::string returnVal;
+
+    if (JSONRes["fields"].size() != 1)
+    {
+        returnVal = "The following fileds are incorrect: ";
+
+        for (auto& el : JSONRes["fields"].items())
+        {
+            returnVal += el.value();
+            returnVal += " ";
+        }
+    }
+
+    return JSONRes["fields"][0];
+}
+
 std::vector<OrgInfo> APIHandler::getAllOrgs(std::string JWTToken)
 {
     cpr::Response r;

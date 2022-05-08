@@ -124,6 +124,129 @@ void drawOrganisationLogo()
 	outputPosition(15, 29); std::cout << "WWWWWWMWMWWMWWMWMMWMWWMWWMMWMWWMWWMWWMWMWWMWWWWWWWW";
 }
 
+void manageAccount(RegisterData userData, std::string JWTToken, SceneContex* ctx)
+{
+	clearConsole();
+	char key;
+	outputPosition(5, 4); std::cout << "M A N A G E   A C C O U N T ";
+
+	while (true)
+	{
+		createInputField(6, " First Name ", 40, 5, 6, userData.fname);
+		createInputField(10, " Last Name  ", 40, 5, 7, userData.lname);
+		createInputField(14, " Username   ", 40, 5, 7, userData.username);
+		createInputField(18, " Email      ", 40, 5, 7, userData.email);
+		createInputField(22, " Password   ", 40, 5, 7, userData.password);
+		createButton(26, "    SUBMIT    ", 14, 5, 2);
+
+		key = _getch();
+
+		if (key == '\r')
+		{
+			break;
+		}
+
+		key == '\b' ? userData.fname = userData.fname.substr(0, userData.fname.size() - 1) : userData.fname += key;
+	}
+
+	while (true)
+	{
+		createInputField(6, " First Name ", 40, 5, 7, userData.fname);
+		createInputField(10, " Last Name  ", 40, 5, 6, userData.lname);
+		createInputField(14, " Username   ", 40, 5, 7, userData.username);
+		createInputField(18, " Email      ", 40, 5, 7, userData.email);
+		createInputField(22, " Password   ", 40, 5, 7, userData.password);
+		createButton(26, "    SUBMIT    ", 14, 5, 2);
+
+		key = _getch();
+
+		if (key == '\r')
+		{
+			break;
+		}
+
+		key == '\b' ? userData.lname = userData.lname.substr(0, userData.lname.size() - 1) : userData.lname += key;
+	}
+
+	while (true)
+	{
+		createInputField(6, " First Name ", 40, 5, 7, userData.fname);
+		createInputField(10, " Last Name  ", 40, 5, 7, userData.lname);
+		createInputField(14, " Username   ", 40, 5, 6, userData.username);
+		createInputField(18, " Email      ", 40, 5, 7, userData.email);
+		createInputField(22, " Password   ", 40, 5, 7, userData.password);
+		createButton(26, "    SUBMIT    ", 14, 5, 2);
+
+		key = _getch();
+
+		if (key == '\r')
+		{
+			break;
+		}
+
+		key == '\b' ? userData.username = userData.username.substr(0, userData.username.size() - 1) : userData.username += key;
+	}
+
+	while (true)
+	{
+		createInputField(6, " First Name ", 40, 5, 7, userData.fname);
+		createInputField(10, " Last Name  ", 40, 5, 7, userData.lname);
+		createInputField(14, " Username   ", 40, 5, 7, userData.username);
+		createInputField(18, " Email      ", 40, 5, 6, userData.email);
+		createInputField(22, " Password   ", 40, 5, 7, userData.password);
+		createButton(26, "    SUBMIT    ", 14, 5, 2);
+
+		key = _getch();
+
+		if (key == '\r')
+		{
+			break;
+		}
+
+		key == '\b' ? userData.email = userData.email.substr(0, userData.email.size() - 1) : userData.email += key;
+	}
+
+	while (true)
+	{
+		createInputField(6, " First Name ", 40, 5, 7, userData.fname);
+		createInputField(10, " Last Name  ", 40, 5, 7, userData.lname);
+		createInputField(14, " Username   ", 40, 5, 7, userData.username);
+		createInputField(18, " Email      ", 40, 5, 7, userData.email);
+		createInputField(22, " Password   ", 40, 5, 6, userData.password);
+		createButton(26, "    SUBMIT    ", 14, 5, 2);
+
+		key = _getch();
+
+		if (key == '\r')
+		{
+			break;
+		}
+
+		key == '\b' ? userData.password = userData.password.substr(0, userData.password.size() - 1) : userData.password += key;
+	}
+
+	APIHandler apiHandler;
+
+	auto recordSet = apiHandler.updateUser(userData, JWTToken);
+
+	if (recordSet.empty())
+	{
+		outputPosition(40, 28); std::cout << "The user info was updated successfully! Press any key to continue!";
+
+		ctx->user.username = userData.username;
+
+		(void)_getch();
+
+		return;
+	}
+
+	outputPosition(40, 28); std::cout << recordSet;
+
+	(void)_getch();
+
+	return;
+}
+
 void joinOrganisation(int orgId, std::string JWTToken)
 {
 	clearConsole();
@@ -596,7 +719,7 @@ void joinCourse(int courseId, std::string JWTToken)
 	return;
 }
 
-std::string accountPage(User user, std::string JWTToken)
+std::string accountPage(User user, std::string JWTToken, SceneContex* ctx)
 {
 	outputPosition(40, 6); setConsoleColorTo(6); std::cout << "A C C O U N T     S E T T I N G S"; setConsoleColorTo(7);
 	outputPosition(43, 8); std::cout << "First name  ";
@@ -626,8 +749,6 @@ std::string accountPage(User user, std::string JWTToken)
 
 	while (true)
 	{
-		// Button for history notebook section
-
 		outputPosition(42, 18); setConsoleColorTo(SetColor[0]); std::cout << "U P D A T E";
 		
 		if (counter == 0)
@@ -653,12 +774,14 @@ std::string accountPage(User user, std::string JWTToken)
 			counter++;
 		}
 
-		if (key == '\r' && (counter == 1)) // 72 is the ASCII code for the up arrow
+		if (key == '\r' && (counter == 0)) // 72 is the ASCII code for the up arrow
 		{
-			counter--;
+			manageAccount({user.fname, user.lname, user.username, user.email}, JWTToken, ctx);
+			clearConsole();
+			return "NavigationBar";
 		}
 
-		if (key == '\r' && (counter == 0)) // 80 is the ASCII code for the up arrow
+		if (key == '\r' && (counter == 1)) // 80 is the ASCII code for the up arrow
 		{
 			std::string recordSet = apiHandler.deleteUser("@me", JWTToken);
 
@@ -1121,7 +1244,7 @@ void SceneManager::LoadScenes()
 					{
 						if (counter == 1)
 						{
-							recordSet = accountPage(userData, sceneContext->JWTToken);
+							recordSet = accountPage(userData, sceneContext->JWTToken, sceneContext);
 
 							if (!recordSet.empty())
 							{
