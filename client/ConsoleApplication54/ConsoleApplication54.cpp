@@ -1961,12 +1961,116 @@ void navigationBar() //Main menu with three options
 	return;
 }
 
+void manageAccount(RegisterData userData)
+{
+	char key;
+	gotoxy(5, 4); std::cout << "M A N A G E   C O U R S E ";
+
+	while (true)
+	{
+		createInputField(6, " First Name ", 40, 5, 6, userData.fname);
+		createInputField(10, " Last Name  ", 40, 5, 7, userData.lname);
+		createInputField(14, " Username   ", 40, 5, 7, userData.username);
+		createInputField(18, " Email      ", 40, 5, 7, userData.email);
+		createInputField(22, " Password   ", 40, 5, 7, userData.password);
+		createButton(26, "    SUBMIT    ", 14, 5, 2);
+
+		key = _getch();
+
+		if (key == '\r')
+		{
+			break;
+		}
+
+		key == '\b' ? userData.fname = userData.fname.substr(0, userData.fname.size() - 1) : userData.fname += key;
+	}
+
+	while (true)
+	{
+		createInputField(6, " First Name ", 40, 5, 7, userData.fname);
+		createInputField(10, " Last Name  ", 40, 5, 6, userData.lname);
+		createInputField(14, " Username   ", 40, 5, 7, userData.username);
+		createInputField(18, " Email      ", 40, 5, 7, userData.email);
+		createInputField(22, " Password   ", 40, 5, 7, userData.password);
+		createButton(26, "    SUBMIT    ", 14, 5, 2);
+
+		key = _getch();
+
+		if (key == '\r')
+		{
+			break;
+		}
+
+		key == '\b' ? userData.lname = userData.lname.substr(0, userData.lname.size() - 1) : userData.lname += key;
+	}
+
+	while (true)
+	{
+		createInputField(6, " First Name ", 40, 5, 7, userData.fname);
+		createInputField(10, " Last Name  ", 40, 5, 7, userData.lname);
+		createInputField(14, " Username   ", 40, 5, 6, userData.username);
+		createInputField(18, " Email      ", 40, 5, 7, userData.email);
+		createInputField(22, " Password   ", 40, 5, 7, userData.password);
+		createButton(26, "    SUBMIT    ", 14, 5, 2);
+
+		key = _getch();
+
+		if (key == '\r')
+		{
+			break;
+		}
+
+		key == '\b' ? userData.username = userData.username.substr(0, userData.username.size() - 1) : userData.username += key;
+	}
+	
+	while (true)
+	{
+		createInputField(6, " First Name ", 40, 5, 7, userData.fname);
+		createInputField(10, " Last Name  ", 40, 5, 7, userData.lname);
+		createInputField(14, " Username   ", 40, 5, 7, userData.username);
+		createInputField(18, " Email      ", 40, 5, 6, userData.email);
+		createInputField(22, " Password   ", 40, 5, 7, userData.password);
+		createButton(26, "    SUBMIT    ", 14, 5, 2);
+
+		key = _getch();
+
+		if (key == '\r')
+		{
+			break;
+		}
+
+		key == '\b' ? userData.email = userData.email.substr(0, userData.email.size() - 1) : userData.email += key;
+	}
+	
+	while (true)
+	{
+		createInputField(6, " First Name ", 40, 5, 7, userData.fname);
+		createInputField(10, " Last Name  ", 40, 5, 7, userData.lname);
+		createInputField(14, " Username   ", 40, 5, 7, userData.username);
+		createInputField(18, " Email      ", 40, 5, 7, userData.email);
+		createInputField(22, " Password   ", 40, 5, 6, userData.password);
+		createButton(26, "    SUBMIT    ", 14, 5, 2);
+
+		key = _getch();
+
+		if (key == '\r')
+		{
+			break;
+		}
+
+		key == '\b' ? userData.password = userData.password.substr(0, userData.password.size() - 1) : userData.password += key;
+	}
+
+}
+
+
 int main()
 {
+	RegisterData data = { "Veselin", "Stoynov", "Vesko", "VStoynov19@da.bg", "Vesko123" };
 	string courses[2] = {
 		"Biology",
 		"Math"
 	};
 	//registerPage();
-	updateOrganisation("VSCPI", "Password123");
+	manageAccount(data);
 }
