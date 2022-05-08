@@ -1833,7 +1833,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(
-						false, courseInfo.errors, "add-techer"
+						false, courseInfo.errors, "add-teacher"
 					);
 
 					res.code = crow::status::BAD_REQUEST;
@@ -1855,7 +1855,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(
-						false, recordSet, "add-techer"
+						false, recordSet, "add-teacher"
 					);
 
 					res.code = crow::status::FORBIDDEN;
@@ -1878,7 +1878,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(
-						false, { "The user is not a teacher in this org" }, "add-techer"
+						false, { "The user is not a teacher in this org" }, "add-teacher"
 					);
 					res.code = crow::status::FORBIDDEN;
 					res.end();
@@ -1904,7 +1904,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 					CROW_LOG_WARNING << log;
 
 					res = responseJSONManager.createJSONResponse(
-						false, recordSet, "add-techer"
+						false, recordSet, "add-teacher"
 					);
 
 					res.code = crow::status::BAD_REQUEST;
@@ -1916,7 +1916,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 				CROW_LOG_INFO << "Teacger with id: " << reqData.get("teacherId") <<
 					" is successfully added to course with id: " << reqData.get("courseId");
 
-				res = responseJSONManager.createJSONResponse(true, recordSet, "add-techer");
+				res = responseJSONManager.createJSONResponse(true, recordSet, "add-teacher");
 				res.end();
 				return;
 			});

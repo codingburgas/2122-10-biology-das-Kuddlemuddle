@@ -524,6 +524,99 @@ std::string APIHandler::updateRoleInOrg(int orgId, int userId, int roleId, std::
     return JSONRes["fields"][0];
 }
 
+std::string APIHandler::deleteCourse(int id, std::string JWTToken)
+{
+    auto r = cpr::Delete(cpr::Url{ "http://localhost:18080/api/courses/" + std::to_string(id) },
+        cpr::Bearer({ JWTToken }));
+
+    nlohmann::json JSONRes;
+
+    try
+    {
+        JSONRes = nlohmann::json::parse(r.text);
+    }
+    catch (nlohmann::json::parse_error& ex)
+    {
+        return "There is a problem with the server! Please try again later!";
+    }
+
+    if (r.status_code != 200)
+    {
+        return "There is a problem with the server! Please try again later!";
+    }
+
+    return "";
+}
+
+std::string APIHandler::updateCourse(OrgData orgData, int id, std::string JWTToken)
+{
+    cpr::Response r = cpr::Patch(cpr::Url{ "http://localhost:18080/api/courses/" + std::to_string(id) },
+        cpr::Bearer({ JWTToken }),
+        cpr::Payload{
+            {"courseName", orgData.name},
+            {"password", orgData.password}
+        });
+
+    nlohmann::json JSONRes;
+
+    try
+    {
+        JSONRes = nlohmann::json::parse(r.text);
+    }
+    catch (nlohmann::json::parse_error& ex)
+    {
+        return "There is a problem with the server! Please try again later!";
+    }
+
+    if (JSONRes["type"] == "course-update-success")
+    {
+        return "";
+    }
+
+    std::string returnVal;
+
+    if (JSONRes["fields"].size() != 1)
+    {
+        returnVal = "The following fileds are incorrect: ";
+
+        for (auto& el : JSONRes["fields"].items())
+        {
+            returnVal += el.value();
+            returnVal += " ";
+        }
+    }
+
+    return JSONRes["fields"][0];
+}
+
+std::string APIHandler::addTeacherToCourse(int courseId, int teacherId, std::string JWTToken)
+{
+    cpr::Response r = cpr::Post(cpr::Url{ "http://localhost:18080/api/addTeacher" },
+        cpr::Bearer({ JWTToken }),
+        cpr::Payload{
+            {"courseId", std::to_string(courseId)},
+            {"teacherId", std::to_string(teacherId)}
+        });
+
+    nlohmann::json JSONRes;
+
+    try
+    {
+        JSONRes = nlohmann::json::parse(r.text);
+    }
+    catch (nlohmann::json::parse_error& ex)
+    {
+        return "There is a problem with the server! Please try again later!";
+    }
+
+    if (JSONRes["type"] == "add-teacher-success")
+    {
+        return "";
+    }
+
+    return JSONRes["fields"][0];
+}
+
 bool APIHandler::doUserHaveAccessToOrg(std::string name, std::string JWTToken)
 {
     auto r = cpr::Get(cpr::Url{ "http://localhost:18080/api/orgs/" + name },

@@ -794,7 +794,6 @@ void viewCoursesInOrganisationUser(string acc[], int orgSize)
 	system("cls");
 	char key; // Key to be entered
 	int orgsCounter = 0;
-	int optionCounter = 0;
 
 	while (true)
 	{
@@ -962,17 +961,16 @@ void createCourse()
 	} while (true);
 
 }
-void manageCourse(string question, string answer, string teacher)
+void manageCourse(string courseName, string password)
 {
 	char key;
 	gotoxy(5, 4); std::cout << "M A N A G E   C O U R S E ";
 
 	while (true)
 	{
-		createInputField(6, " Course name", 40, 5, 6, question);
-		createInputField(10, " Password   ", 40, 5, 7, answer);
-		createInputField(14, " Add Teacher", 40, 5, 7, teacher);
-		createButton(18, "    SUBMIT    ", 14, 5, 2);
+		createInputField(6, " Course name", 40, 5, 6, courseName);
+		createInputField(10, " Password   ", 40, 5, 7, password);
+		createButton(14, "    SUBMIT    ", 14, 5, 2);
 
 		key = _getch();
 
@@ -981,15 +979,14 @@ void manageCourse(string question, string answer, string teacher)
 			break;
 		}
 
-		key == '\b' ? question = question.substr(0, question.size() - 1) : question += key;
+		key == '\b' ? courseName = courseName.substr(0, courseName.size() - 1) : courseName += key;
 	}
 
 	while (true)
 	{
-		createInputField(6, " Course name", 40, 5, 7, question);
-		createInputField(10, " Password   ", 40, 5, 6, answer);
-		createInputField(14, " Add Teacher", 40, 5, 7, teacher);
-		createButton(18, "    SUBMIT    ", 14, 5, 2);
+		createInputField(6, " Course name", 40, 5, 7, courseName);
+		createInputField(10, " Password   ", 40, 5, 6, password);
+		createButton(14, "    SUBMIT    ", 14, 5, 2);
 
 		key = _getch();
 
@@ -998,26 +995,8 @@ void manageCourse(string question, string answer, string teacher)
 			break;
 		}
 
-		key == '\b' ? answer = answer.substr(0, answer.size() - 1) : answer += key;
+		key == '\b' ? password = password.substr(0, password.size() - 1) : password += key;
 	} 
-
-	while (true)
-	{
-		createInputField(6, " Course name", 40, 5, 7, question);
-		createInputField(10, " Password   ", 40, 5, 7, answer);
-		createInputField(14, " Add Teacher", 40, 5, 6, teacher);
-		createButton(18, "    SUBMIT    ", 14, 5, 2);
-
-		key = _getch();
-
-		if (key == '\r')
-		{
-			break;
-		}
-
-		key == '\b' ? teacher = teacher.substr(0, teacher.size() - 1) : teacher += key;
-	} 
-
 }
 
 void viewTopicsInCourse(string acc[], int orgSize)
@@ -2072,5 +2051,5 @@ int main()
 		"Math"
 	};
 	//registerPage();
-	manageAccount(data);
+	addTopicsInCourse(courses, 2);
 }
