@@ -1,32 +1,32 @@
 # Documentation 
 ## Information and development of a plan
 ### Presentation of the project
-Our main goal was to make a program, helping you add, edit, remove, connect or visualize events. 
+Our goal for the project was to create an application that both students and teachers would benefit from. The main idea is that our program can be used as a learning application for any subject, but given that our topic is biology, we have mainly focused on that aspect.
 
 ### Roles in the team
-Vasilen Mihaylov - [VMMihaylov19](https://github.com/VMMihaylov19) - Scrum trainer  
-Stoyan Ivanov - [SSIvanov19](https://github.com/SSIvanov19) - Back-end Developer  
-Mariya Ilcheva - [MZIlcheva19](https://github.com/MZIlcheva19) -  Front-end Developer  
-Vesela Dekova - [VBDekova19](https://github.com/VBDekova19) - Front-end Developer  
-Polina Petrova - [PIPetrova19](https://github.com/PIPetrova19) - QA Engineer
+Yoanna Simeonova - [YVSimeonova19](https://github.com/YVSimeonova19) - Scrum trainer  
+Veselin Stoyanov - [VNStoyanov19](https://github.com/VNStoyanov19) - Front-end Developer  
+Stoyan Ivanov - [SSIvanov19](https://github.com/SSIvanov19) -  Back-end Developer  
+Tereza Opanska - [TNOpanska19](https://github.com/TNOpanska19) - Back-end Developer  
+Kostadin Taligadzhiev - [KNTaligadzhiev19](https://github.com/KNTaligadzhiev19) - QA Engineer
 
 ### Introduction
 #### What is the product?
-The product is a C++ console application about history event management. It represents a simple app, where you can manage your events, storylines and users is a simple way.
+The product is a C++ console application for helping students and teachers with schoolwork, in particular with biology.
 #### Where is it available?
-Our collaborative work took place in GitHub and for the files to be accessible to everyone they were uploaded in the GitHub Repository of our project. You can download the latest release from [GitHub releases](https://github.com/SSIvanov19/lathraea-rhodopaea/releases/download/v1.0.0/Release.zip) or the [download section](DOWNLOAD.md).
+Our collaborative work took place in GitHub. The files were uploaded in the GitHub Repository of our project so they can be accessible for everyone. You can download the latest release from [GitHub releases](https://github.com/SSIvanov19/lathraea-rhodopaea/releases/download/v1.0.0/Release.zip) or the [download section](DOWNLOAD.md).
 #### Communication?
-Communication is realized through Teams. Thanks to all the features and the provided visualization - on-screen communication and feedback are sufficiently complete.
+Communication is realised through Teams and Discord. Thanks to all the features and the provided visualization - on-screen communication and feedback are sufficiently complete.
 #### What technologies are used?
-The technologies we used are C++ as the programming language with which the code is written, Git and GitHub for collaborative work, Visual Studio 2019 - as an IDE, Teams - connection and communication and Doxygen - preparing a presentation and documentation.
+The technologies we used are C++ as the programming language with which the code is written, Git and GitHub for collaborative work, Visual Studio 2019 - as an IDE, Teams and Discord - connection and communication, PowerPoint and Word - for presentation and word documentation and Doxygen - for doxygen documentation.
 
 ### Method and manner of implementation
 #### Productive work
-The tasks are defined in a way that everyone is aware of the tasks performed so far to present and answer quickly, clearly, and accurately, and teamwork is more efficient and productive.
+The given tasks are presented in a way where everyone is informed of their current and previous duties. This method allows people to do their tasks more quickly, efficiently, and accurately, thus making the teamwork far more productive.
 #### Distribution of tasks
-For each task, a person is selected who is more familiar with the field and will be able to perform the task in the most competent way possible.
+For each task, the most skilled and well-informed person in the field is chosen. This allows for better end-results and the task is completed in the most competent way possible.
 #### Terms
-Observance of dates was reminded by the Scrum Trainer. A meeting of the team is held every week to discuss the amount of time needed to complete the assigned task.
+The Scrum Trainer observed the dates of the tasks and reminded the team to complete them on time. A meeting of the team is held every few days to discuss the amount of time needed for completion of a certain task and to discuss the progress which has been made.
 
 ## Testing the plan
 ### Organise the folder structure
@@ -35,18 +35,16 @@ This was the start of our project. The first thing that we should do is to organ
 The account system is a good start for our project, as it is a core part of our project.
 ### Encryption system
 Every good account system should have an encryption system. This is where we implemented the gray code.
-### Add some basic graphics of book
-There should be some basic graphics of the book.
-### Add event system
-The event system is a core part of our project.
-### Add main menu
-The main menu will help the user to navigate through the app.
-### Implement storyline manager
-The storyline manager is a core part of our project.
+### Create lesson materials
+For presenting purposes, we created some premade lessons for the application having the project's topic biology in mind.
+### Create questions for quizzes
+For presenting purposes, we created some premade quizzes for the application having the project's topic biology in mind.
+### Front-end create pages
+The front-end pages will help the user out when using the program and give them a most satisfactory  experience of it.
 ### Front-end data visualization
 The front-end data visualization is used to present the data in a more convenient way.
 ### Fix bugs
-Fix the reaming bugs. 
+Fix the remaining bugs. 
 ### QA Documentation
 Checking the correctness of the code.
 ### Documentation
@@ -57,7 +55,7 @@ The aim of the presentation is to be short and tell everything important about t
 ## Back-end developer
 The back-end developer is responsible for the core functionality of the project. The main tasks of the back-end developer are:
 ### Account system
-Account system, where the user can create an account, log in, log out, and visualise the events. It also has a admin account, where the admin can create, edit, delete and manager the events.
+Account system, where the user can create an account, log in, log out, and visualise the events. It also has an admin account, where the admin can create, edit, delete and manager the events.
 ### Event system
 Event system, where the admin can create, edit, delete and manage the events. 
 ### Storyline system
@@ -65,4 +63,4 @@ Storyline system, where the admin can create, edit, delete and manage the storyl
 
 
 ## Front-end developer
-The task of our front-end developer was to make the app look good and to make it more interactive. For this purpose, he used different ASCII art.
+The task of our front-end developer was to make the app look appealing and clean so the clients get the best experience possible from our application. For this purpose, creative ASCII art was used.
