@@ -66,7 +66,19 @@ namespace DBUnitTest
 			Assert::AreEqual(result, "Could not find organisation with name: Org1");
 		}
 
-		
+		TEST_METHOD(doesPasswordMatchOrgUnitTest)
+		{
+			// Arrange
+			DBManager DBManager;
+			std::string orgName = "Org1", result;
+			int orgID = 1;
+
+			// Act
+			result = DBManager.doesPasswordMatchOrg(orgName, orgID);
+
+			// Assert
+			Assert::AreEqual(result, "Could not find organisation with name: Org1");
+		}
 
 	};
 }
