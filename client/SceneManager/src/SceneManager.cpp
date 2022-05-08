@@ -1155,6 +1155,60 @@ void manageCourseOptions(std::string courseName, int courseId, std::string JWTTo
 	}
 }
 
+void addTopicsInCourse(int courseId, std::string JWTToken)
+{
+	clearConsole();
+
+	char key; // Key to be entered
+	int counter = 0, counter2 = 0;
+
+	int posy = 5;
+	std::string newTopic = "";
+
+	while (true)
+	{
+		createInputField(posy + 3, "  TOPIC NAME", 40, 4, 7, newTopic);
+		key = _getch();
+
+		if (key == '\r')
+		{
+			break;
+		}
+
+		else
+		{
+			if (key == '\b')
+			{
+				newTopic = newTopic.substr(0, newTopic.size() - 1);
+			}
+
+			else
+			{
+				newTopic += key;
+			}
+
+		}
+	}
+
+	APIHandler apiHandler;
+	std::string recordSet = apiHandler.createTopic(newTopic, courseId, JWTToken);
+	
+	if (recordSet.empty())
+	{
+		outputPosition(15, 31); std::cout << "The topic was created successfully! Press any key to continue!";
+
+		(void)_getch();
+
+		return;
+	}
+
+	outputPosition(15, 31); std::cout << recordSet;
+
+	(void)_getch();
+
+	return;
+}
+
 void SceneManager::LoadScenes()
 {
 	SceneContex* sceneContext = new SceneContex();
@@ -2439,14 +2493,12 @@ void SceneManager::LoadScenes()
 						return "NavigationBar";
 					}
 
-					/*
-					if (key == '\r' && counter == orgInfo.courses.size())
+					if (key == '\r' && counter == courseInfo.topics.size())
 					{
-						createCourse(sceneContext->JWTToken, orgInfo.id);
-						return "ViewOrgAsAdmin";
+						addTopicsInCourse(courseInfo.id, sceneContext->JWTToken);
+						return "NavigationBar";
 					}
-					*/
-
+					
 					if (key == 72 && (counter >= 1 && counter <= courseInfo.topics.size()))
 					{
 						counter--;
