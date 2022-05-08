@@ -22,7 +22,7 @@ namespace DBUnitTest
 			answerInfo = DBManager.getAnswersInfo(0);
 
 			// Assert
-			Assert::AreSame(answerInfo, answerInfo1);
+			Assert::AreEqual(answerInfo, answerInfo1);
 		}
 
 		TEST_METHOD(DeleteUserUnitTest)
@@ -47,7 +47,7 @@ namespace DBUnitTest
 			int userID = 1;
 
 			// Act
-			result = DBManager.deleteUser(userID, image);
+			result = DBManager.updateUserAvatar(userID, image);
 
 			// Assert
 			Assert::AreEqual(result, "Could not find user with id: 1");
