@@ -25,7 +25,21 @@ namespace DBUnitTest
 			Assert::AreSame(answerInfo, answerInfo1);
 		}
 
+		TEST_METHOD(DeleteUserUnitTest)
+		{
+			// Arrange
+			DBManager DBManager;
+			std::string username = "KNTaligadzhiev19", result;
+			int userID = 1;
 
+			// Act
+			result = DBManager.deleteUser(username, userID);
+
+			// Assert
+			Assert::AreEqual(result, "Could not find user with id: 1");
+		}
+
+		
 
 	};
 }
