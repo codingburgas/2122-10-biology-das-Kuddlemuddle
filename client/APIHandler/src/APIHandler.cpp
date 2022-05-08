@@ -112,12 +112,13 @@ std::string APIHandler::getUserInfo(std::string username, SceneContex* ctx, User
 
     if (JSONRes["type"] == "user-success")
     {
-        user.fname = JSONRes["data"][0];
-        user.lname = JSONRes["data"][1];
-        user.username = JSONRes["data"][2];
-        user.email = JSONRes["data"][3];
-        user.role = JSONRes["data"][4];
-        user.avatarURL = JSONRes["data"][5];
+        user.id = JSONRes["data"][0];
+        user.fname = JSONRes["data"][1];
+        user.lname = JSONRes["data"][2];
+        user.username = JSONRes["data"][3];
+        user.email = JSONRes["data"][4];
+        user.role = JSONRes["data"][5];
+        user.avatarURL = JSONRes["data"][6];
         return "";
     }
 
@@ -310,4 +311,82 @@ std::vector<User> APIHandler::getAllUsers(std::string JWTToken)
     }
 
     return usersInfo;
+}
+
+OrgInfo APIHandler::getOrg(std::string name, std::string JWTToken)
+{
+    auto r = cpr::Get(cpr::Url{ "http://localhost:18080/api/orgs/" + name },
+        cpr::Bearer({ JWTToken }));
+
+    nlohmann::json JSONRes;
+
+    try
+    {
+        JSONRes = nlohmann::json::parse(r.text);
+    }
+    catch (nlohmann::json::parse_error& ex)
+    {
+        // Send error
+        OrgInfo error;
+        error.errors = "There is a problem with the server! Please try again later!";
+        return { error };
+    }
+    
+    OrgInfo orgInfo;
+
+    if (JSONRes["type"] == "get-organisation-success")
+    {
+
+        orgInfo.id = JSONRes["org-id"];
+        orgInfo.name = JSONRes["org-name"];
+        
+        for (auto it = JSONRes["org-users"].begin(); it != JSONRes["org-users"].end(); ++it)
+        {
+            if (it.value()["role-id"] == 1)
+            {
+                OrgUser orgUser;
+
+                orgUser.id = it.value()["user-id"];
+                orgUser.role = it.value()["role-id"];
+
+                for (auto courseIt = it.value()["teacher-courses-id"].begin(); 
+                    courseIt != it.value()["teacher-courses-id"].end();
+                    ++courseIt
+                    )
+                {
+                    orgUser.userCoursesId.push_back(courseIt.value());
+                }
+
+                orgInfo.users.push_back(orgUser);
+            }
+            else
+            {
+                orgInfo.users.push_back(
+                    {
+                        it.value()["user-id"],
+                        it.value()["role-id"]
+                    }
+                );
+            }
+        }
+
+        for(auto it = JSONRes["org-courses"].begin(); it != JSONRes["org-courses"].end(); ++it)
+        {
+            orgInfo.courses.push_back(
+                {
+                    it.value()["course-id"],
+                    orgInfo.id,
+                    it.value()["course-name"]
+                }
+            );
+        }
+    }
+    else
+    {
+        OrgInfo error;
+        error.errors = "There is a problem with the server! Please try again later!";
+        return { error };
+    }
+
+    return orgInfo;
 }

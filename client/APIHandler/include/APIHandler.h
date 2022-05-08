@@ -14,23 +14,45 @@ struct User
     std::string errors;
 };
 
-struct SceneContex
+/**
+ * @brief Struct that holds the role and id of a user in organisation
+*/
+struct OrgUser
 {
-    bool isAuth = false;
-    User user;
-    std::string JWTToken;
-    bool isDataFetchOnPage = false;
+    int id; /*!< ID of the user */
+    int role; /*!< Role of the user */
+    std::vector<int> userCoursesId; /* ID of the courses in which this user is part of */
+};
+
+/**
+ * @brief Struct that holds course data
+*/
+struct CourseInfo
+{
+    int id; /*!< ID of the course */
+    int orgId; /*!< ID of the organisation */
+    std::string name; /*!< Name of the course */
+    std::vector<OrgUser> users; /*!< Users in this course */
+    //std::vector<TopicInfo> topics; /*!< Topics in this course */
+    std::vector<std::string> errors; /*!< Errors in this course */
 };
 
 struct OrgInfo
 {
     int id;
     std::string name;
-    /*
     std::vector<OrgUser> users;
     std::vector<CourseInfo> courses;
-    */
     std::string errors;
+};
+
+struct SceneContex
+{
+    bool isAuth = false;
+    User user;
+    std::string JWTToken;
+    bool isDataFetchOnPage = false;
+    OrgInfo orgInfo;
 };
 
 struct OrgData
@@ -67,6 +89,7 @@ public:
     bool doUserHaveAccessToOrg(std::string name, std::string JWTToken);
     std::vector<User> getAllUsers(std::string JWTToken);
     std::vector<OrgInfo> getAllOrgs(std::string JWTToken);
+    OrgInfo getOrg(std::string name, std::string JWTToken);
 private:
 
 };

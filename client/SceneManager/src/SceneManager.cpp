@@ -138,6 +138,9 @@ void viewOrganisationAdmin(std::string JWTToken)
 	if (!orgsInfo[0].errors.empty())
 	{
 		std::cout << "There was problem with the server. Please try again latter!";
+
+		(void)_getch();
+		return;
 	}
 
 	while (true)
@@ -210,14 +213,14 @@ void joinOrganisation(int orgId, std::string JWTToken)
 
 	do
 	{
-		int colors[2] = { 7, 7 };
-		colors[iPut] = 6;
+		int setConsoleColorTos[2] = { 7, 7 };
+		setConsoleColorTos[iPut] = 6;
 		setConsoleColorTo(6);
 		printLogo(26);
 		drawOrganisationLogo();
 		outputPosition(75, 9); std::cout << "You are not part of this organisation.";
 		outputPosition(75, 10); std::cout << "Pleas enter the organisation password to continue!";
-		createInputField(12, " Password   ", 40, 75, colors[1], info[0]);
+		createInputField(12, " Password   ", 40, 75, setConsoleColorTos[1], info[0]);
 
 		if (iPut == 1)
 		{
@@ -233,6 +236,12 @@ void joinOrganisation(int orgId, std::string JWTToken)
 		{
 			iPut++;
 			key = ' ';
+		}
+
+		if (key == 27)
+		{
+			clearConsole();
+			return;
 		}
 
 		else
@@ -282,13 +291,13 @@ void createOrganisation(std::string JWTToken)
 
 	do
 	{
-		int colors[3] = { 7, 7 };
-		colors[iPut] = 6;
+		int setConsoleColorTos[3] = { 7, 7 };
+		setConsoleColorTos[iPut] = 6;
 		setConsoleColorTo(6);
 		printLogo(26);
 		drawOrganisationLogo();
-		createInputField(8, " Organisation name", 46, 75, colors[0], info[0], 7, 20);
-		createInputField(12, " Password         ", 46, 75, colors[1], info[1], 7, 20);
+		createInputField(8, " Organisation name", 46, 75, setConsoleColorTos[0], info[0], 7, 20);
+		createInputField(12, " Password         ", 46, 75, setConsoleColorTos[1], info[1], 7, 20);
 
 
 		if (iPut == 2)
@@ -349,7 +358,7 @@ void createOrganisation(std::string JWTToken)
 	return;
 }
 
-std::string viewOrganisationUser(std::string JWTToken)
+std::string viewOrganisationUser(std::string JWTToken, SceneContex* sceneContext)
 {
 	char key; // Key to be entered
 	int counter = 0, posy;
@@ -410,10 +419,37 @@ std::string viewOrganisationUser(std::string JWTToken)
 		
 		if (key == '\r')
 		{
+			auto orgInfo = apiHandler.getOrg(orgsInfo[counter].name, JWTToken);
 			// try to get org info
-			if (apiHandler.doUserHaveAccessToOrg(orgsInfo[counter].name, JWTToken))
+			if (orgInfo.errors.empty())
 			{
-				return "NavigationBar";
+				sceneContext->orgInfo = orgInfo;
+				
+				int userRole = 0;
+
+				apiHandler.getUserInfo("@me", sceneContext, sceneContext->user);
+
+				for (auto& user : orgInfo.users)
+				{
+					if (user.id == std::stoi(sceneContext->user.id))
+					{
+						userRole = user.role;
+					}
+				}
+
+				switch (userRole)
+				{
+				case 1:
+					return "ViewOrgAsTeacher";
+					break;
+				case 2:
+					return "ViewOrgAsAdmin";
+					break;
+				case 0:
+				default:
+					return "ViewOrgAsUser";
+					break;
+				}
 			}
 			else
 			{
@@ -622,13 +658,13 @@ void SceneManager::LoadScenes()
 				int iPut = 0;
 				std::string info[5] = { "", "", "", "", "" };
 				bool firstShow = true;
-				int colors[5] = { 7,7,7,7,7 };
+				int setConsoleColorTos[5] = { 7,7,7,7,7 };
 
 				setConsoleColorTo(6);
 			
 				do
 				{
-					colors[iPut] = 6;
+					setConsoleColorTos[iPut] = 6;
 
 					if (firstShow)
 					{
@@ -637,7 +673,7 @@ void SceneManager::LoadScenes()
 						outputPosition(15, 8); std::cout << "MMMMMMMMMMMMMNX0kXXXXXXk0XNMMMMMMMMMMMMMMM" << std::endl;
 					}
 
-					createInputField(8, " First name ", 40, 65, colors[0], info[0]);
+					createInputField(8, " First name ", 40, 65, setConsoleColorTos[0], info[0]);
 
 					if (firstShow)
 					{
@@ -647,7 +683,7 @@ void SceneManager::LoadScenes()
 						outputPosition(15, 12); std::cout << "MMMNd.                              .dNMMM" << std::endl;
 					}
 
-					createInputField(12, " Last name  ", 40, 65, colors[1], info[1]);
+					createInputField(12, " Last name  ", 40, 65, setConsoleColorTos[1], info[1]);
 
 					if (firstShow)
 					{
@@ -657,7 +693,7 @@ void SceneManager::LoadScenes()
 						outputPosition(15, 16); std::cout << "Wl             .kWMMMMMMNo.             lW" << std::endl;
 					}
 
-					createInputField(16, " Username   ", 40, 65, colors[2], info[2]);
+					createInputField(16, " Username   ", 40, 65, setConsoleColorTos[2], info[2]);
 
 					if (firstShow)
 					{
@@ -667,7 +703,7 @@ void SceneManager::LoadScenes()
 						outputPosition(15, 20); std::cout << "MK,         '0MMMMMMMMMMMMMWx.         ,KM" << std::endl;
 					}
 
-					createInputField(20, " Email      ", 40, 65, colors[3], info[3]);
+					createInputField(20, " Email      ", 40, 65, setConsoleColorTos[3], info[3]);
 
 					if (firstShow)
 					{
@@ -677,7 +713,7 @@ void SceneManager::LoadScenes()
 						outputPosition(15, 24); std::cout << "MMMMMNO:.                        .:ONMMMMM" << std::endl;
 					}
 
-					createInputField(24, " Password   ", 40, 65, colors[4], info[4]);
+					createInputField(24, " Password   ", 40, 65, setConsoleColorTos[4], info[4]);
 
 					if (firstShow)
 					{
@@ -745,25 +781,25 @@ void SceneManager::LoadScenes()
 				char inputKey = ' ';
 				int iPut = 0;
 				std::string info[2] = { "", "" };
-				int colors[2] = { 7,7 };
+				int setConsoleColorTos[2] = { 7,7 };
 
 				setConsoleColorTo(6);
 				do {
 					printLogo(30);
 
-					colors[iPut] = 6;
+					setConsoleColorTos[iPut] = 6;
 
 					outputPosition(15, 7); std::cout << "MMMMMMMMMMMMMNX0kXXXXXXk0XNMMMMMMMMMMMMMMM" << std::endl;
 					outputPosition(15, 8); std::cout << "MMMMMMMMMMMMMNX0kXXXXXXk0XNMMMMMMMMMMMMMMM" << std::endl;
 
-					createInputField(8, " Email/Username ", 44, 65, colors[0], info[0], 7, 18);
+					createInputField(8, " Email/Username ", 44, 65, setConsoleColorTos[0], info[0], 7, 18);
 
 					outputPosition(15, 9); std::cout << "MMMMMMMMMNOd:'.            .':dONMMMMMMMMM" << std::endl;
 					outputPosition(15, 10); std::cout << "MMMMMMW0o'                      'o0WMMMMMM" << std::endl;
 					outputPosition(15, 11); std::cout << "MMMMW0c.                          .c0WMMMM" << std::endl;
 					outputPosition(15, 12); std::cout << "MMMNd.                              .dNMMM" << std::endl;
 
-					createInputField(12, " Password       ", 44, 65, colors[1], info[1], 7, 18);
+					createInputField(12, " Password       ", 44, 65, setConsoleColorTos[1], info[1], 7, 18);
 
 					outputPosition(15, 13); std::cout << "MMXl             ,oxkkxl'             lXMM" << std::endl;
 					outputPosition(15, 14); std::cout << "MNo            .dNMMMMMMXc             oNM" << std::endl;
@@ -847,7 +883,7 @@ void SceneManager::LoadScenes()
 				User userData;
 
 				sceneContext->isAuth = true;
-				sceneContext->JWTToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJleHAiOjE2NTIwNDk0MDYsImlhdCI6MTY1MTk2MzAwNiwiaXNBZG1pbiI6MCwic3ViIjoiMyJ9.tCmIx03JTOKclF93MztFkcTEg4ZCNt16V1pwtNVzCmE";
+				sceneContext->JWTToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJleHAiOjE2NTIwODMxOTgsImlhdCI6MTY1MTk5Njc5OCwiaXNBZG1pbiI6MCwic3ViIjoiNCJ9.ZBTOksRcZoePXKEDrNhcCVdboe0BvQqziBz028Yh-pc";
 
 				std::string recordSet = apiHandler.getUserInfo("@me", sceneContext, userData);
 
@@ -940,7 +976,7 @@ void SceneManager::LoadScenes()
 							}
 							else
 							{
-								recordSet = viewOrganisationUser(sceneContext->JWTToken);
+								recordSet = viewOrganisationUser(sceneContext->JWTToken, sceneContext);
 
 								if (!recordSet.empty())
 								{
@@ -991,6 +1027,300 @@ void SceneManager::LoadScenes()
 				}
 
 				return "NavigationBar";
+			}
+		}
+	);
+
+	scenes.push_back(
+		{
+			4,
+			"ViewOrgAsUser",
+			[&]()
+			{
+				clearConsole();
+				char key; // Key to be entered
+				int orgsCounter = 0;
+				int optionCounter = 0;
+
+				APIHandler apiHandler;
+				
+				OrgInfo orgInfo = apiHandler.getOrg(sceneContext->orgInfo.name, sceneContext->JWTToken);
+
+				if (!orgInfo.errors.empty())
+				{
+					std::cout << "There was problem with the server. Please try again latter!";
+
+					sceneContext->orgInfo = {};
+
+					(void)_getch();
+					return "NavigationBar";
+				}
+
+				sceneContext->orgInfo = orgInfo;
+
+				while (true)
+				{
+					int posy = 5;
+
+					outputPosition(2, 3); setConsoleColorTo(6); std::cout << "O R G A N I S A T I O N   C O U R S E S"; setConsoleColorTo(7);
+
+					for (int i = 0; i < orgInfo.courses.size(); i++)
+					{
+						outputPosition(4, posy); std::cout << "-->";
+
+						if (i == orgsCounter)
+						{
+							setConsoleColorTo(6); outputPosition(9, posy); std::cout << orgInfo.courses[i].name;
+							outputPosition(60, posy);
+						}
+						else
+						{
+							outputPosition(9, posy); std::cout << orgInfo.courses[i].name;
+						}
+
+
+						posy += 2;
+						setConsoleColorTo(7);
+					}
+
+					key = _getch();
+
+					if (key == 27)
+					{
+						clearConsole();
+						return "NavigationBar";
+					}
+
+					if (key == 72 && (orgsCounter >= 1 && orgsCounter <= orgInfo.courses.size())) // 72/75 is the ASCII code for the up arrow
+					{
+						orgsCounter--;
+					}
+
+					if (key == 80 && (orgsCounter >= 0 && orgsCounter < orgInfo.courses.size() - 1)) // 80/77 is the ASCII code for the up arrow
+					{
+						orgsCounter++;
+					}
+				}
+
+				return "ViewOrgAsUser";
+			}
+		}
+	);
+
+	scenes.push_back(
+		{
+			5,
+			"ViewOrgAsAdmin",
+			[&]()
+			{
+				clearConsole();
+				char key; // Key to be entered
+				int counter = 0, counter2 = 0;
+
+				APIHandler apiHandler;
+
+				OrgInfo orgInfo = apiHandler.getOrg(sceneContext->orgInfo.name, sceneContext->JWTToken);
+
+				if (!orgInfo.errors.empty())
+				{
+					std::cout << "There was problem with the server. Please try again latter!";
+
+					sceneContext->orgInfo = {};
+
+					(void)_getch();
+					return "NavigationBar";
+				}
+
+				sceneContext->orgInfo = orgInfo;
+
+				while (true)
+				{
+					int posy = 5;
+					outputPosition(2, 3); setConsoleColorTo(6); std::cout << "O R G A N I S A T I O N   C O U R S E S"; setConsoleColorTo(7);
+					for (int i = 0; i < orgInfo.courses.size(); i++)
+					{
+						outputPosition(4, posy); std::cout << "-->";
+						if (i == counter)
+						{
+							setConsoleColorTo(6); outputPosition(9, posy); std::cout << orgInfo.courses[i].name;
+							outputPosition(60, posy);
+							if (counter2 == 0)
+							{
+								setConsoleColorTo(2); std::cout << "Enter"; setConsoleColorTo(7); std::cout << " | Settings | Delete";
+							}
+							else if (counter2 == 1)
+							{
+								setConsoleColorTo(7); std::cout << "Enter | "; setConsoleColorTo(9); std::cout << "Settings"; setConsoleColorTo(7); std::cout << " | Delete";
+							}
+							else
+							{
+								setConsoleColorTo(7); std::cout << "Enter | Settings | "; setConsoleColorTo(4); std::cout << "Delete";
+							}
+						}
+						else
+						{
+							outputPosition(9, posy); std::cout << orgInfo.courses[i].name;
+							outputPosition(60, posy); setConsoleColorTo(8); std::cout << "Enter | Settings | Delete";
+						}
+
+
+						posy += 2;
+						setConsoleColorTo(7);
+					}
+
+					key = _getch();
+
+					if (key == 27)
+					{
+						clearConsole();
+						return "NavigationBar";
+					}
+
+					if (key == 72 && (counter >= 1 && counter <= orgInfo.courses.size()))
+					{
+						counter--;
+					}
+
+					if (key == 80 && (counter >= 0 && counter < orgInfo.courses.size() - 1))
+					{
+						counter++;
+					}
+
+					if (key == 75 && (counter2 == 1) || key == 75 && (counter2 == 2)) // 72/75 is the ASCII code for the up arrow
+					{
+						counter2--;
+					}
+
+					if (key == 77 && (counter2 == 0) || key == 77 && (counter2 == 1)) // 80/77 is the ASCII code for the up arrow
+					{
+						counter2++;
+					}
+				}
+
+				return "ViewOrgAsAdmin";
+			}
+		}
+	);
+
+	scenes.push_back(
+		{
+			6,
+			"ViewOrgAsTeacher",
+			[&]()
+			{
+				system("cls");
+				char key; // Key to be entered
+				int counter = 0, counter2 = 0;
+
+				APIHandler apiHandler;
+
+				OrgInfo orgInfo = apiHandler.getOrg(sceneContext->orgInfo.name, sceneContext->JWTToken);
+
+				if (!orgInfo.errors.empty())
+				{
+					std::cout << "There was problem with the server. Please try again latter!";
+
+					sceneContext->orgInfo = {};
+
+					(void)_getch();
+					return "NavigationBar";
+				}
+
+				sceneContext->orgInfo = orgInfo;
+
+				OrgUser userRole;
+
+				for (auto& user: orgInfo.users)
+				{
+					if (std::to_string(user.id) == sceneContext->user.id)
+					{
+						userRole = user;
+						break;
+					}
+				}
+
+				while (true)
+				{
+					int posy = 5;
+					outputPosition(2, 3); setConsoleColorTo(6); std::cout << "O R G A N I S A T I O N   C O U R S E S"; setConsoleColorTo(7);
+					for (int i = 0; i < orgInfo.courses.size(); i++)
+					{
+						outputPosition(4, posy); std::cout << "-->";
+						if (i == counter)
+						{
+							sceneContext->user.id;
+							setConsoleColorTo(6); outputPosition(9, posy); std::cout << orgInfo.courses[i].name;
+							outputPosition(60, posy);
+							
+							if (std::find(userRole.userCoursesId.begin(), userRole.userCoursesId.end(), orgInfo.courses[i].id) != userRole.userCoursesId.end())
+							{
+								if (counter2 == 0)
+								{
+									setConsoleColorTo(2); std::cout << "Enter"; setConsoleColorTo(7); std::cout << " | Settings | Delete";
+								}
+								else if (counter2 == 1)
+								{
+									setConsoleColorTo(7); std::cout << "Enter | "; setConsoleColorTo(9); std::cout << "Settings"; setConsoleColorTo(7); std::cout << " | Delete";
+								}
+								else
+								{
+									setConsoleColorTo(7); std::cout << "Enter | Settings | "; setConsoleColorTo(4); std::cout << "Delete";
+								}
+							}
+							else
+							{
+								setConsoleColorTo(6); outputPosition(9, posy); std::cout << orgInfo.courses[i].name;
+								outputPosition(60, posy);
+							}
+						}
+						else
+						{
+							if (std::find(userRole.userCoursesId.begin(), userRole.userCoursesId.end(), orgInfo.courses[i].id) != userRole.userCoursesId.end())
+							{
+								outputPosition(9, posy); std::cout << orgInfo.courses[i].name;
+								outputPosition(60, posy); setConsoleColorTo(8); std::cout << "Enter | Settings | Delete";
+							}
+							else
+							{
+								outputPosition(9, posy); std::cout << orgInfo.courses[i].name;
+							}
+						}
+
+
+						posy += 2;
+						setConsoleColorTo(7);
+					}
+
+					key = _getch();
+
+					if (key == 27)
+					{
+						clearConsole();
+						return "NavigationBar";
+					}
+
+					if (key == 72 && (counter >= 1 && counter <= orgInfo.courses.size()))
+					{
+						counter--;
+					}
+
+					if (key == 80 && (counter >= 0 && counter < orgInfo.courses.size() - 1))
+					{
+						counter++;
+					}
+
+					if (key == 75 && (counter2 == 1) || key == 75 && (counter2 == 2)) // 72/75 is the ASCII code for the up arrow
+					{
+						counter2--;
+					}
+
+					if (key == 77 && (counter2 == 0) || key == 77 && (counter2 == 1)) // 80/77 is the ASCII code for the up arrow
+					{
+						counter2++;
+					}
+				}
+
+				return "ViewOrgAsTeacher";
 			}
 		}
 	);

@@ -725,7 +725,115 @@ void manageUserRoles(string acc[], int orgSize)
 	}
 }
 
-void viewCoursesInOrganisation(string acc[], int orgSize)
+void viewCoursesInOrganisationAdmin(string acc[], int orgSize)
+{
+	system("cls");
+	char key; // Key to be entered
+	int counter = 0, counter2 = 0;
+
+	while (true)
+	{
+		int posy = 5;
+		gotoxy(2, 3); color(6); std::cout << "O R G A N I S A T I O N   C O U R S E S"; color(7);
+		for (int i = 0; i < orgSize; i++)
+		{
+			gotoxy(4, posy); std::cout << "-->";
+			if (i == counter)
+			{
+				color(6); gotoxy(9, posy); std::cout << acc[i];
+				gotoxy(60, posy);
+				if (counter2 == 0)
+				{
+					color(2); std::cout << "Enter"; color(7); std::cout << " | Settings | Delete";
+				}
+				else if (counter2 == 1)
+				{
+					color(7); std::cout << "Enter | "; color(9); std::cout << "Settings"; color(7); std::cout << " | Delete";
+				}
+				else
+				{
+					color(7); std::cout << "Enter | Settings | "; color(4); std::cout << "Delete";
+				}
+			}
+			else
+			{
+				gotoxy(9, posy); std::cout << acc[i];
+				gotoxy(60, posy); color(8); std::cout << "Enter | Settings | Delete";
+			}
+
+
+			posy += 2;
+			color(7);
+		}
+
+		key = _getch();
+
+		if (key == 72 && (counter >= 1 && counter <= orgSize)) // 72/75 is the ASCII code for the up arrow
+		{
+			counter--;
+		}
+
+		if (key == 80 && (counter >= 0 && counter < orgSize - 1)) // 80/77 is the ASCII code for the up arrow
+		{
+			counter++;
+		}
+
+		if (key == 75 && (counter2 == 1) || key == 75 && (counter2 == 2)) // 72/75 is the ASCII code for the up arrow
+		{
+			counter2--;
+		}
+
+		if (key == 77 && (counter2 == 0) || key == 77 && (counter2 == 1) ) // 80/77 is the ASCII code for the up arrow
+		{
+			counter2++;
+		}
+	}
+}
+void viewCoursesInOrganisationUser(string acc[], int orgSize)
+{
+	system("cls");
+	char key; // Key to be entered
+	int orgsCounter = 0;
+	int optionCounter = 0;
+
+	while (true)
+	{
+		int posy = 5;
+		
+		gotoxy(2, 3); color(6); std::cout << "O R G A N I S A T I O N   C O U R S E S"; color(7);
+
+		for (int i = 0; i < orgSize; i++)
+		{
+			gotoxy(4, posy); std::cout << "-->";
+			if (i == orgsCounter)
+			{
+				color(6); gotoxy(9, posy); std::cout << acc[i];
+				gotoxy(60, posy);
+			}
+			else
+			{
+				gotoxy(9, posy); std::cout << acc[i];
+			}
+
+
+			posy += 2;
+			color(7);
+		}
+
+		key = _getch();
+
+		if (key == 72 && (orgsCounter >= 1 && orgsCounter <= orgSize)) // 72/75 is the ASCII code for the up arrow
+		{
+			orgsCounter--;
+		}
+
+		if (key == 80 && (orgsCounter >= 0 && orgsCounter < orgSize - 1)) // 80/77 is the ASCII code for the up arrow
+		{
+			orgsCounter++;
+		}
+	}
+}
+void viewCoursesInOrganisationTeacher(string acc[], int orgSize)
 {
 	system("cls");
 	char key; // Key to be entered
@@ -788,6 +896,7 @@ void viewCoursesInOrganisation(string acc[], int orgSize)
 
 	}
 }
+
 void createCourse()
 {
 	string question = "", answer, teacher;
@@ -1859,5 +1968,5 @@ int main()
 		"Math"
 	};
 	//registerPage();
-	manageUserRoles(courses, 2);
+	viewCoursesInOrganisationAdmin(courses, 2);
 }
