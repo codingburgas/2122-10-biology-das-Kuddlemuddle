@@ -27,14 +27,12 @@ Explaining a variety of Biology-related concepts in an easily-accessible way wit
 <img src = "" alt = "demo img 2">
 
 ## Related documents 📄 <a name = "docs"></a>
-   + [Documentation]()
-   + [Presentation]()
-
-## How it works ⌨️ <a name = "howwork"></a>
-
+   + [Documentation](https://github.com/codingburgas/2122-10-biology-das-Kuddlemuddle/blob/main/documents/Documentation.docx)
+   + [Doxygen documentation]()
+   + [Presentation](https://github.com/codingburgas/2122-10-biology-das-Kuddlemuddle/blob/main/documents/Presentation.pptx)
 
 ## Usage 🖱️ <a name = "usage"></a>
-
+The user can create or be added to different organizations where they can find lessons and quzzes to learn from. Navigate through the menu and find the information you need.
   
 ## Installation ⚙ <a name = "installation"></a>
 
