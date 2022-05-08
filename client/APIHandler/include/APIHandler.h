@@ -83,12 +83,14 @@ class APIHandler
 public:
 	std::string registerHandler(RegisterData regData);
 	std::string loginHandler(LoginData logData, SceneContex* ctx);
-	std::string getUserInfo(std::string userId, SceneContex* ctx, User& user);
+	std::string getUserInfo(std::string username, SceneContex* ctx, User& user);
+	std::string getUserInfoById(std::string userId, SceneContex* ctx, User& user);
     std::string deleteUser(std::string username, std::string JWTToken);
     std::string createOrg(OrgData orgData, std::string JWTToken);
     std::string joinOrg(int orgId, std::string password, std::string JWTToken);
     std::string updateOrg(OrgData orgData, std::string name, std::string JWTToken);
     std::string deleteOrg(std::string name, std::string JWTToken);
+    std::string updateRoleInOrg(int orgId, int userId, int roleId, std::string JWTToken);
     bool doUserHaveAccessToOrg(std::string name, std::string JWTToken);
     std::vector<User> getAllUsers(std::string JWTToken);
     std::vector<OrgInfo> getAllOrgs(std::string JWTToken);

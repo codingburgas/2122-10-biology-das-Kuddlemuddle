@@ -970,7 +970,7 @@ crow::Blueprint initApi(crow::App<crow::CORSHandler, AuthorisationMiddleware>& a
 				// If there are null values
 				if (recordSet.size() != 0)
 				{
-					res = responseJSONManager.createJSONResponse(false, recordSet, "update-user-role-org");
+					res = responseJSONManager.createJSONResponse(false, recordSet, "user-update");
 					res.code = crow::status::BAD_REQUEST;
 					res.end();
 					return;

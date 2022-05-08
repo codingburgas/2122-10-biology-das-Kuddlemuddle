@@ -1243,7 +1243,7 @@ void SceneManager::LoadScenes()
 
 	scenes.push_back(
 		{
-			6,
+			7,
 			"ViewOrgAsTeacher",
 			[&]()
 			{
@@ -1366,7 +1366,7 @@ void SceneManager::LoadScenes()
 
 	scenes.push_back(
 		{
-			6,
+			8,
 			"updateOrganisation",
 			[&]() -> std::string
 			{
@@ -1419,7 +1419,7 @@ void SceneManager::LoadScenes()
 
 					if (key == '\t')
 					{
-						return "ViewOrgAsAdmin";
+						return "ManageRolesInOrg";
 					}
 
 					if (key == '\r')
@@ -1464,6 +1464,166 @@ void SceneManager::LoadScenes()
 				(void)_getch();
 
 				return "updateOrganisation";
+			}
+		}
+	);
+
+	scenes.push_back(
+		{
+			9,
+			"ManageRolesInOrg",
+			[&]() -> std::string
+			{
+				clearConsole();
+				char key; // Key to be entered
+				int counter = 0, counter2 = 0;
+
+				APIHandler apiHandler;
+
+				OrgInfo orgInfo = apiHandler.getOrg(sceneContext->orgInfo.name, sceneContext->JWTToken);
+
+				if (!orgInfo.errors.empty())
+				{
+					std::cout << "There was problem with the server. Please try again latter!";
+
+					sceneContext->orgInfo = {};
+
+					(void)_getch();
+					return "NavigationBar";
+				}
+
+				sceneContext->orgInfo = orgInfo;
+
+				std::vector<std::string> usernames;
+
+				for (int i = 0; i < orgInfo.users.size(); i++)
+				{
+					User user;
+					apiHandler.getUserInfoById(std::to_string(orgInfo.users[i].id), sceneContext, user);
+
+					usernames.push_back(user.username);
+				}
+
+				while (true)
+				{
+					// Button for history notebook section
+					int posy = 5;
+					outputPosition(2, 3); setConsoleColorTo(6); std::cout << "O R G A N I Z A T I O N   U S E R S"; setConsoleColorTo(7);
+					for (int i = 0; i < usernames.size(); i++)
+					{
+						outputPosition(4, posy); std::cout << "-->";
+
+						if (i == counter)
+						{
+							setConsoleColorTo(6); outputPosition(9, posy); std::cout << usernames[i];
+							outputPosition(60, posy);
+							if (counter2 == 0)
+							{
+								setConsoleColorTo(2); std::cout << "Student"; setConsoleColorTo(7); std::cout << " | Teacher | Admin";
+							}
+							else if (counter2 == 1)
+							{
+								setConsoleColorTo(7); std::cout << "Student | "; setConsoleColorTo(9); std::cout << "Teacher"; setConsoleColorTo(7); std::cout << " | Admin";
+							}
+							else
+							{
+								setConsoleColorTo(7); std::cout << "Student | Teacher | "; setConsoleColorTo(4); std::cout << "Admin";
+							}
+						}
+						else
+						{
+							outputPosition(9, posy); std::cout << usernames[i];
+							outputPosition(60, posy); setConsoleColorTo(8); std::cout << "Student | Teacher | Admin";
+						}
+
+						posy += 2;
+						setConsoleColorTo(7);
+					}
+
+					key = _getch();
+
+					if (key == 27)
+					{
+						return "NavigationBar";
+					}
+
+					if (key == '\t')
+					{
+						return "ViewOrgAsAdmin";
+					}
+
+					if (key == '\r' && counter2 == 0)
+					{
+						auto recordSet = apiHandler.updateRoleInOrg(orgInfo.id, orgInfo.users[counter].id, 0,sceneContext->JWTToken);
+
+						outputPosition(4, posy + 2);
+
+						if (recordSet.empty())
+						{
+							std::cout << "User role updated successfully! Press any key to continue...";
+							(void)_getch();
+							clearConsole();
+							return "NavigationBar";
+						}
+
+						std::cout << recordSet;
+					}
+
+					if (key == '\r' && counter2 == 1)
+					{
+						auto recordSet = apiHandler.updateRoleInOrg(orgInfo.id, orgInfo.users[counter].id, 1, sceneContext->JWTToken);
+
+						outputPosition(4, posy + 2);
+
+						if (recordSet.empty())
+						{
+							std::cout << "User role updated successfully! Press any key to continue...";
+							(void)_getch();
+							clearConsole();
+							return "NavigationBar";
+						}
+
+						std::cout << recordSet;
+					}
+
+					if (key == '\r' && counter2 == 2)
+					{
+						auto recordSet = apiHandler.updateRoleInOrg(orgInfo.id, orgInfo.users[counter].id, 2, sceneContext->JWTToken);
+
+						outputPosition(4, posy + 2);
+
+						if (recordSet.empty())
+						{
+							std::cout << "User role updated successfully! Press any key to continue...";
+							(void)_getch();
+							clearConsole();
+							return "NavigationBar";
+						}
+
+						std::cout << recordSet;
+					}
+
+					if (key == 72 && (counter >= 1 && counter <= usernames.size())) // 72/75 is the ASCII code for the up arrow
+					{
+						counter--;
+					}
+
+					if (key == 80 && (counter >= 0 && counter < usernames.size() - 1)) // 80/77 is the ASCII code for the up arrow
+					{
+						counter++;
+					}
+
+					if (key == 75 && (counter2 == 1) || key == 75 && (counter2 == 2)) // 72/75 is the ASCII code for the up arrow
+					{
+						counter2--;
+					}
+
+					if (key == 77 && (counter2 == 0) || key == 77 && (counter2 == 1)) // 80/77 is the ASCII code for the up arrow
+					{
+						counter2++;
+					}
+
+				}
 			}
 		}
 	);

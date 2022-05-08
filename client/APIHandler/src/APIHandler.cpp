@@ -125,6 +125,45 @@ std::string APIHandler::getUserInfo(std::string username, SceneContex* ctx, User
     return "The user wasn't found";
 }
 
+std::string APIHandler::getUserInfoById(std::string userId, SceneContex* ctx, User& user)
+{
+    cpr::Response r;
+    if (!ctx->JWTToken.empty())
+    {
+        r = cpr::Get(cpr::Url{ "http://localhost:18080/api/users/" + userId },
+            cpr::Bearer({ ctx->JWTToken }));
+    }
+    else
+    {
+        r = cpr::Get(cpr::Url{ "http://localhost:18080/api/users/" + userId });
+    }
+
+    nlohmann::json JSONRes;
+
+    try
+    {
+        JSONRes = nlohmann::json::parse(r.text);
+    }
+    catch (nlohmann::json::parse_error& ex)
+    {
+        return "There is a problem with the server! Please try again later!";
+    }
+
+    if (JSONRes["type"] == "user-success")
+    {
+        user.id = JSONRes["data"][0];
+        user.fname = JSONRes["data"][1];
+        user.lname = JSONRes["data"][2];
+        user.username = JSONRes["data"][3];
+        user.email = JSONRes["data"][4];
+        user.role = JSONRes["data"][5];
+        user.avatarURL = JSONRes["data"][6];
+        return "";
+    }
+
+    return "The user wasn't found";
+}
+
 std::string APIHandler::deleteUser(std::string username, std::string JWTToken)
 {
     auto r = cpr::Delete(cpr::Url{ "http://localhost:18080/api/users/" + username },
@@ -324,6 +363,35 @@ std::string APIHandler::updateOrg(OrgData orgData, std::string name, std::string
             returnVal += el.value();
             returnVal += " ";
         }
+    }
+
+    return JSONRes["fields"][0];
+}
+
+std::string APIHandler::updateRoleInOrg(int orgId, int userId, int roleId, std::string JWTToken)
+{
+    cpr::Response r = cpr::Post(cpr::Url{ "http://localhost:18080/api/updateRolesInOrg" },
+        cpr::Bearer({ JWTToken }),
+        cpr::Payload{
+            {"orgId", std::to_string(orgId)},
+            {"userId", std::to_string(userId)},
+            {"roleId", std::to_string(roleId)}
+        });
+
+    nlohmann::json JSONRes;
+
+    try
+    {
+        JSONRes = nlohmann::json::parse(r.text);
+    }
+    catch (nlohmann::json::parse_error& ex)
+    {
+        return "There is a problem with the server! Please try again later!";
+    }
+
+    if (JSONRes["type"] == "update-user-role-org-success")
+    {
+        return "";
     }
 
     return JSONRes["fields"][0];
