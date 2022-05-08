@@ -1,27 +1,31 @@
 #include "pch.h"
 #include "CppUnitTest.h"
 #include "../DB/include/db.h"
-#include "../types/include/types.h"
+#include "../types/include/types.h" 
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
-namespace UnitTest
+namespace DBUnitTest
 {
-	TEST_CLASS(UnitTest)
+	TEST_CLASS(DBUnitTest)
 	{
 	public:
 		
-		TEST_METHOD(TestMethod1)
+		TEST_METHOD(AnswerInfoTest)
 		{
 			// Arrange
-			AnswerInfo AnswerInfo;
+			AnswerInfo answerInfo;
+			AnswerInfo answerInfo1;
 			DBManager DBManager;
 
 			// Act
-			AnswerInfo = DBManager.getAnswersInfo(0);
+			answerInfo = DBManager.getAnswersInfo(0);
 
 			// Assert
-			Assert::
+			Assert::AreSame(answerInfo, answerInfo1);
 		}
+
+
+
 	};
 }
