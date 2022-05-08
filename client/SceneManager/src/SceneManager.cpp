@@ -452,6 +452,150 @@ std::string viewOrganisation(std::string JWTToken, SceneContex* sceneContext)
 	}
 }
 
+void createCourse(std::string JWTToken, int orgId)
+{
+	clearConsole();
+	char key = ' ';
+	int iPut = 0;
+	std::string info[5] = { "", "" };
+
+	do
+	{
+		int colors[3] = { 7, 7 };
+		colors[iPut] = 6;
+		setConsoleColorTo(6);
+		printLogo(26);
+		drawOrganisationLogo();
+		createInputField(8, " Course name", 40, 75, colors[0], info[0]);
+		createInputField(12, " Password   ", 40, 75, colors[1], info[1]);
+
+		if (iPut == 2)
+		{
+			createButton(16, "  Create now  ", 14, 75, 2);
+		}
+		else {
+			createButton(16, "  Create now  ", 14, 75, 7);
+		}
+
+		key = _getch();
+
+		if (key == '\r')
+		{
+			iPut++;
+			key = ' ';
+		}
+
+		else
+		{
+			if (iPut < 2)
+			{
+				if (key == '\b')
+				{
+					info[iPut] = info[iPut].substr(0, info[iPut].size() - 1);
+				}
+
+				else
+				{
+					info[iPut] += key;
+				}
+			}
+		}
+
+	} while (key != '\r' && iPut <= 2);
+	
+	APIHandler apiHandler;
+
+	std::string recordSet = apiHandler.createCourse({ info[0], info[1] }, orgId, JWTToken);
+
+	if (recordSet.empty())
+	{
+		outputPosition(15, 31); std::cout << "The course was created successfully! Press any key to continue!";
+
+		(void)_getch();
+
+		return;
+	}
+
+	outputPosition(15, 31); std::cout << recordSet;
+
+	(void)_getch();
+
+	return;
+
+}
+
+void joinCourse(int courseId, std::string JWTToken)
+{
+	clearConsole();
+	char key = ' ';
+	int iPut = 0;
+	std::string info[5] = { "", "" };
+
+	do
+	{
+		int colors[2] = { 7, 7 };
+		colors[iPut] = 6;
+		setConsoleColorTo(6);
+		printLogo(26);
+		drawOrganisationLogo();
+		outputPosition(75, 9); std::cout << "You are not part of this course.";
+		outputPosition(75, 10); std::cout << "Pleas enter the course password to continue!";
+		createInputField(12, " Password   ", 40, 75, colors[1], info[0]);
+
+		if (iPut == 1)
+		{
+			createButton(16, "   Join now   ", 14, 75, 2);
+		}
+		else {
+			createButton(16, "   Join now   ", 14, 75, 7);
+		}
+
+		key = _getch();
+
+		if (key == '\r')
+		{
+			iPut++;
+			key = ' ';
+		}
+
+		else
+		{
+			if (iPut < 1)
+			{
+				if (key == '\b')
+				{
+					info[iPut] = info[iPut].substr(0, info[iPut].size() - 1);
+				}
+
+				else
+				{
+					info[iPut] += key;
+				}
+			}
+		}
+
+	} while (key != '\r' && iPut <= 1);
+
+	APIHandler apiHandler;
+
+	std::string recordSet = apiHandler.joinCourse(courseId, info[0], JWTToken);
+
+	if (recordSet.empty())
+	{
+		outputPosition(15, 31); std::cout << "You are now part of this course! Press any key to continue!";
+
+		(void)_getch();
+
+		return;
+	}
+
+	outputPosition(15, 31); std::cout << recordSet;
+
+	(void)_getch();
+
+	return;
+}
+
 std::string accountPage(User user, std::string JWTToken)
 {
 	outputPosition(40, 6); setConsoleColorTo(6); std::cout << "A C C O U N T     S E T T I N G S"; setConsoleColorTo(7);
@@ -917,7 +1061,7 @@ void SceneManager::LoadScenes()
 				User userData;
 
 				sceneContext->isAuth = true;
-				sceneContext->JWTToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJleHAiOjE2NTIxMTk2MDYsImlhdCI6MTY1MjAzMzIwNiwiaXNBZG1pbiI6MCwic3ViIjoiMyJ9.eGC8e-HftJG157WGHjozJ0J0zg2DQJx1jjnEZGSnuaA";
+				sceneContext->JWTToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJleHAiOjE2NTIxMjcwNDMsImlhdCI6MTY1MjA0MDY0MywiaXNBZG1pbiI6MCwic3ViIjoiNCJ9.pSyXvF5NBmQJ-mCYmgFv94eQTzVb7HweiKc5xEKQufE";
 
 				std::string recordSet = apiHandler.getUserInfo("@me", sceneContext, userData);
 
@@ -1124,6 +1268,48 @@ void SceneManager::LoadScenes()
 						return "NavigationBar";
 					}
 
+					if (key == '\r')
+					{
+						auto courseInfo = apiHandler.getCourse(orgInfo.courses[orgsCounter].id, sceneContext->JWTToken);
+						// try to get course info
+						if (courseInfo.errors.empty())
+						{
+							sceneContext->courseInfo = courseInfo;
+
+							int userRole = 0;
+
+							apiHandler.getUserInfo("@me", sceneContext, sceneContext->user);
+
+							for (auto& user : courseInfo.users)
+							{
+								if (user.id == std::stoi(sceneContext->user.id))
+								{
+									userRole = user.role;
+								}
+							}
+
+							switch (userRole)
+							{
+							case 1:
+								return "ViewOrgAsTeacher";
+								break;
+							case 2:
+								return "ViewOrgAsAdmin";
+								break;
+							case 0:
+							default:
+								return "ViewOrgAsUser";
+								break;
+							}
+						}
+						else
+						{
+							joinCourse(orgInfo.courses[orgsCounter].id, sceneContext->JWTToken);
+							clearConsole();
+							return "ViewOrgAsUser";
+						}
+					}
+
 					if (key == 72 && (orgsCounter >= 1 && orgsCounter <= orgInfo.courses.size())) // 72/75 is the ASCII code for the up arrow
 					{
 						orgsCounter--;
@@ -1201,6 +1387,11 @@ void SceneManager::LoadScenes()
 						setConsoleColorTo(7);
 					}
 
+					outputPosition(4, posy); std::cout << "-->";
+					orgInfo.courses.size() == counter ? setConsoleColorTo(6) : setConsoleColorTo(7);
+					outputPosition(9, posy); std::cout << "Create Course";
+					setConsoleColorTo(7);
+
 					key = _getch();
 
 					if (key == 27)
@@ -1215,12 +1406,18 @@ void SceneManager::LoadScenes()
 						return "updateOrganisation";
 					}
 
+					if (key == '\r' && counter == orgInfo.courses.size())
+					{
+						createCourse(sceneContext->JWTToken, orgInfo.id);
+						return "ViewOrgAsAdmin";
+					}
+
 					if (key == 72 && (counter >= 1 && counter <= orgInfo.courses.size()))
 					{
 						counter--;
 					}
 
-					if (key == 80 && (counter >= 0 && counter < orgInfo.courses.size() - 1))
+					if (key == 80 && (counter >= 0 && counter < orgInfo.courses.size()))
 					{
 						counter++;
 					}

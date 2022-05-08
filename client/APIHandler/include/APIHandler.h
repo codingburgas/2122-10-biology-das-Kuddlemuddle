@@ -25,6 +25,19 @@ struct OrgUser
 };
 
 /**
+ * @brief Struct that holds topic data
+*/
+struct TopicInfo
+{
+    int id; /*!< ID of the topic */
+    int courseId; /*!< ID of the course */
+    std::string name; /*!< Name of the topic */
+    //std::vector<LessonInfo> lessons; /*!< Lessons for this topic */
+    //std::vector<QuizInfo> quizzes; /*!< Quizzes for this topic */
+    std::vector<std::string> errors; /*!< Errors for this topic */
+};
+
+/**
  * @brief Struct that holds course data
 */
 struct CourseInfo
@@ -33,8 +46,8 @@ struct CourseInfo
     int orgId; /*!< ID of the organisation */
     std::string name; /*!< Name of the course */
     std::vector<OrgUser> users; /*!< Users in this course */
-    //std::vector<TopicInfo> topics; /*!< Topics in this course */
-    std::vector<std::string> errors; /*!< Errors in this course */
+    std::vector<TopicInfo> topics; /*!< Topics in this course */
+    std::string errors; /*!< Errors in this course */
 };
 
 struct OrgInfo
@@ -54,6 +67,7 @@ struct SceneContex
     std::string JWTToken;
     bool isDataFetchOnPage = false;
     OrgInfo orgInfo;
+    CourseInfo courseInfo;
 };
 
 struct OrgData
@@ -91,10 +105,13 @@ public:
     std::string updateOrg(OrgData orgData, std::string name, std::string JWTToken);
     std::string deleteOrg(std::string name, std::string JWTToken);
     std::string updateRoleInOrg(int orgId, int userId, int roleId, std::string JWTToken);
+    std::string createCourse(OrgData courseData, int orgId, std::string JWTToken);
+    std::string joinCourse(int courseId, std::string password, std::string JWTToken);
     bool doUserHaveAccessToOrg(std::string name, std::string JWTToken);
     std::vector<User> getAllUsers(std::string JWTToken);
     std::vector<OrgInfo> getAllOrgs(std::string JWTToken);
     OrgInfo getOrg(std::string name, std::string JWTToken);
+    CourseInfo getCourse(int id, std::string JWTToken);
 private:
 
 };

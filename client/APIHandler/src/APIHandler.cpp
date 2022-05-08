@@ -262,6 +262,89 @@ std::string APIHandler::createOrg(OrgData orgData, std::string JWTToken)
     return JSONRes["fields"][0];
 }
 
+std::string APIHandler::createCourse(OrgData courseData, int orgId, std::string JWTToken)
+{
+    cpr::Response r = cpr::Post(cpr::Url{ "http://localhost:18080/api/createNewCourse" },
+        cpr::Bearer({ JWTToken }),
+        cpr::Payload{
+            {"courseName", courseData.name},
+            {"password", courseData.password},
+            {"orgId", std::to_string(orgId)}
+        });
+
+    nlohmann::json JSONRes;
+
+    try
+    {
+        JSONRes = nlohmann::json::parse(r.text);
+    }
+    catch (nlohmann::json::parse_error& ex)
+    {
+        return "There is a problem with the server! Please try again later!";
+    }
+
+    if (JSONRes["type"] == "course-register-success")
+    {
+        return "";
+    }
+
+    std::string returnVal;
+
+    if (JSONRes["fields"].size() != 1)
+    {
+        returnVal = "The following fileds are incorrect: ";
+
+        for (auto& el : JSONRes["fields"].items())
+        {
+            returnVal += el.value();
+            returnVal += " ";
+        }
+    }
+
+    return JSONRes["fields"][0];
+}
+
+std::string APIHandler::joinCourse(int courseId, std::string password, std::string JWTToken)
+{
+    cpr::Response r = cpr::Post(cpr::Url{ "http://localhost:18080/api/joinCourse" },
+        cpr::Bearer({ JWTToken }),
+        cpr::Payload{
+            {"courseId", std::to_string(courseId)},
+            {"password", password}
+        });
+
+    nlohmann::json JSONRes;
+
+    try
+    {
+        JSONRes = nlohmann::json::parse(r.text);
+    }
+    catch (nlohmann::json::parse_error& ex)
+    {
+        return "There is a problem with the server! Please try again later!";
+    }
+
+    if (JSONRes["type"] == "join-course-success")
+    {
+        return "";
+    }
+
+    std::string returnVal;
+
+    if (JSONRes["fields"].size() != 1)
+    {
+        returnVal = "The following fileds are incorrect: ";
+
+        for (auto& el : JSONRes["fields"].items())
+        {
+            returnVal += el.value();
+            returnVal += " ";
+        }
+    }
+
+    return JSONRes["fields"][0];
+}
+
 std::string APIHandler::joinOrg(int orgId, std::string password, std::string JWTToken)
 {
     cpr::Response r = cpr::Post(cpr::Url{ "http://localhost:18080/api/joinOrg" },
@@ -522,4 +605,63 @@ OrgInfo APIHandler::getOrg(std::string name, std::string JWTToken)
     }
 
     return orgInfo;
+}
+
+CourseInfo APIHandler::getCourse(int id, std::string JWTToken)
+{
+    auto r = cpr::Get(cpr::Url{ "http://localhost:18080/api/courses/" + std::to_string(id) },
+        cpr::Bearer({ JWTToken }));
+
+    nlohmann::json JSONRes;
+
+    try
+    {
+        JSONRes = nlohmann::json::parse(r.text);
+    }
+    catch (nlohmann::json::parse_error& ex)
+    {
+        // Send error
+        CourseInfo error;
+        error.errors = "There is a problem with the server! Please try again later!";
+        return { error };
+    }
+
+    CourseInfo courseInfo;
+
+    if (JSONRes["type"] == "get-course-success")
+    {
+
+        courseInfo.id = JSONRes["course-id"];
+        courseInfo.orgId = JSONRes["org-id"];
+        courseInfo.name = JSONRes["course-name"];
+
+        for (auto it = JSONRes["course-users"].begin(); it != JSONRes["course-users"].end(); ++it)
+        {
+            courseInfo.users.push_back(
+                {
+                    it.value()["user-id"],
+                    it.value()["role-id"]
+                }
+            );
+        }
+
+        for (auto it = JSONRes["course-topics"].begin(); it != JSONRes["course-topics"].end(); ++it)
+        {
+            courseInfo.topics.push_back(
+                {
+                    it.value()["topic-id"],
+                    courseInfo.id,
+                    it.value()["topic-name"]
+                }
+            );
+        }
+    }
+    else
+    {
+        CourseInfo error;
+        error.errors = "There is a problem with the server! Please try again later!";
+        return { error };
+    }
+
+    return courseInfo;
 }
