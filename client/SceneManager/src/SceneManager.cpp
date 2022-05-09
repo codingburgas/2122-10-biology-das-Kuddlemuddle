@@ -1317,6 +1317,63 @@ void createLesson(int topicId, std::string JWTToken)
 	return;
 }
 
+void updateLesson(std::string lessonName, int lessonId, std::string JWTToken)
+{
+	clearConsole();
+
+	char key; // Key to be entered
+	int counter = 0, counter2 = 0;
+	std::string lessonData = "";
+	int posy = 5;
+
+	while (true)
+	{
+		createInputField(posy + 3, " LESSON NAME", 40, 4, 7, lessonName);
+		key = _getch();
+
+		if (key == '\r')
+		{
+			break;
+		}
+		else
+		{
+			if (key == '\b')
+			{
+				lessonName = lessonName.substr(0, lessonName.size() - 1);
+			}
+
+			else
+			{
+				lessonName += key;
+			}
+
+		}
+	}
+
+	outputPosition(4, posy + 7); std::cout << "LESSON DATA:" << std::endl;
+	outputPosition(4, posy + 8); std::getline(std::cin, lessonData);
+
+
+	APIHandler apiHandler;
+	std::string recordSet = apiHandler.updateLesson(lessonName, lessonData, lessonId, JWTToken);
+
+	if (recordSet.empty())
+	{
+		outputPosition(15, 31); std::cout << "The lesson was created successfully! Press any key to continue!";
+
+		(void)_getch();
+
+		return;
+	}
+
+	outputPosition(15, 31); std::cout << recordSet;
+
+	(void)_getch();
+
+	return;
+}
+
+
 void displayLesson(int lessonId, std::string JWTToken)
 {
 	clearConsole();
@@ -2908,6 +2965,11 @@ void SceneManager::LoadScenes()
 					if (key == '\r' && counter2 == 0 && counter < topicInfo.lessons.size())
 					{
 						displayLesson(topicInfo.lessons[counter].id, sceneContext->JWTToken);
+						return "ViewTopicAsAuth";
+					}
+					if (key == '\r' && counter2 == 1 && counter < topicInfo.lessons.size())
+					{
+						updateLesson(topicInfo.lessons[counter].name, topicInfo.lessons[counter].id, sceneContext->JWTToken);
 						return "ViewTopicAsAuth";
 					}
 
