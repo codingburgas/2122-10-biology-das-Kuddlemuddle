@@ -1262,6 +1262,63 @@ void updateTopicsInCourse(std::string topicName, int topicId, std::string JWTTok
 	return;
 }
 
+void createLesson(int topicId, std::string JWTToken)
+{
+	clearConsole();
+
+	char key; // Key to be entered
+	int counter = 0, counter2 = 0;
+	std::string newLesson = "";
+	std::string lessonData = "";
+	int posy = 5;
+
+	while (true)
+	{
+		createInputField(posy + 3, " LESSON NAME", 40, 4, 7, newLesson);
+		key = _getch();
+
+		if (key == '\r')
+		{
+			break;
+		}
+		else
+		{
+			if (key == '\b')
+			{
+				newLesson = newLesson.substr(0, newLesson.size() - 1);
+			}
+
+			else
+			{
+				newLesson += key;
+			}
+
+		}
+	}
+
+	outputPosition(4, posy + 7); std::cout << "LESSON DATA:" << std::endl;
+	outputPosition(4, posy + 8); std::getline(std::cin, lessonData);
+
+
+	APIHandler apiHandler;
+	std::string recordSet = apiHandler.createLesson(newLesson, lessonData, topicId, JWTToken);
+
+	if (recordSet.empty())
+	{
+		outputPosition(15, 31); std::cout << "The lesson was created successfully! Press any key to continue!";
+
+		(void)_getch();
+
+		return;
+	}
+
+	outputPosition(15, 31); std::cout << recordSet;
+
+	(void)_getch();
+
+	return;
+}
+
 void SceneManager::LoadScenes()
 {
 	SceneContex* sceneContext = new SceneContex();
@@ -2777,13 +2834,18 @@ void SceneManager::LoadScenes()
 						setConsoleColorTo(7);
 					}
 
-					outputPosition(2, topicInfo.lessons.size() + 7); setConsoleColorTo(6); std::cout << "T O P I C   Q U I Z Z E S"; setConsoleColorTo(7);
-					posy += 2;
+					outputPosition(4, posy); std::cout << "-->";
+					topicInfo.lessons.size() == counter ? setConsoleColorTo(6) : setConsoleColorTo(7);
+					outputPosition(9, posy); std::cout << "Create Lesson";
+					setConsoleColorTo(7);
+
+					outputPosition(2, topicInfo.lessons.size() + 9); setConsoleColorTo(6); std::cout << "T O P I C   Q U I Z Z E S"; setConsoleColorTo(7);
+					posy += 4;
 
 					for (int i = 0; i < topicInfo.lessons.size(); i++)
 					{
 						outputPosition(4, posy); std::cout << "-->";
-						if (i + topicInfo.lessons.size() == counter)
+						if (i + topicInfo.lessons.size() + 1 == counter)
 						{
 							setConsoleColorTo(6); outputPosition(9, posy); std::cout << topicInfo.lessons[i].name;
 							outputPosition(60, posy);
@@ -2812,8 +2874,8 @@ void SceneManager::LoadScenes()
 					}
 
 					outputPosition(4, posy); std::cout << "-->";
-					topicInfo.lessons.size() + topicInfo.quizzes.size() == counter ? setConsoleColorTo(6) : setConsoleColorTo(7);
-					outputPosition(9, posy); std::cout << "Create Lesson";
+					topicInfo.lessons.size() + topicInfo.quizzes.size() + 1 == counter ? setConsoleColorTo(6) : setConsoleColorTo(7);
+					outputPosition(9, posy); std::cout << "Create Quiz";
 					setConsoleColorTo(7);
 
 					key = _getch();
@@ -2821,19 +2883,19 @@ void SceneManager::LoadScenes()
 					if (key == 27)
 					{
 						clearConsole();
-						return "NavigationBar";
+						return "ViewCourseAsAuth";
 					}
 
 					if (key == '\r' && counter == topicInfo.lessons.size())
 					{
-						addTopicsInCourse(topicInfo.id, sceneContext->JWTToken);
-						return "NavigationBar";
+						createLesson(topicInfo.id, sceneContext->JWTToken);
+						return "ViewCourseAsAuth";
 					}
 
 					if (key == '\r' && counter2 == 1)
 					{
 						updateTopicsInCourse(topicInfo.lessons[counter].name, topicInfo.lessons[counter].id, sceneContext->JWTToken);
-						return "NavigationBar";
+						return "ViewCourseAsAuth";
 					}
 
 					if (key == '\r' && counter2 == 2)
@@ -2847,21 +2909,21 @@ void SceneManager::LoadScenes()
 							std::cout << "Topic deleted successfully! Press any key to continue...";
 							(void)_getch();
 							clearConsole();
-							return "NavigationBar";
+							return "ViewCourseAsAuth";
 						}
 
 						std::cout << recordSet;
 						(void)_getch();
 
-						return "NavigationBar";
+						return "ViewCourseAsAuth";
 					}
 
-					if (key == 72 && (counter >= 1 && counter <= topicInfo.lessons.size() + topicInfo.quizzes.size()))
+					if (key == 72 && (counter >= 1 && counter <= topicInfo.lessons.size() + topicInfo.quizzes.size() + 1))
 					{
 						counter--;
 					}
 
-					if (key == 80 && (counter >= 0 && counter < topicInfo.lessons.size() + topicInfo.quizzes.size()))
+					if (key == 80 && (counter >= 0 && counter < topicInfo.lessons.size() + topicInfo.quizzes.size() + 1))
 					{
 						counter++;
 					}

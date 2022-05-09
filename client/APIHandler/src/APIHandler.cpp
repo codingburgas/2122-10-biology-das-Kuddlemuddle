@@ -722,6 +722,48 @@ std::string APIHandler::deleteTopic(int id, std::string JWTToken)
     return "";
 }
 
+std::string APIHandler::createLesson(std::string lessonName, std::string lessonData, int topicId, std::string JWTToken)
+{
+    cpr::Response r = cpr::Post(cpr::Url{ "http://localhost:18080/api/createNewLesson" },
+        cpr::Bearer({ JWTToken }),
+        cpr::Payload{
+            {"lessonName", lessonName},
+            {"lessonData", lessonData},
+            {"topicId", std::to_string(topicId)}
+        });
+
+    nlohmann::json JSONRes;
+
+    try
+    {
+        JSONRes = nlohmann::json::parse(r.text);
+    }
+    catch (nlohmann::json::parse_error& ex)
+    {
+        return "There is a problem with the server! Please try again later!";
+    }
+
+    if (JSONRes["type"] == "lesson-register-success")
+    {
+        return "";
+    }
+
+    std::string returnVal;
+
+    if (JSONRes["fields"].size() != 1)
+    {
+        returnVal = "The following fileds are incorrect: ";
+
+        for (auto& el : JSONRes["fields"].items())
+        {
+            returnVal += el.value();
+            returnVal += " ";
+        }
+    }
+
+    return JSONRes["fields"][0];
+}
+
 bool APIHandler::doUserHaveAccessToOrg(std::string name, std::string JWTToken)
 {
     auto r = cpr::Get(cpr::Url{ "http://localhost:18080/api/orgs/" + name },

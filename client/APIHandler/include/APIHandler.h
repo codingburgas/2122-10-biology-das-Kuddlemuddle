@@ -187,6 +187,7 @@ public:
     std::string createTopic(std::string topicName, int courseId, std::string JWTToken);
     std::string updateTopic(std::string topicName, int id, std::string JWTToken);
     std::string deleteTopic(int id, std::string JWTToken);
+    std::string createLesson(std::string lessonName, std::string lessonData, int topicId, std::string JWTToken);
     bool doUserHaveAccessToOrg(std::string name, std::string JWTToken);
     std::vector<User> getAllUsers(std::string JWTToken);
     std::vector<OrgInfo> getAllOrgs(std::string JWTToken);

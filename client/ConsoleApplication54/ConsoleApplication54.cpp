@@ -2051,5 +2051,5 @@ int main()
 		"Math"
 	};
 	//registerPage();
-	addTopicsInCourse(courses, 2);
+	addLesson(courses, 2);
 }
