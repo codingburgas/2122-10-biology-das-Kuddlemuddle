@@ -3072,6 +3072,25 @@ void SceneManager::LoadScenes()
 						return "ViewTopicAsAuth";
 					}
 
+					if (key == '\r' && counter2 == 2)
+					{
+						std::string recordSet = apiHandler.deleteQuiz(topicInfo.quizzes[counter - topicInfo.lessons.size() - 1].id, sceneContext->JWTToken);
+
+						outputPosition(4, posy + 2);
+
+						if (recordSet.empty())
+						{
+							std::cout << "Organisation deleted successfully! Press any key to continue...";
+							(void)_getch();
+							clearConsole();
+							return "ViewTopicAsAuth";
+						}
+
+						std::cout << recordSet;
+
+						return "ViewTopicAsAuth";
+					}
+
 					if (key == 72 && (counter >= 1 && counter <= topicInfo.lessons.size() + topicInfo.quizzes.size() + 1))
 					{
 						counter--;
