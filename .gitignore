@@ -376,6 +376,9 @@ middlewares.lib
 routes.lib
 utils.lib
 APIHandler.lib
+Application.lib
+ErrorHandaling.lib
+ErrorHandaling.lib
 
 # Doxygen files
 docs
