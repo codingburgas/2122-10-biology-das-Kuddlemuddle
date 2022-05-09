@@ -1375,7 +1375,6 @@ void updateLesson(std::string lessonName, int lessonId, std::string JWTToken)
 
 void createQuiz(int topicId, std::string JWTToken)
 {
-
 	clearConsole();
 
 	char key; // Key to be entered
@@ -1415,6 +1414,59 @@ void createQuiz(int topicId, std::string JWTToken)
 	if (recordSet.empty())
 	{
 		outputPosition(15, 31); std::cout << "The quiz was created successfully! Press any key to continue!";
+
+		(void)_getch();
+
+		return;
+	}
+
+	outputPosition(15, 31); std::cout << recordSet;
+
+	(void)_getch();
+
+	return;
+}
+
+void updateQuiz(std::string newQuizName, int quizId, std::string JWTToken)
+{
+	clearConsole();
+
+	char key; // Key to be entered
+	int counter = 0, counter2 = 0;
+
+	int posy = 5;
+
+	while (true)
+	{
+		createInputField(posy + 3, "  QUIZ NAME ", 40, 4, 7, newQuizName);
+		key = _getch();
+
+		if (key == '\r')
+		{
+			break;
+		}
+
+		else
+		{
+			if (key == '\b')
+			{
+				newQuizName = newQuizName.substr(0, newQuizName.size() - 1);
+			}
+
+			else
+			{
+				newQuizName += key;
+			}
+
+		}
+	}
+
+	APIHandler apiHandler;
+	std::string recordSet = apiHandler.updateQuiz(newQuizName, quizId, JWTToken);
+
+	if (recordSet.empty())
+	{
+		outputPosition(15, 31); std::cout << "The quiz was updated successfully! Press any key to continue!";
 
 		(void)_getch();
 
@@ -2835,48 +2887,10 @@ void SceneManager::LoadScenes()
 						return "ViewCourseAsUser";
 					}
 
-					if (key == '\r')
+					if (key == '\r' && orgsCounter < topicsInfo.lessons.size())
 					{
-						/*
-						auto courseInfo = apiHandler.getCourse(courseInfo.courses[orgsCounter].id, sceneContext->JWTToken);
-						// try to get course info
-						if (courseInfo.errors.empty())
-						{
-							sceneContext->courseInfo = courseInfo;
-
-							int userRole = 0;
-
-							apiHandler.getUserInfo("@me", sceneContext, sceneContext->user);
-
-							for (auto& user : courseInfo.users)
-							{
-								if (user.id == std::stoi(sceneContext->user.id))
-								{
-									userRole = user.role;
-								}
-							}
-
-							switch (userRole)
-							{
-							case 1:
-								return "ViewOrgAsTeacher";
-								break;
-							case 2:
-								return "ViewOrgAsAdmin";
-								break;
-							case 0:
-							default:
-								return "ViewOrgAsUser";
-								break;
-							}
-						}
-						else
-						{
-							joinCourse(courseInfo.courses[orgsCounter].id, sceneContext->JWTToken);
-							clearConsole();
-							return "ViewOrgAsUser";
-						}
-						*/
+						displayLesson(topicsInfo.lessons[orgsCounter].id, sceneContext->JWTToken);
+						return "ViewTopicAsUser";
 					}
 
 					if (key == 72 && (orgsCounter >= 1 && orgsCounter <= topicsInfo.lessons.size() + topicsInfo.quizzes.size())) // 72/75 is the ASCII code for the up arrow
@@ -3050,6 +3064,12 @@ void SceneManager::LoadScenes()
 						(void)_getch();
 
 						return "ViewCourseAsAuth";
+					}
+
+					if (key == '\r' && counter2 == 1)
+					{
+						updateQuiz(topicInfo.quizzes[counter - topicInfo.lessons.size() - 1].name, topicInfo.quizzes[counter - topicInfo.lessons.size() - 1].id, sceneContext->JWTToken);
+						return "ViewTopicAsAuth";
 					}
 
 					if (key == 72 && (counter >= 1 && counter <= topicInfo.lessons.size() + topicInfo.quizzes.size() + 1))
