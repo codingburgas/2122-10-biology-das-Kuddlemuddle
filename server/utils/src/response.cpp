@@ -205,7 +205,7 @@ crow::json::wvalue ResponseJSONManager::createAttemptJSONResponse(AttemptInfo da
 	crow::json::wvalue resBody;
 
 	resBody["type"] = type + "-success";
-	resBody["is-in-progress"] = data.inProgress;
+	resBody["is-in-progress"] = int(data.inProgress);
 	resBody["attempt-id"] = data.id;
 	resBody["attempt-quiz-id"] = data.quizId;
 	resBody["attempt-user-id"] = data.userId;
