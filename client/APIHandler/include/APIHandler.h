@@ -193,6 +193,8 @@ public:
     std::string createQuiz(std::string quizName, int topicId, std::string JWTToken);
     std::string updateQuiz(std::string quizName, int quizId, std::string JWTToken);
     std::string deleteQuiz(int id, std::string JWTToken);
+    std::string createQuestion(std::string question, std::string answer, int quizId, std::string JWTToken);
+    std::string createPunnettQuestion(std::string P1, std::string P2, int quizId, std::string JWTToken);
     bool doUserHaveAccessToOrg(std::string name, std::string JWTToken);
     std::vector<User> getAllUsers(std::string JWTToken);
     std::vector<OrgInfo> getAllOrgs(std::string JWTToken);

@@ -1095,7 +1095,7 @@ void addTeacherToCourse(int courseId, std::string JWTToken, SceneContex* ctx)
 
 void manageCourseOptions(std::string courseName, int courseId, std::string JWTToken, SceneContex* ctx)
 {
-	system("cls");
+	clearConsole();
 	char key; // Key to be entered
 	int optionCounter = 0;
 	std::vector<std::string> options = {
@@ -1478,6 +1478,278 @@ void updateQuiz(std::string newQuizName, int quizId, std::string JWTToken)
 	(void)_getch();
 
 	return;
+}
+
+void addQuestionToQuizz(int quizId, std::string JWTToken)
+{
+	clearConsole();
+	std::string question = "", answer;
+	char key;
+	do {
+
+		createButton(5, "   QUESTION   ", 14, 5, 6);
+		createInputField(8, " TYPE HERE  ", 40, 5, 7, question);
+
+		createButton(12, "    ANSWER    ", 14, 5, 8, 8);
+		createInputField(15, " TYPE HERE  ", 40, 5, 8, " ", 8);
+		createButton(19, "    SUBMIT    ", 14, 5, 2);
+		key = _getch();
+
+		if (key == '\b')
+		{
+			question = question.substr(0, question.size() - 1);
+		}
+
+		else if (key == '\r')
+		{
+			break;
+		}
+		else
+		{
+			question += key;
+		}
+
+
+
+	} while (key != '\r');
+
+	int subcol = 7;
+	do {
+		createButton(5, "   QUESTION   ", 14, 5, 8, 8);
+		createInputField(8, " TYPE HERE  ", 40, 5, 8, question, 8);
+		createButton(12, "    ANSWER    ", 14, 5, 6);
+		createInputField(15, " TYPE HERE  ", 40, 5, 7, answer);
+		createButton(19, "    SUBMIT    ", 14, 5, 2, subcol);
+		key = _getch();
+
+		if (key == '\b')
+		{
+			answer = answer.substr(0, answer.size() - 1);
+		}
+
+		else
+		{
+			answer += key;
+		}
+
+		answer.size() > 0 ? subcol = 2 : subcol = 7;
+
+	} while (key != '\r');
+
+	APIHandler apiHandler;
+
+	std::string recordSet = apiHandler.createQuestion(question, answer, quizId, JWTToken);
+
+	if (recordSet.empty())
+	{
+		outputPosition(15, 31); std::cout << "The question was created successfully! Press any key to continue!";
+
+		(void)_getch();
+
+		return;
+	}
+
+	outputPosition(15, 31); std::cout << recordSet;
+
+	(void)_getch();
+
+	return;
+}
+
+void addPunnettQuestionToQuizz(int quizId, std::string JWTToken)
+{
+	clearConsole();
+	std::string P1 = "", P2;
+	char key;
+	do {
+
+		createButton(5, "   P1         ", 14, 5, 6);
+		createInputField(8, " TYPE HERE  ", 40, 5, 7, P1);
+
+		createButton(12, "    P2        ", 14, 5, 8, 8);
+		createInputField(15, " TYPE HERE  ", 40, 5, 8, " ", 8);
+		createButton(19, "    SUBMIT    ", 14, 5, 2);
+		key = _getch();
+
+		if (key == '\b')
+		{
+			P1 = P1.substr(0, P1.size() - 1);
+		}
+		else if (key == '\r')
+		{
+			break;
+		}
+		else
+		{
+			P1 += key;
+		}
+
+
+
+	} while (key != '\r');
+
+	int subcol = 7;
+	do {
+		createButton(5, "   P1         ", 14, 5, 8, 8);
+		createInputField(8, " TYPE HERE  ", 40, 5, 8, P1, 8);
+		createButton(12, "    P2        ", 14, 5, 6);
+		createInputField(15, " TYPE HERE  ", 40, 5, 7, P2);
+		createButton(19, "    SUBMIT    ", 14, 5, 2, subcol);
+		key = _getch();
+
+		if (key == '\b')
+		{
+			P2 = P2.substr(0, P2.size() - 1);
+		}
+		else
+		{
+			P2 += key;
+		}
+
+		P2.size() > 0 ? subcol = 2 : subcol = 7;
+
+	} while (key != '\r');
+
+	APIHandler apiHandler;
+
+	P2.pop_back();
+
+	std::string recordSet = apiHandler.createPunnettQuestion(P1, P2, quizId, JWTToken);
+
+	if (recordSet.empty())
+	{
+		outputPosition(15, 31); std::cout << "The question was created successfully! Press any key to continue!";
+
+		(void)_getch();
+
+		return;
+	}
+
+	outputPosition(15, 31); std::cout << recordSet;
+
+	(void)_getch();
+
+	return;
+}
+
+void quizQuestionOptions(int quizId, std::string JWTToken)
+{
+	clearConsole();
+	char key; // Key to be entered
+	int optionCounter = 0;
+	std::vector<std::string> options = {
+		"Add open question",
+		"Add punnett square question"
+	};
+
+	while (true)
+	{
+		int posy = 5;
+
+		outputPosition(2, 3); setConsoleColorTo(6); std::cout << "T O P I C   Q U I Z Z E S"; setConsoleColorTo(7);
+
+		for (int i = 0; i < options.size(); i++)
+		{
+			outputPosition(4, posy); std::cout << "-->";
+			if (i == optionCounter)
+			{
+				setConsoleColorTo(6); outputPosition(9, posy); std::cout << options[i];
+				outputPosition(60, posy);
+			}
+			else
+			{
+				outputPosition(9, posy); std::cout << options[i];
+			}
+
+
+			posy += 2;
+			setConsoleColorTo(7);
+		}
+
+		key = _getch();
+
+		if (key == '\r' && optionCounter == 0)
+		{
+			addQuestionToQuizz(quizId, JWTToken);
+			return;
+		}
+
+		if (key == '\r' && optionCounter == 1)
+		{
+			addPunnettQuestionToQuizz(quizId, JWTToken);
+			return;
+		}
+
+		if (key == 72 && (optionCounter >= 1 && optionCounter <= options.size())) // 72/75 is the ASCII code for the up arrow
+		{
+			optionCounter--;
+		}
+
+		if (key == 80 && (optionCounter >= 0 && optionCounter < options.size() - 1)) // 80/77 is the ASCII code for the up arrow
+		{
+			optionCounter++;
+		}
+	}
+}
+
+void quizQuestionOptions(std::string quizName, int quizId, std::string JWTToken)
+{
+	clearConsole();
+	char key; // Key to be entered
+	int optionCounter = 0;
+	std::vector<std::string> options = {
+		"Update quiz info",
+		"Add question to quiz"
+	};
+
+	while (true)
+	{
+		int posy = 5;
+
+		outputPosition(2, 3); setConsoleColorTo(6); std::cout << "T O P I C   Q U I Z Z E S"; setConsoleColorTo(7);
+
+		for (int i = 0; i < options.size(); i++)
+		{
+			outputPosition(4, posy); std::cout << "-->";
+			if (i == optionCounter)
+			{
+				setConsoleColorTo(6); outputPosition(9, posy); std::cout << options[i];
+				outputPosition(60, posy);
+			}
+			else
+			{
+				outputPosition(9, posy); std::cout << options[i];
+			}
+
+
+			posy += 2;
+			setConsoleColorTo(7);
+		}
+
+		key = _getch();
+
+		if (key == '\r' && optionCounter == 0)
+		{
+			updateQuiz(quizName, quizId, JWTToken);
+			return;
+		}
+
+		if (key == '\r' && optionCounter == 1)
+		{
+			quizQuestionOptions(quizId, JWTToken);
+			return;
+		}
+
+		if (key == 72 && (optionCounter >= 1 && optionCounter <= options.size())) // 72/75 is the ASCII code for the up arrow
+		{
+			optionCounter--;
+		}
+
+		if (key == 80 && (optionCounter >= 0 && optionCounter < options.size() - 1)) // 80/77 is the ASCII code for the up arrow
+		{
+			optionCounter++;
+		}
+	}
 }
 
 void displayLesson(int lessonId, std::string JWTToken)
@@ -2160,7 +2432,7 @@ void SceneManager::LoadScenes()
 			"ViewOrgAsTeacher",
 			[&]()
 			{
-				system("cls");
+				clearConsole();
 				char key; // Key to be entered
 				int counter = 0, counter2 = 0;
 
@@ -2325,7 +2597,7 @@ void SceneManager::LoadScenes()
 			"updateOrganisation",
 			[&]() -> std::string
 			{
-				system("cls");
+				clearConsole();
 				char key = ' ';
 				int iPut = 0;
 
@@ -2857,7 +3129,7 @@ void SceneManager::LoadScenes()
 						setConsoleColorTo(7);
 					}
 
-					outputPosition(2, topicsInfo.lessons.size() + 7); setConsoleColorTo(6); std::cout << "C O U R S E   Q U I Z Z E S"; setConsoleColorTo(7);
+					outputPosition(2, topicsInfo.lessons.size() + 7); setConsoleColorTo(6); std::cout << "T O P I C  Q U I Z Z E S"; setConsoleColorTo(7);
 					posy += 2;
 
 					for (int i = 0; i < topicsInfo.quizzes.size(); i++)
@@ -3068,7 +3340,7 @@ void SceneManager::LoadScenes()
 
 					if (key == '\r' && counter2 == 1)
 					{
-						updateQuiz(topicInfo.quizzes[counter - topicInfo.lessons.size() - 1].name, topicInfo.quizzes[counter - topicInfo.lessons.size() - 1].id, sceneContext->JWTToken);
+						quizQuestionOptions(topicInfo.quizzes[counter - topicInfo.lessons.size() - 1].name, topicInfo.quizzes[counter - topicInfo.lessons.size() - 1].id, sceneContext->JWTToken);
 						return "ViewTopicAsAuth";
 					}
 
