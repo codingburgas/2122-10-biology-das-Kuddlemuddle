@@ -2557,6 +2557,26 @@ void SceneManager::LoadScenes()
 						updateTopicsInCourse(courseInfo.topics[counter].name, courseInfo.topics[counter].id, sceneContext->JWTToken);
 						return "NavigationBar";
 					}
+
+					if (key == '\r' && counter2 == 2)
+					{
+						std::string recordSet = apiHandler.deleteTopic(courseInfo.topics[counter].id, sceneContext->JWTToken);
+
+						outputPosition(4, posy + 2);
+
+						if (recordSet.empty())
+						{
+							std::cout << "Topic deleted successfully! Press any key to continue...";
+							(void)_getch();
+							clearConsole();
+							return "NavigationBar";
+						}
+
+						std::cout << recordSet;
+						(void)_getch();
+
+						return "NavigationBar";
+					}
 					
 					if (key == 72 && (counter >= 1 && counter <= courseInfo.topics.size()))
 					{

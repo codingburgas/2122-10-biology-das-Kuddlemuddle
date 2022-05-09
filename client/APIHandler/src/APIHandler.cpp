@@ -698,6 +698,30 @@ std::string APIHandler::updateTopic(std::string topicName, int id, std::string J
     return JSONRes["fields"][0];
 }
 
+std::string APIHandler::deleteTopic(int id, std::string JWTToken)
+{
+    auto r = cpr::Delete(cpr::Url{ "http://localhost:18080/api/topics/" + std::to_string(id) },
+        cpr::Bearer({ JWTToken }));
+
+    nlohmann::json JSONRes;
+
+    try
+    {
+        JSONRes = nlohmann::json::parse(r.text);
+    }
+    catch (nlohmann::json::parse_error& ex)
+    {
+        return "There is a problem with the server! Please try again later!";
+    }
+
+    if (r.status_code != 200)
+    {
+        return "There is a problem with the server! Please try again later!";
+    }
+
+    return "";
+}
+
 bool APIHandler::doUserHaveAccessToOrg(std::string name, std::string JWTToken)
 {
     auto r = cpr::Get(cpr::Url{ "http://localhost:18080/api/orgs/" + name },
