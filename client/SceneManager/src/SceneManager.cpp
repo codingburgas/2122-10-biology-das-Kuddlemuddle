@@ -1373,6 +1373,60 @@ void updateLesson(std::string lessonName, int lessonId, std::string JWTToken)
 	return;
 }
 
+void createQuiz(int topicId, std::string JWTToken)
+{
+
+	clearConsole();
+
+	char key; // Key to be entered
+	int counter = 0, counter2 = 0;
+
+	int posy = 5;
+	std::string newQuizName = "";
+
+	while (true)
+	{
+		createInputField(posy + 3, "  QUIZ NAME ", 40, 4, 7, newQuizName);
+		key = _getch();
+
+		if (key == '\r')
+		{
+			break;
+		}
+
+		else
+		{
+			if (key == '\b')
+			{
+				newQuizName = newQuizName.substr(0, newQuizName.size() - 1);
+			}
+
+			else
+			{
+				newQuizName += key;
+			}
+
+		}
+	}
+
+	APIHandler apiHandler;
+	std::string recordSet = apiHandler.createQuiz(newQuizName, topicId, JWTToken);
+
+	if (recordSet.empty())
+	{
+		outputPosition(15, 31); std::cout << "The quiz was created successfully! Press any key to continue!";
+
+		(void)_getch();
+
+		return;
+	}
+
+	outputPosition(15, 31); std::cout << recordSet;
+
+	(void)_getch();
+
+	return;
+}
 
 void displayLesson(int lessonId, std::string JWTToken)
 {
@@ -2912,12 +2966,12 @@ void SceneManager::LoadScenes()
 					outputPosition(2, topicInfo.lessons.size() + 9); setConsoleColorTo(6); std::cout << "T O P I C   Q U I Z Z E S"; setConsoleColorTo(7);
 					posy += 4;
 
-					for (int i = 0; i < topicInfo.lessons.size(); i++)
+					for (int i = 0; i < topicInfo.quizzes.size(); i++)
 					{
 						outputPosition(4, posy); std::cout << "-->";
 						if (i + topicInfo.lessons.size() + 1 == counter)
 						{
-							setConsoleColorTo(6); outputPosition(9, posy); std::cout << topicInfo.lessons[i].name;
+							setConsoleColorTo(6); outputPosition(9, posy); std::cout << topicInfo.quizzes[i].name;
 							outputPosition(60, posy);
 							if (counter2 == 0)
 							{
@@ -2934,10 +2988,9 @@ void SceneManager::LoadScenes()
 						}
 						else
 						{
-							outputPosition(9, posy); std::cout << topicInfo.lessons[i].name;
+							outputPosition(9, posy); std::cout << topicInfo.quizzes[i].name;
 							outputPosition(60, posy); setConsoleColorTo(8); std::cout << "Enter | Settings | Delete";
 						}
-
 
 						posy += 2;
 						setConsoleColorTo(7);
@@ -2959,6 +3012,12 @@ void SceneManager::LoadScenes()
 					if (key == '\r' && counter == topicInfo.lessons.size())
 					{
 						createLesson(topicInfo.id, sceneContext->JWTToken);
+						return "ViewTopicAsAuth";
+					}
+
+					if (key == '\r' && counter == topicInfo.lessons.size() + topicInfo.quizzes.size() + 1)
+					{
+						createQuiz(topicInfo.id, sceneContext->JWTToken);
 						return "ViewTopicAsAuth";
 					}
 

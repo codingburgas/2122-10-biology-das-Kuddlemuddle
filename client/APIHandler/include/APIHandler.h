@@ -190,6 +190,7 @@ public:
     std::string createLesson(std::string lessonName, std::string lessonData, int topicId, std::string JWTToken);
     std::string deleteLesson(int id, std::string JWTToken);
     std::string updateLesson(std::string lessonName, std::string lessonData, int lessonId, std::string JWTToken);
+    std::string createQuiz(std::string quizName, int topicId, std::string JWTToken);
     bool doUserHaveAccessToOrg(std::string name, std::string JWTToken);
     std::vector<User> getAllUsers(std::string JWTToken);
     std::vector<OrgInfo> getAllOrgs(std::string JWTToken);
