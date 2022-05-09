@@ -907,3 +907,63 @@ CourseInfo APIHandler::getCourse(int id, std::string JWTToken)
 
     return courseInfo;
 }
+
+TopicInfo APIHandler::getTopic(int id, std::string JWTToken)
+{
+    auto r = cpr::Get(cpr::Url{ "http://localhost:18080/api/topics/" + std::to_string(id) },
+        cpr::Bearer({ JWTToken }));
+
+    nlohmann::json JSONRes;
+
+    try
+    {
+        JSONRes = nlohmann::json::parse(r.text);
+    }
+    catch (nlohmann::json::parse_error& ex)
+    {
+        // Send error
+        TopicInfo error;
+        error.errors = "There is a problem with the server! Please try again later!";
+        return { error };
+    }
+
+    TopicInfo topicInfo;
+
+    if (JSONRes["type"] == "get-topic-success")
+    {
+
+        topicInfo.id = JSONRes["topic-id"];
+        topicInfo.name = JSONRes["topic-name"];
+        topicInfo.courseId = JSONRes["course-id"];
+
+        for (auto it = JSONRes["topic-quizzes"].begin(); it != JSONRes["topic-quizzes"].end(); ++it)
+        {
+            topicInfo.quizzes.push_back(
+                {
+                    it.value()["quiz-id"],
+                    topicInfo.id,
+                    it.value()["quiz-name"]
+                }
+            );
+        }
+
+        for (auto it = JSONRes["topic-lessons"].begin(); it != JSONRes["topic-lessons"].end(); ++it)
+        {
+            topicInfo.lessons.push_back(
+                {
+                    it.value()["lesson-id"],
+                    topicInfo.id,
+                    it.value()["lesson-name"]
+                }
+            );
+        }
+    }
+    else
+    {
+        TopicInfo error;
+        error.errors = "There is a problem with the server! Please try again later!";
+        return { error };
+    }
+
+    return topicInfo;
+}

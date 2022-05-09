@@ -1502,7 +1502,7 @@ void SceneManager::LoadScenes()
 				User userData;
 
 				sceneContext->isAuth = true;
-				sceneContext->JWTToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJleHAiOjE2NTIxMzgwMzYsImlhdCI6MTY1MjA1MTYzNiwiaXNBZG1pbiI6MCwic3ViIjoiMyJ9.T0yVQ9PWKVJ4-ehRfyk-8Ifr0pal8ZXVa2E_5TscEBo";
+				sceneContext->JWTToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJleHAiOjE2NTIxNDMzNTksImlhdCI6MTY1MjA1Njk1OSwiaXNBZG1pbiI6MCwic3ViIjoiMiJ9.FZuDtASJb79hfGlMOy2rgW95AHmEQ9FsDWCbXVaHno8";
 
 				std::string recordSet = apiHandler.getUserInfo("@me", sceneContext, userData);
 
@@ -2358,7 +2358,7 @@ void SceneManager::LoadScenes()
 			{
 				clearConsole();
 				char key; // Key to be entered
-				int orgsCounter = 0;
+				int coursesCounter = 0;
 				int optionCounter = 0;
 
 				APIHandler apiHandler;
@@ -2387,7 +2387,7 @@ void SceneManager::LoadScenes()
 					{
 						outputPosition(4, posy); std::cout << "-->";
 
-						if (i == orgsCounter)
+						if (i == coursesCounter)
 						{
 							setConsoleColorTo(6); outputPosition(9, posy); std::cout << courseInfo.topics[i].name;
 							outputPosition(60, posy);
@@ -2412,56 +2412,18 @@ void SceneManager::LoadScenes()
 
 					if (key == '\r')
 					{
-						/*
-						auto courseInfo = apiHandler.getCourse(courseInfo.courses[orgsCounter].id, sceneContext->JWTToken);
-						// try to get course info
-						if (courseInfo.errors.empty())
-						{
-							sceneContext->courseInfo = courseInfo;
-
-							int userRole = 0;
-
-							apiHandler.getUserInfo("@me", sceneContext, sceneContext->user);
-
-							for (auto& user : courseInfo.users)
-							{
-								if (user.id == std::stoi(sceneContext->user.id))
-								{
-									userRole = user.role;
-								}
-							}
-
-							switch (userRole)
-							{
-							case 1:
-								return "ViewOrgAsTeacher";
-								break;
-							case 2:
-								return "ViewOrgAsAdmin";
-								break;
-							case 0:
-							default:
-								return "ViewOrgAsUser";
-								break;
-							}
-						}
-						else
-						{
-							joinCourse(courseInfo.courses[orgsCounter].id, sceneContext->JWTToken);
-							clearConsole();
-							return "ViewOrgAsUser";
-						}
-						*/
+						sceneContext->topicInfo.id = courseInfo.topics[coursesCounter].id;
+						return "ViewTopicAsUser";
 					}
 
-					if (key == 72 && (orgsCounter >= 1 && orgsCounter <= courseInfo.topics.size())) // 72/75 is the ASCII code for the up arrow
+					if (key == 72 && (coursesCounter >= 1 && coursesCounter <= courseInfo.topics.size())) // 72/75 is the ASCII code for the up arrow
 					{
-						orgsCounter--;
+						coursesCounter--;
 					}
 
-					if (key == 80 && (orgsCounter >= 0 && orgsCounter < courseInfo.topics.size() - 1)) // 80/77 is the ASCII code for the up arrow
+					if (key == 80 && (coursesCounter >= 0 && coursesCounter < courseInfo.topics.size() - 1)) // 80/77 is the ASCII code for the up arrow
 					{
-						orgsCounter++;
+						coursesCounter++;
 					}
 				}
 
@@ -2552,6 +2514,12 @@ void SceneManager::LoadScenes()
 						return "NavigationBar";
 					}
 
+					if (key == '\r' && counter2 == 0)
+					{
+						sceneContext->topicInfo.id = courseInfo.topics[counter].id;
+						return "ViewTopicAsAuth";
+					}
+					
 					if (key == '\r' && counter2 == 1)
 					{
 						updateTopicsInCourse(courseInfo.topics[counter].name, courseInfo.topics[counter].id, sceneContext->JWTToken);
@@ -2584,6 +2552,316 @@ void SceneManager::LoadScenes()
 					}
 
 					if (key == 80 && (counter >= 0 && counter < courseInfo.topics.size()))
+					{
+						counter++;
+					}
+
+					if (key == 75 && (counter2 == 1) || key == 75 && (counter2 == 2)) // 72/75 is the ASCII code for the up arrow
+					{
+						counter2--;
+					}
+
+					if (key == 77 && (counter2 == 0) || key == 77 && (counter2 == 1)) // 80/77 is the ASCII code for the up arrow
+					{
+						counter2++;
+					}
+				}
+
+				return "ViewCourseAsAuth";
+			}
+		}
+	);
+
+	scenes.push_back(
+		{
+			12,
+			"ViewTopicAsUser",
+			[&]()
+			{
+				clearConsole();
+				char key; // Key to be entered
+				int orgsCounter = 0;
+				int optionCounter = 0;
+
+				APIHandler apiHandler;
+
+				TopicInfo topicsInfo = apiHandler.getTopic(sceneContext->topicInfo.id, sceneContext->JWTToken);
+
+				if (!topicsInfo.errors.empty())
+				{
+					std::cout << "There was problem with the server. Please try again latter!";
+
+					sceneContext->courseInfo = {};
+
+					(void)_getch();
+					return "NavigationBar";
+				}
+
+				sceneContext->topicInfo = topicsInfo;
+
+				while (true)
+				{
+					int posy = 5;
+
+					outputPosition(2, 3); setConsoleColorTo(6); std::cout << "C O U R S E   T O P I C S"; setConsoleColorTo(7);
+
+					for (int i = 0; i < topicsInfo.lessons.size(); i++)
+					{
+						outputPosition(4, posy); std::cout << "-->";
+
+						if (i == orgsCounter)
+						{
+							setConsoleColorTo(6); outputPosition(9, posy); std::cout << topicsInfo.lessons[i].name;
+							outputPosition(60, posy);
+						}
+						else
+						{
+							outputPosition(9, posy); std::cout << topicsInfo.lessons[i].name;
+						}
+
+
+						posy += 2;
+						setConsoleColorTo(7);
+					}
+
+					outputPosition(2, topicsInfo.lessons.size() + 7); setConsoleColorTo(6); std::cout << "C O U R S E   Q U I Z Z E S"; setConsoleColorTo(7);
+					posy += 2;
+
+					for (int i = 0; i < topicsInfo.quizzes.size(); i++)
+					{
+						outputPosition(4, posy); std::cout << "-->";
+
+						if (i + topicsInfo.lessons.size() == orgsCounter)
+						{
+							setConsoleColorTo(6); outputPosition(9, posy); std::cout << topicsInfo.quizzes[i].name;
+							outputPosition(60, posy);
+						}
+						else
+						{
+							outputPosition(9, posy); std::cout << topicsInfo.quizzes[i].name;
+						}
+
+
+						posy += 2;
+						setConsoleColorTo(7);
+					}
+
+					key = _getch();
+
+					if (key == 27)
+					{
+						clearConsole();
+						return "ViewCourseAsUser";
+					}
+
+					if (key == '\r')
+					{
+						/*
+						auto courseInfo = apiHandler.getCourse(courseInfo.courses[orgsCounter].id, sceneContext->JWTToken);
+						// try to get course info
+						if (courseInfo.errors.empty())
+						{
+							sceneContext->courseInfo = courseInfo;
+
+							int userRole = 0;
+
+							apiHandler.getUserInfo("@me", sceneContext, sceneContext->user);
+
+							for (auto& user : courseInfo.users)
+							{
+								if (user.id == std::stoi(sceneContext->user.id))
+								{
+									userRole = user.role;
+								}
+							}
+
+							switch (userRole)
+							{
+							case 1:
+								return "ViewOrgAsTeacher";
+								break;
+							case 2:
+								return "ViewOrgAsAdmin";
+								break;
+							case 0:
+							default:
+								return "ViewOrgAsUser";
+								break;
+							}
+						}
+						else
+						{
+							joinCourse(courseInfo.courses[orgsCounter].id, sceneContext->JWTToken);
+							clearConsole();
+							return "ViewOrgAsUser";
+						}
+						*/
+					}
+
+					if (key == 72 && (orgsCounter >= 1 && orgsCounter <= topicsInfo.lessons.size() + topicsInfo.quizzes.size())) // 72/75 is the ASCII code for the up arrow
+					{
+						orgsCounter--;
+					}
+
+					if (key == 80 && (orgsCounter >= 0 && orgsCounter < topicsInfo.lessons.size() + topicsInfo.quizzes.size() - 1)) // 80/77 is the ASCII code for the up arrow
+					{
+						orgsCounter++;
+					}
+				}
+
+				return "ViewOrgAsUser";
+			}
+		}
+	);
+
+	scenes.push_back(
+		{
+			13,
+			"ViewTopicAsAuth",
+			[&]()
+			{
+				clearConsole();
+				char key; // Key to be entered
+				int counter = 0, counter2 = 0;
+
+				APIHandler apiHandler;
+
+				TopicInfo topicInfo = apiHandler.getTopic(sceneContext->topicInfo.id, sceneContext->JWTToken);
+
+				if (!topicInfo.errors.empty())
+				{
+					std::cout << "There was problem with the server. Please try again latter!";
+
+					sceneContext->orgInfo = {};
+
+					(void)_getch();
+					return "NavigationBar";
+				}
+
+				sceneContext->topicInfo = topicInfo;
+
+				while (true)
+				{
+					int posy = 5;
+
+					outputPosition(2, 3); setConsoleColorTo(6); std::cout << "T O P I C  T O P I C S"; setConsoleColorTo(7);
+
+					for (int i = 0; i < topicInfo.lessons.size(); i++)
+					{
+						outputPosition(4, posy); std::cout << "-->";
+						if (i == counter)
+						{
+							setConsoleColorTo(6); outputPosition(9, posy); std::cout << topicInfo.lessons[i].name;
+							outputPosition(60, posy);
+							if (counter2 == 0)
+							{
+								setConsoleColorTo(2); std::cout << "Enter"; setConsoleColorTo(7); std::cout << " | Settings | Delete";
+							}
+							else if (counter2 == 1)
+							{
+								setConsoleColorTo(7); std::cout << "Enter | "; setConsoleColorTo(9); std::cout << "Settings"; setConsoleColorTo(7); std::cout << " | Delete";
+							}
+							else
+							{
+								setConsoleColorTo(7); std::cout << "Enter | Settings | "; setConsoleColorTo(4); std::cout << "Delete";
+							}
+						}
+						else
+						{
+							outputPosition(9, posy); std::cout << topicInfo.lessons[i].name;
+							outputPosition(60, posy); setConsoleColorTo(8); std::cout << "Enter | Settings | Delete";
+						}
+
+
+						posy += 2;
+						setConsoleColorTo(7);
+					}
+
+					outputPosition(2, topicInfo.lessons.size() + 7); setConsoleColorTo(6); std::cout << "T O P I C   Q U I Z Z E S"; setConsoleColorTo(7);
+					posy += 2;
+
+					for (int i = 0; i < topicInfo.lessons.size(); i++)
+					{
+						outputPosition(4, posy); std::cout << "-->";
+						if (i + topicInfo.lessons.size() == counter)
+						{
+							setConsoleColorTo(6); outputPosition(9, posy); std::cout << topicInfo.lessons[i].name;
+							outputPosition(60, posy);
+							if (counter2 == 0)
+							{
+								setConsoleColorTo(2); std::cout << "Enter"; setConsoleColorTo(7); std::cout << " | Settings | Delete";
+							}
+							else if (counter2 == 1)
+							{
+								setConsoleColorTo(7); std::cout << "Enter | "; setConsoleColorTo(9); std::cout << "Settings"; setConsoleColorTo(7); std::cout << " | Delete";
+							}
+							else
+							{
+								setConsoleColorTo(7); std::cout << "Enter | Settings | "; setConsoleColorTo(4); std::cout << "Delete";
+							}
+						}
+						else
+						{
+							outputPosition(9, posy); std::cout << topicInfo.lessons[i].name;
+							outputPosition(60, posy); setConsoleColorTo(8); std::cout << "Enter | Settings | Delete";
+						}
+
+
+						posy += 2;
+						setConsoleColorTo(7);
+					}
+
+					outputPosition(4, posy); std::cout << "-->";
+					topicInfo.lessons.size() + topicInfo.quizzes.size() == counter ? setConsoleColorTo(6) : setConsoleColorTo(7);
+					outputPosition(9, posy); std::cout << "Create Lesson";
+					setConsoleColorTo(7);
+
+					key = _getch();
+
+					if (key == 27)
+					{
+						clearConsole();
+						return "NavigationBar";
+					}
+
+					if (key == '\r' && counter == topicInfo.lessons.size())
+					{
+						addTopicsInCourse(topicInfo.id, sceneContext->JWTToken);
+						return "NavigationBar";
+					}
+
+					if (key == '\r' && counter2 == 1)
+					{
+						updateTopicsInCourse(topicInfo.lessons[counter].name, topicInfo.lessons[counter].id, sceneContext->JWTToken);
+						return "NavigationBar";
+					}
+
+					if (key == '\r' && counter2 == 2)
+					{
+						std::string recordSet = apiHandler.deleteTopic(topicInfo.lessons[counter].id, sceneContext->JWTToken);
+
+						outputPosition(4, posy + 2);
+
+						if (recordSet.empty())
+						{
+							std::cout << "Topic deleted successfully! Press any key to continue...";
+							(void)_getch();
+							clearConsole();
+							return "NavigationBar";
+						}
+
+						std::cout << recordSet;
+						(void)_getch();
+
+						return "NavigationBar";
+					}
+
+					if (key == 72 && (counter >= 1 && counter <= topicInfo.lessons.size() + topicInfo.quizzes.size()))
+					{
+						counter--;
+					}
+
+					if (key == 80 && (counter >= 0 && counter < topicInfo.lessons.size() + topicInfo.quizzes.size()))
 					{
 						counter++;
 					}
