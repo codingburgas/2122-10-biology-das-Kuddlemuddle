@@ -93,7 +93,7 @@ struct LessonInfo
     int topicId; /*!< ID of the topic */
     std::string name; /*!< Name of the lesson */
     std::string data; /*!< Data of the lesson */
-    std::vector<std::string> errors; /*!< Errors for this the lesson */
+    std::string errors; /*!< Errors for this the lesson */
 };
 
 /**
@@ -194,6 +194,7 @@ public:
     OrgInfo getOrg(std::string name, std::string JWTToken);
     CourseInfo getCourse(int id, std::string JWTToken);
     TopicInfo getTopic(int id, std::string JWTToken);
+    LessonInfo getLesson(int id, std::string JWTToken);
 private:
 
 };

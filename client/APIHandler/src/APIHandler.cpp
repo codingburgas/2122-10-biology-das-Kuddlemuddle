@@ -1009,3 +1009,42 @@ TopicInfo APIHandler::getTopic(int id, std::string JWTToken)
 
     return topicInfo;
 }
+
+LessonInfo APIHandler::getLesson(int id, std::string JWTToken)
+{
+    auto r = cpr::Get(cpr::Url{ "http://localhost:18080/api/lessons/" + std::to_string(id) },
+        cpr::Bearer({ JWTToken }));
+
+    nlohmann::json JSONRes;
+
+    try
+    {
+        JSONRes = nlohmann::json::parse(r.text);
+    }
+    catch (nlohmann::json::parse_error& ex)
+    {
+        // Send error
+        LessonInfo error;
+        error.errors = "There is a problem with the server! Please try again later!";
+        return { error };
+    }
+
+    LessonInfo lessonInfo;
+
+    if (JSONRes["type"] == "get-lesson-success")
+    {
+
+        lessonInfo.id = JSONRes["lesson-id"];
+        lessonInfo.name = JSONRes["lesson-name"];
+        lessonInfo.data = JSONRes["lesson-data"];
+        lessonInfo.topicId = JSONRes["topic-id"];
+    }
+    else
+    {
+        LessonInfo error;
+        error.errors = "There is a problem with the server! Please try again later!";
+        return { error };
+    }
+
+    return lessonInfo;
+}

@@ -1150,8 +1150,6 @@ void manageCourseOptions(std::string courseName, int courseId, std::string JWTTo
 		{
 			optionCounter++;
 		}
-
-		
 	}
 }
 
@@ -1313,6 +1311,21 @@ void createLesson(int topicId, std::string JWTToken)
 	}
 
 	outputPosition(15, 31); std::cout << recordSet;
+
+	(void)_getch();
+
+	return;
+}
+
+void displayLesson(int lessonId, std::string JWTToken)
+{
+	clearConsole();
+	APIHandler apiHandler;
+	LessonInfo lessonInfo = apiHandler.getLesson(lessonId, JWTToken);
+
+	outputPosition(2, 6); setConsoleColorTo(6); std::cout << "L E S S O N: "; std::cout << lessonInfo.name; setConsoleColorTo(7);
+
+	outputPosition(2, 9); std::cout << lessonInfo.data;
 
 	(void)_getch();
 
@@ -2892,9 +2905,9 @@ void SceneManager::LoadScenes()
 						return "ViewCourseAsAuth";
 					}
 
-					if (key == '\r' && counter2 == 1)
+					if (key == '\r' && counter2 == 0 && counter < topicInfo.lessons.size())
 					{
-						updateTopicsInCourse(topicInfo.lessons[counter].name, topicInfo.lessons[counter].id, sceneContext->JWTToken);
+						displayLesson(topicInfo.lessons[counter].id, sceneContext->JWTToken);
 						return "ViewCourseAsAuth";
 					}
 
