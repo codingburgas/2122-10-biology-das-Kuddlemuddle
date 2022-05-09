@@ -2902,27 +2902,27 @@ void SceneManager::LoadScenes()
 					if (key == '\r' && counter == topicInfo.lessons.size())
 					{
 						createLesson(topicInfo.id, sceneContext->JWTToken);
-						return "ViewCourseAsAuth";
+						return "ViewTopicAsAuth";
 					}
 
 					if (key == '\r' && counter2 == 0 && counter < topicInfo.lessons.size())
 					{
 						displayLesson(topicInfo.lessons[counter].id, sceneContext->JWTToken);
-						return "ViewCourseAsAuth";
+						return "ViewTopicAsAuth";
 					}
 
-					if (key == '\r' && counter2 == 2)
+					if (key == '\r' && counter2 == 2 && counter < topicInfo.lessons.size())
 					{
-						std::string recordSet = apiHandler.deleteTopic(topicInfo.lessons[counter].id, sceneContext->JWTToken);
+						std::string recordSet = apiHandler.deleteLesson(topicInfo.lessons[counter].id, sceneContext->JWTToken);
 
 						outputPosition(4, posy + 2);
 
 						if (recordSet.empty())
 						{
-							std::cout << "Topic deleted successfully! Press any key to continue...";
+							std::cout << "Lesson deleted successfully! Press any key to continue...";
 							(void)_getch();
 							clearConsole();
-							return "ViewCourseAsAuth";
+							return "ViewTopicAsAuth";
 						}
 
 						std::cout << recordSet;
