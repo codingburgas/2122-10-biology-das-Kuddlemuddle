@@ -1209,6 +1209,59 @@ void addTopicsInCourse(int courseId, std::string JWTToken)
 	return;
 }
 
+void updateTopicsInCourse(std::string topicName, int topicId, std::string JWTToken)
+{
+	clearConsole();
+
+	char key; // Key to be entered
+	int counter = 0, counter2 = 0;
+
+	int posy = 5;
+
+	while (true)
+	{
+		createInputField(posy + 3, "  TOPIC NAME", 40, 4, 7, topicName);
+		key = _getch();
+
+		if (key == '\r')
+		{
+			break;
+		}
+
+		else
+		{
+			if (key == '\b')
+			{
+				topicName = topicName.substr(0, topicName.size() - 1);
+			}
+
+			else
+			{
+				topicName += key;
+			}
+
+		}
+	}
+
+	APIHandler apiHandler;
+	std::string recordSet = apiHandler.updateTopic(topicName, topicId, JWTToken);
+
+	if (recordSet.empty())
+	{
+		outputPosition(15, 31); std::cout << "The topic was updated successfully! Press any key to continue!";
+
+		(void)_getch();
+
+		return;
+	}
+
+	outputPosition(15, 31); std::cout << recordSet;
+
+	(void)_getch();
+
+	return;
+}
+
 void SceneManager::LoadScenes()
 {
 	SceneContex* sceneContext = new SceneContex();
@@ -2496,6 +2549,12 @@ void SceneManager::LoadScenes()
 					if (key == '\r' && counter == courseInfo.topics.size())
 					{
 						addTopicsInCourse(courseInfo.id, sceneContext->JWTToken);
+						return "NavigationBar";
+					}
+
+					if (key == '\r' && counter2 == 1)
+					{
+						updateTopicsInCourse(courseInfo.topics[counter].name, courseInfo.topics[counter].id, sceneContext->JWTToken);
 						return "NavigationBar";
 					}
 					
