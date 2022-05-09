@@ -409,10 +409,13 @@ std::string viewOrganisation(std::string JWTToken, SceneContex* sceneContext)
 	APIHandler apiHandler;
 
 	auto orgsInfo = apiHandler.getAllOrgs(JWTToken);
-
-	if (!orgsInfo[0].errors.empty())
+	
+	if (!orgsInfo.empty())
 	{
-		std::cout << "There was problem with the server. Please try again latter!";
+		if (!orgsInfo[0].errors.empty())
+		{
+			std::cout << "There was problem with the server. Please try again latter!";
+		}
 	}
 
 	while (true)
@@ -2007,7 +2010,7 @@ void SceneManager::LoadScenes()
 				User userData;
 
 				sceneContext->isAuth = true;
-				sceneContext->JWTToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJleHAiOjE2NTIxNDMzNTksImlhdCI6MTY1MjA1Njk1OSwiaXNBZG1pbiI6MCwic3ViIjoiMiJ9.FZuDtASJb79hfGlMOy2rgW95AHmEQ9FsDWCbXVaHno8";
+				sceneContext->JWTToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJleHAiOjE2NTIxNjM0OTEsImlhdCI6MTY1MjA3NzA5MSwiaXNBZG1pbiI6MCwic3ViIjoiMSJ9.Ch_NwjZYuZD2f7rpp0dgzF3Grmz9BN0Sm6bcYcnuu-I";
 
 				std::string recordSet = apiHandler.getUserInfo("@me", sceneContext, userData);
 

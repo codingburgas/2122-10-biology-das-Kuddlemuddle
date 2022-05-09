@@ -9,7 +9,6 @@ void Application::init(
 	SceneManager& sceneManager
 )
 {
-	// Hide the cursor
 	setCursorVisibilityTo(false);
 
 	sceneManager.LoadScenes();
@@ -19,6 +18,7 @@ void Application::run(
 	SceneManager& sceneManager
 )
 {
+	// Based on that load the first scene
 	std::string nextSceneName = "NavigationBar";
 	
 	while (true)

@@ -771,6 +771,13 @@ std::vector<OrgInfo> DBManager::getAllOrgsInfo(int userId)
 		}
 
 	}
+	
+	if (recordSet.empty())
+	{
+		OrgInfo error;
+		error.errors.push_back("The organisation file is empty!");
+		recordSet.push_back(error);
+	}
 
 	return recordSet;
 }
