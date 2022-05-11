@@ -1,0 +1,6 @@
+[submodule "server/server/include/boost"]
+	path = server/server/include/boost
+	url = https://github.com/SSIvanov19/boost
+[submodule "doxygen-awesome-css"]
+	path = doxygen-awesome-css
+	url = https://github.com/jothepro/doxygen-awesome-css.git
